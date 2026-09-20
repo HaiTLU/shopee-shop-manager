@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+
+# Token cua shop - tuyet doi khong day len git
+data/
+*.token.json
+token.json
+
+# Log va tam
+*.log
+.DS_Store
+dist/

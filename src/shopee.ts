@@ -1,0 +1,163 @@
+/**
+ * Khoi tao SDK Shopee va va lo hong gia han token.
+ *
+ * SDK goc tu gia han khi token het han, nhung KHONG co khoa. Vi refresh_token
+ * cua Shopee chi dung duoc mot lan, hai lenh goi cung luc se lam hong ket noi.
+ * Tep nay thay ham gia han cua SDK bang mot ban co hai lop chan:
+ *
+ * 1. Gop lenh trong cung tien trinh: nhieu lenh goi cung doi mot loi hua.
+ * 2. Khoa lien tien trinh: neu chay nhieu ban sao (vi du PM2 cluster), chi
+ *    mot ban duoc gia han, cac ban con lai doc lai token vua duoc ghi.
+ */
+import { ShopeeSDK } from "@congminh1254/shopee-sdk";
+import type { AccessToken } from "@congminh1254/shopee-sdk/schemas";
+import { config } from "./config.js";
+import { FileTokenStorage, withLock, type StoredToken } from "./tokenStore.js";
+
+/**
+ * Khoang an toan truoc khi token het han (mili giay).
+ *
+ * SDK da tru san 60 giay khi tinh expired_at. Cong them 5 phut o day de mot
+ * lenh goi dai khong bi het han giua chung.
+ */
+const SAFETY_MARGIN_MS = 5 * 60 * 1000;
+
+/** refresh_token cua Shopee song 30 ngay ke tu lan gia han gan nhat. */
+const REFRESH_TOKEN_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
+
+export const tokenStorage = new FileTokenStorage(config.tokenFile);
+
+export const sdk = new ShopeeSDK(
+  {
+    partner_id: config.partnerId,
+    partner_key: config.partnerKey,
+    region: config.region,
+  },
+  tokenStorage,
+);
+
+/** Loi hua gia han dang chay, de gop cac lenh goi song song. */
+let inflightRefresh: Promise<AccessToken | null> | null = null;
+
+/**
+ * True khi token con han dung duoc, tinh ca khoang an toan.
+ *
+ * Co y KHONG khai bao la ham thu hep kieu (`token is StoredToken`): neu lam
+ * vay, TypeScript se thu hep nhanh `else` xuong `never` va cac dong sau khong
+ * truy cap duoc truong nao nua.
+ */
+function isUsable(token: StoredToken | null): boolean {
+  if (!token?.access_token) return false;
+  if (!token.expired_at) return false;
+  return token.expired_at > Date.now() + SAFETY_MARGIN_MS;
+}
+
+/**
+ * Gia han token, dam bao ca he thong chi co dung mot lenh gia han chay.
+ *
+ * Ham nay thay the ShopeeSDK.refreshToken nen duoc goi ca tu ben trong SDK
+ * moi khi SDK thay token het han.
+ */
+async function guardedRefresh(shopId?: number, merchantId?: number): Promise<AccessToken | null> {
+  if (inflightRefresh) return inflightRefresh;
+
+  inflightRefresh = withLock(tokenStorage.lockPath, async () => {
+    // Doc lai sau khi da giu khoa: co the mot tien trinh khac vua gia han xong
+    // trong luc minh dang xep hang. Neu vay thi dung luon, khong gia han nua.
+    const current = await tokenStorage.get();
+    if (!current) {
+      throw new Error(
+        "Chua co token nao duoc luu. Mo /auth/start tren trinh duyet de uy quyen shop.",
+      );
+    }
+    if (isUsable(current)) return current;
+
+    const ageMs = current.obtained_at ? Date.now() - current.obtained_at : null;
+    if (ageMs !== null && ageMs > REFRESH_TOKEN_LIFETIME_MS) {
+      throw new Error(
+        `refresh_token da qua han 30 ngay (lan gia han gan nhat cach day ${Math.floor(
+          ageMs / 86_400_000,
+        )} ngay). Phai vao /auth/start de uy quyen lai shop.`,
+      );
+    }
+
+    const fresh = await sdk.auth.getRefreshToken(
+      current.refresh_token,
+      shopId ?? current.shop_id,
+      merchantId,
+    );
+    if (fresh.error) {
+      throw new Error(
+        `Shopee tu choi gia han token: ${fresh.error} - ${fresh.message}. ` +
+          "Neu loi la invalid_refresh_token thi phai uy quyen lai shop tai /auth/start.",
+      );
+    }
+
+    // Ghi khi dang giu khoa, dung writeUnlocked de khong tu khoa chinh minh.
+    await tokenStorage.writeUnlocked(fresh);
+    return fresh;
+  }).finally(() => {
+    inflightRefresh = null;
+  });
+
+  return inflightRefresh;
+}
+
+sdk.refreshToken = guardedRefresh;
+
+/** Tinh trang token hien tai, dung cho trang theo doi va lenh cli. */
+export async function tokenStatus(): Promise<{
+  connected: boolean;
+  shopId?: number;
+  accessTokenExpiresInMinutes?: number;
+  refreshTokenExpiresInDays?: number;
+  needsReauthorization: boolean;
+}> {
+  const token = await tokenStorage.get();
+  if (!token?.access_token) {
+    return { connected: false, needsReauthorization: true };
+  }
+
+  const accessMs = token.expired_at ? token.expired_at - Date.now() : 0;
+  const refreshMs = token.obtained_at
+    ? token.obtained_at + REFRESH_TOKEN_LIFETIME_MS - Date.now()
+    : 0;
+
+  return {
+    connected: true,
+    ...(token.shop_id !== undefined ? { shopId: token.shop_id } : {}),
+    accessTokenExpiresInMinutes: Math.floor(accessMs / 60_000),
+    refreshTokenExpiresInDays: Math.floor(refreshMs / 86_400_000),
+    needsReauthorization: refreshMs <= 0,
+  };
+}
+
+/**
+ * Chu dong gia han token theo dinh ky.
+ *
+ * Khong bat buoc, vi SDK da tu gia han khi can. Nhung neu shop im ang hon 30
+ * ngay (nghi Tet chang han) thi refresh_token chet han va phai uy quyen lai
+ * bang tay. Vong lap nay giu ket noi song.
+ */
+export function startTokenKeepalive(): NodeJS.Timeout | null {
+  if (config.keepaliveMinutes <= 0) return null;
+
+  const intervalMs = config.keepaliveMinutes * 60 * 1000;
+  const timer = setInterval(() => {
+    void (async () => {
+      try {
+        const token = await tokenStorage.get();
+        if (!token) return;
+        if (isUsable(token)) return;
+        await guardedRefresh();
+        console.log("[token] Da gia han token tu dong.");
+      } catch (error) {
+        console.error("[token] Gia han tu dong that bai:", (error as Error).message);
+      }
+    })();
+  }, intervalMs);
+
+  // Khong giu tien trinh song chi vi cai hen gio nay.
+  timer.unref();
+  return timer;
+}

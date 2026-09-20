@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quan ly shop Shopee</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #666666;
+    --line: #d5d5d5;
+    --accent: #1a1a1a;
+    --warn-bg: #fff8e1;
+    --warn-line: #e0c060;
+    --ok-bg: #edf7ed;
+    --ok-line: #8fbf8f;
+    --err-bg: #fdecea;
+    --err-line: #d98a80;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161616; --fg: #ececec; --muted: #a0a0a0; --line: #3a3a3a; --accent: #ececec;
+      --warn-bg: #3a3320; --warn-line: #7a6a35;
+      --ok-bg: #1f3020; --ok-line: #4a7a4a;
+      --err-bg: #3a2220; --err-line: #8a4a44;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px; background: var(--bg); color: var(--fg);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1060px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+  .bar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 18px;
+  }
+  .bar.ok  { background: var(--ok-bg);  border-color: var(--ok-line); }
+  .bar.warn{ background: var(--warn-bg);border-color: var(--warn-line); }
+  .bar.err { background: var(--err-bg); border-color: var(--err-line); }
+  .bar .grow { flex: 1 1 auto; min-width: 200px; }
+  button, .btn {
+    font: inherit; padding: 7px 14px; border: 1px solid var(--accent); border-radius: 6px;
+    background: var(--accent); color: var(--bg); cursor: pointer; text-decoration: none;
+  }
+  button.ghost, .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+  button:disabled { opacity: .5; cursor: default; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle; text-align: center; }
+  th { font-weight: 600; background: transparent; }
+  td.name { text-align: left; max-width: 340px; }
+  td.name small { color: var(--muted); display: block; }
+  input[type=number] {
+    font: inherit; width: 110px; padding: 5px 7px; text-align: right;
+    border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--fg);
+  }
+  .thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid var(--line); }
+  .muted { color: var(--muted); }
+  .rowmsg { font-size: 12px; }
+  .rowmsg.ok { color: #2e7d32; }
+  .rowmsg.err { color: #c62828; }
+  .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
+  .empty { padding: 40px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; }
+  @media (max-width: 720px) {
+    td.name { max-width: none; }
+    .thumb { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quan ly shop Shopee</h1>
+  <p class="sub">Sua gia va ton kho truc tiep. Moi thay doi duoc day thang len Shopee.</p>
+
+  <div id="bar" class="bar">
+    <span class="grow">Dang kiem tra ket noi...</span>
+  </div>
+
+  <div id="content"></div>
+</main>
+
+<script>
+const state = { offset: 0, pageSize: 20, hasNext: false, total: 0 };
+
+const el = (tag, props = {}, children = []) => {
+  const node = Object.assign(document.createElement(tag), props);
+  for (const child of [].concat(children)) {
+    if (child != null) node.append(child);
+  }
+  return node;
+};
+
+const money = (value) =>
+  typeof value === "number" ? value.toLocaleString("vi-VN") : "-";
+
+async function api(path, options) {
+  const res = await fetch(path, options);
+  const text = await res.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text }; }
+  if (!res.ok) throw new Error(data.error || `Loi HTTP ${res.status}`);
+  return data;
+}
+
+async function renderStatus() {
+  const bar = document.getElementById("bar");
+  bar.textContent = "";
+  try {
+    const s = await api("/auth/status");
+    if (!s.connected) {
+      bar.className = "bar warn";
+      bar.append(
+        el("span", { className: "grow", textContent: "Chua ket noi shop nao." }),
+        el("a", { className: "btn", href: "/auth/start", textContent: "Ket noi shop Shopee" }),
+      );
+      return false;
+    }
+    const lowRefresh = s.refreshTokenExpiresInDays <= 3;
+    bar.className = lowRefresh ? "bar warn" : "bar ok";
+    bar.append(
+      el("span", {
+        className: "grow",
+        textContent:
+          `Da ket noi shop ${s.shopId}. Token con ${s.accessTokenExpiresInMinutes} phut, ` +
+          `ma gia han con ${s.refreshTokenExpiresInDays} ngay.`,
+      }),
+      el("a", { className: "btn ghost", href: "/auth/start", textContent: "Uy quyen lai" }),
+    );
+    return true;
+  } catch (error) {
+    bar.className = "bar err";
+    bar.textContent = `Khong doc duoc tinh trang ket noi: ${error.message}`;
+    return false;
+  }
+}
+
+function productRow(item) {
+  const msg = el("div", { className: "rowmsg" });
+  const priceInput = el("input", { type: "number", min: "1", step: "1", value: item.original_price ?? "" });
+  const stockInput = el("input", { type: "number", min: "0", step: "1", value: item.available_stock ?? "" });
+
+  const save = async (kind) => {
+    msg.className = "rowmsg muted";
+    msg.textContent = "Dang luu...";
+    try {
+      if (kind === "price") {
+        await api(`/api/products/${item.item_id}/price`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ original_price: Number(priceInput.value) }),
+        });
+      } else {
+        await api(`/api/products/${item.item_id}/stock`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stock: Number(stockInput.value) }),
+        });
+      }
+      msg.className = "rowmsg ok";
+      msg.textContent = "Da luu len Shopee.";
+    } catch (error) {
+      msg.className = "rowmsg err";
+      msg.textContent = error.message;
+    }
+  };
+
+  const priceBtn = el("button", { className: "ghost", textContent: "Luu gia" });
+  priceBtn.addEventListener("click", () => save("price"));
+  const stockBtn = el("button", { className: "ghost", textContent: "Luu ton" });
+  stockBtn.addEventListener("click", () => save("stock"));
+
+  const hasModelNote = item.has_model
+    ? el("small", { className: "muted", textContent: "Co bien the - sua o day chi ap cho bien the mac dinh" })
+    : null;
+
+  return el("tr", {}, [
+    el("td", {}, item.image ? el("img", { className: "thumb", src: item.image, alt: "" }) : ""),
+    el("td", { className: "name" }, [
+      el("span", { textContent: item.item_name ?? "(khong ten)" }),
+      el("small", { textContent: `Ma ${item.item_id}${item.item_sku ? " - SKU " + item.item_sku : ""}` }),
+      hasModelNote,
+    ]),
+    el("td", {}, [priceInput, el("div", {}, priceBtn)]),
+    el("td", {}, [
+      stockInput,
+      el("div", {}, stockBtn),
+      item.reserved_stock
+        ? el("small", { className: "muted", textContent: `Dang giu cho khuyen mai: ${item.reserved_stock}` })
+        : null,
+    ]),
+    el("td", {}, [el("div", { className: "muted", textContent: `Dang ban: ${money(item.current_price)}` }), msg]),
+  ]);
+}
+
+async function renderProducts() {
+  const content = document.getElementById("content");
+  content.textContent = "";
+  content.append(el("p", { className: "muted", textContent: "Dang tai danh sach san pham..." }));
+
+  try {
+    const data = await api(`/api/products?offset=${state.offset}&page_size=${state.pageSize}`);
+    state.hasNext = data.has_next_page;
+    state.total = data.total_count;
+    content.textContent = "";
+
+    if (!data.items.length) {
+      content.append(el("div", { className: "empty", textContent: "Shop chua co san pham nao dang ban." }));
+      return;
+    }
+
+    const head = el("tr", {}, ["Anh", "San pham", "Gia goc", "Ton kho", "Ghi chu"].map((t) => el("th", { textContent: t })));
+    const table = el("table", {}, [
+      el("thead", {}, head),
+      el("tbody", {}, data.items.map(productRow)),
+    ]);
+
+    const prev = el("button", { className: "ghost", textContent: "Trang truoc", disabled: state.offset === 0 });
+    prev.addEventListener("click", () => {
+      state.offset = Math.max(0, state.offset - state.pageSize);
+      renderProducts();
+    });
+    const next = el("button", { className: "ghost", textContent: "Trang sau", disabled: !state.hasNext });
+    next.addEventListener("click", () => {
+      state.offset = data.next_offset;
+      renderProducts();
+    });
+
+    content.append(
+      table,
+      el("div", { className: "pager" }, [
+        prev,
+        el("span", { className: "muted", textContent: `Tong ${state.total} san pham` }),
+        next,
+      ]),
+    );
+  } catch (error) {
+    content.textContent = "";
+    content.append(el("div", { className: "empty", textContent: error.message }));
+  }
+}
+
+(async () => {
+  if (await renderStatus()) await renderProducts();
+})();
+</script>
+</body>
+</html>
