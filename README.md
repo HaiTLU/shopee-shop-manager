@@ -90,6 +90,15 @@ Lớp bảo vệ nằm ở `src/shopee.ts` và `src/tokenStore.ts`, gồm hai t�
 - Nhận thông báo đẩy từ Shopee thay vì hỏi liên tục
 - Đối soát tiền về
 
+## Skill cho Claude Code
+
+Nằm trong `.claude/skills/`, Claude tự nạp khi gặp đúng tình huống, gọi tay bằng `/<ten-skill>`.
+
+| Skill | Dùng khi |
+|---|---|
+| `goi-api-shopee` | Thêm lệnh gọi API, sửa giá hoặc tồn kho, sửa ủy quyền và gia hạn token |
+| `kiem-tra-truoc-khi-push` | Trước mọi commit và push |
+
 ## Giấy phép
 
 MIT
