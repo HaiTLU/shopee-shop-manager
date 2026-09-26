@@ -34,6 +34,7 @@ npm run cli -- exchange "<đường dẫn>"  # Hoàn tất ủy quyền bằng t
 npm run cli -- refresh      # Gia hạn token ngay
 npm run cli -- shop         # Thông tin shop
 npm run cli -- products 20  # Liệt kê 20 sản phẩm đầu
+npm run cli -- tao-san-pham-thu 3  # Tạo 3 sản phẩm thử, CHỈ chạy trên môi trường thử nghiệm
 ```
 
 **Hoàn tất ủy quyền bằng tay:** nếu sau khi bấm đồng ý trên Shopee mà trình duyệt báo không mở được trang (máy chủ chưa chạy, hoặc chạy ở máy khác), đừng bấm lại. Chép nguyên đường dẫn trên thanh địa chỉ, dán vào lệnh `exchange` trong vòng vài phút. Mã `code` trong đường dẫn chỉ dùng được một lần.
@@ -42,7 +43,7 @@ npm run cli -- products 20  # Liệt kê 20 sản phẩm đầu
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 26 bài kiểm thử
+npm test            # 32 bài kiểm thử
 ```
 
 ## Cấu trúc
