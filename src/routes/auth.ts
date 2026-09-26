@@ -61,7 +61,9 @@ authRouter.get("/callback", async (req, res) => {
       .status(400)
       .send(
         "Ma state khong hop le hoac da qua han. Hay bat dau lai tu /auth/start " +
-          "thay vi mo truc tiep duong dan callback.",
+          "thay vi mo truc tiep duong dan callback. Neu duong dan uy quyen duoc tao " +
+          "bang lenh auth-url thi day la binh thuong: chep nguyen duong dan tren thanh " +
+          'dia chi va chay npm run cli -- exchange "<duong dan>" trong vai phut.',
       );
     return;
   }

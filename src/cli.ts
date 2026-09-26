@@ -34,15 +34,24 @@ async function main(): Promise<void> {
         console.log(`Ma gia han con:  ${status.refreshTokenExpiresInDays} ngay`);
       }
       if (status.needsReauthorization) {
-        console.log("Can uy quyen lai: chay lenh auth-url roi mo duong dan do tren trinh duyet.");
+        console.log(
+          `Can uy quyen: chay 'npm start', mo http://localhost:${config.port} tren trinh duyet ` +
+            "roi bam 'Ket noi shop Shopee'.",
+        );
       }
       break;
     }
 
     case "auth-url": {
       console.log(sdk.getAuthorizationUrl(config.redirectUri, { auth_type: "seller" }));
-      console.log("\nMo duong dan tren, dang nhap tai khoan nguoi ban va bam dong y.");
-      console.log("Nho chay 'npm start' truoc de may chu san sang nhan ket qua tra ve.");
+      // Duong dan nay khong di qua /auth/start nen khong co ma state. Trang
+      // callback cua may chu se tu choi (dung nhu thiet ke chong gia mao) va
+      // KHONG dung toi code, nen van doi code lay token bang lenh exchange duoc.
+      console.log("\nCach nay chi dung khi khong mo duoc trang web. Binh thuong hay bam nut tren trang web.");
+      console.log("1. Mo duong dan tren, dang nhap tai khoan nguoi ban va bam dong y.");
+      console.log("2. Trinh duyet se bao loi 'Ma state khong hop le'. Day la binh thuong.");
+      console.log("3. Chep NGUYEN duong dan tren thanh dia chi, chay trong vai phut:");
+      console.log('   npm run cli -- exchange "<duong dan vua chep>"');
       break;
     }
 
