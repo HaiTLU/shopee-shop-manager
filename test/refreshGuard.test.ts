@@ -227,11 +227,17 @@ test("tokenStatus bao dung tinh trang khi chua ket noi", async () => {
 test("tokenStatus bao dung so ngay con lai cua ma gia han", async () => {
   await tokenStorage.store(expiredToken("cu"));
   const current = await tokenStorage.get();
-  await tokenStorage.store({ ...current!, obtained_at: Date.now() - 10 * 24 * 60 * 60 * 1000 });
+  // Lui them 1 gio de so ngay con lai (19 ngay 23 gio) khong nam dung ranh gioi
+  // ngay tron. Neu dat dung 10 ngay, ket qua la 19 hay 20 tuy hai lan doc dong
+  // ho co roi vao cung mot mili giay hay khong, va bai kiem thu se chap chon.
+  await tokenStorage.store({
+    ...current!,
+    obtained_at: Date.now() - 10 * 24 * 60 * 60 * 1000 - 60 * 60 * 1000,
+  });
 
   const status = await tokenStatus();
   assert.equal(status.connected, true);
   assert.equal(status.shopId, 12345);
-  assert.equal(status.refreshTokenExpiresInDays, 19, "30 ngay tru 10 ngay da troi qua, con 19 ngay tron");
+  assert.equal(status.refreshTokenExpiresInDays, 19, "con 19 ngay 23 gio thi hien 19 ngay");
   assert.equal(status.needsReauthorization, false);
 });
