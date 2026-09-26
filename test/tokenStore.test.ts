@@ -140,3 +140,11 @@ test("khoa cu bi bo lai do may tat dot ngot se duoc don di", async () => {
   });
   assert.ok(ran, "khoa qua cu phai bi don, neu khong he thong ket vinh vien");
 });
+
+test("lan dau luu token khi thu muc chua ton tai thi tu tao thu muc", async () => {
+  // Tai hien loi that tren may PM: data/ chua co, khoa duoc tao TRUOC khi tao
+  // thu muc nen bao ENOENT va token Shopee vua cap bi mat.
+  const store = new FileTokenStorage(path.join(tmpRoot, `chua-co-${Date.now()}`, "data", "token.json"));
+  await store.store(sampleToken);
+  assert.equal((await store.get())?.access_token, "acc-1");
+});

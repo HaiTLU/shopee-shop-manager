@@ -40,6 +40,10 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function withLock<T>(lockPath: string, fn: () => Promise<T>): Promise<T> {
   const deadline = Date.now() + LOCK_TIMEOUT_MS;
 
+  // Lan dau chay, thu muc data/ chua ton tai. Thieu buoc nay thi tao tep khoa
+  // bao ENOENT va token Shopee vua cap bi mat ngay luc uy quyen.
+  await fs.mkdir(path.dirname(lockPath), { recursive: true });
+
   for (;;) {
     try {
       const handle = await fs.open(lockPath, "wx");
