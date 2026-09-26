@@ -25,6 +25,12 @@ const SAFETY_MARGIN_MS = 5 * 60 * 1000;
 /** refresh_token cua Shopee song 30 ngay ke tu lan gia han gan nhat. */
 const REFRESH_TOKEN_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
 
+/**
+ * Token duoc ghi trong khoang nay coi nhu "vua gia han xong" boi mot tien
+ * trinh khac, nen dung luon thay vi gia han them lan nua.
+ */
+const JUST_REFRESHED_MS = 60 * 1000;
+
 export const tokenStorage = new FileTokenStorage(config.tokenFile);
 
 export const sdk = new ShopeeSDK(
@@ -32,6 +38,8 @@ export const sdk = new ShopeeSDK(
     partner_id: config.partnerId,
     partner_key: config.partnerKey,
     region: config.region,
+    ...(config.baseUrl ? { base_url: config.baseUrl } : {}),
+    ...(config.authUrl ? { base_auth_url: config.authUrl } : {}),
   },
   tokenStorage,
 );
@@ -55,8 +63,8 @@ function isUsable(token: StoredToken | null): boolean {
 /**
  * Gia han token, dam bao ca he thong chi co dung mot lenh gia han chay.
  *
- * Ham nay thay the ShopeeSDK.refreshToken nen duoc goi ca tu ben trong SDK
- * moi khi SDK thay token het han.
+ * Ham nay thay the ShopeeSDK.refreshToken nen duoc goi ca tu ben trong SDK:
+ * khi SDK thay token het han, va khi Shopee tra ve loi invalid_access_token.
  */
 async function guardedRefresh(shopId?: number, merchantId?: number): Promise<AccessToken | null> {
   if (inflightRefresh) return inflightRefresh;
@@ -70,7 +78,16 @@ async function guardedRefresh(shopId?: number, merchantId?: number): Promise<Acc
         "Chua co token nao duoc luu. Mo /auth/start tren trinh duyet de uy quyen shop.",
       );
     }
-    if (isUsable(current)) return current;
+    const justRefreshed =
+      current.obtained_at !== undefined && Date.now() - current.obtained_at < JUST_REFRESHED_MS;
+    if (isUsable(current) && justRefreshed) return current;
+
+    // Con lai la hai truong hop, deu phai gia han that:
+    // - token het han (hoac sap het han) theo dong ho;
+    // - token con han theo dong ho nhung Shopee vua tu choi no (bi thu hoi,
+    //   het han som). SDK goi ham nay khi nhan loi invalid_access_token. Neu
+    //   chi xet han theo dong ho ma tra lai token cu thi SDK goi lai bang dung
+    //   token hong do va ket noi khong bao gio tu phuc hoi.
 
     const ageMs = current.obtained_at ? Date.now() - current.obtained_at : null;
     if (ageMs !== null && ageMs > REFRESH_TOKEN_LIFETIME_MS) {

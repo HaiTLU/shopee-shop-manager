@@ -27,14 +27,23 @@ Với mục đích tự quản lý shop của mình thì chọn **tự dùng**. 
 
 Lưu ý: ứng dụng loại tự dùng có thể không được cấp quyền cho một số nhóm lệnh gọi như Chat và Quảng cáo. Nếu cần những nhóm này thì phải xin quyền riêng.
 
-## Bước 4: Lấy khóa
+Trong Console, bấm **Add New APP**, điền thông tin cơ bản. Ở mục **App Category** chọn đúng **Seller In House System**. Chọn sai loại thì về sau không kết nối được.
 
-Sau khi được duyệt, vào **App Management > App List** để lấy:
+## Bước 4: Lấy khóa - có hai cặp khóa
 
-- `partner_id` - số định danh ứng dụng
-- `partner_key` - khóa bí mật để ký lệnh gọi
+| Cặp khóa | Khi nào có | Dùng cho |
+|---|---|---|
+| Test Partner ID + Test Key | Ngay sau khi tạo ứng dụng | Chỉ môi trường thử nghiệm (sandbox). Không nối được shop thật |
+| Live Partner ID + Live Key | Sau khi bấm **Go-Live** và Shopee duyệt | Shop thật |
 
-Điền hai giá trị này vào tệp `.env` của dự án. **Không bao giờ đưa `partner_key` vào mã nguồn hay đẩy lên git.**
+Xem khóa trong **App Management > App List**. Điền vào tệp `.env` của dự án:
+
+- `SHOPEE_PARTNER_ID` - số định danh ứng dụng
+- `SHOPEE_PARTNER_KEY` - khóa bí mật để ký lệnh gọi
+
+**Không bao giờ đưa `partner_key` vào mã nguồn, đẩy lên git, hay dán vào khung chat.**
+
+Khi bấm Go-Live, theo hướng dẫn thực tế của một đơn vị đã làm (Qxpress Smartship), Shopee có thể hỏi: địa chỉ hệ thống, một tài khoản đăng nhập thử để họ kiểm tra, và danh sách IP máy chủ. Nghĩa là trước khi Go-Live nên có sẵn máy chủ IP cố định. Cùng nguồn đó cho biết Shopee yêu cầu **xác nhận lại danh sách IP 90 ngày một lần**. Hai điểm này chưa đối chiếu được với tài liệu chính thức.
 
 ## Bước 5: Khai IP máy chủ
 

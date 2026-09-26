@@ -30,16 +30,19 @@ Lần đầu nên để `SHOPEE_REGION=TEST_GLOBAL` (môi trường thử nghi�
 ```bash
 npm run cli -- status       # Xem tình trạng kết nối và hạn token
 npm run cli -- auth-url     # In đường dẫn ủy quyền shop
+npm run cli -- exchange "<đường dẫn>"  # Hoàn tất ủy quyền bằng tay, xem bên dưới
 npm run cli -- refresh      # Gia hạn token ngay
 npm run cli -- shop         # Thông tin shop
 npm run cli -- products 20  # Liệt kê 20 sản phẩm đầu
 ```
 
+**Hoàn tất ủy quyền bằng tay:** nếu sau khi bấm đồng ý trên Shopee mà trình duyệt báo không mở được trang (máy chủ chưa chạy, hoặc chạy ở máy khác), đừng bấm lại. Chép nguyên đường dẫn trên thanh địa chỉ, dán vào lệnh `exchange` trong vòng vài phút. Mã `code` trong đường dẫn chỉ dùng được một lần.
+
 ## Kiểm tra chất lượng
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 18 bài kiểm thử
+npm test            # 26 bài kiểm thử
 ```
 
 ## Cấu trúc
@@ -52,6 +55,7 @@ src/
   server.ts          Máy chủ web
   routes/auth.ts     Luồng ủy quyền shop
   routes/api.ts      API nội bộ cho giao diện
+  authCallback.ts    Tách code và shop_id từ đường dẫn sau ủy quyền
   cli.ts             Công cụ dòng lệnh
 public/index.html    Giao diện, không cần bước biên dịch
 docs/                Hướng dẫn đăng ký và vận hành
@@ -72,6 +76,8 @@ Shopee cấp `refresh_token` chỉ dùng được **đúng một lần**. Mỗi 
 | Có lớp bảo vệ của dự án này | 1 |
 
 Lớp bảo vệ nằm ở `src/shopee.ts` và `src/tokenStore.ts`, gồm hai tầng: gộp lệnh trong cùng tiến trình, và khóa tệp giữa nhiều tiến trình. Bài kiểm thử `test/refreshGuard.test.ts` giữ cho tính chất này không bị phá vỡ về sau.
+
+Lớp bảo vệ cũng xử lý trường hợp Shopee từ chối một token mà theo đồng hồ vẫn còn hạn (bị thu hồi, hết hạn sớm): lúc đó hệ thống gia hạn thật rồi gọi lại, thay vì dùng lại token hỏng. Có bài kiểm thử tái hiện đúng đường đi này trong SDK.
 
 ## Điểm cần lưu ý
 

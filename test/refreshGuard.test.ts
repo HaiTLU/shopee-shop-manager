@@ -25,6 +25,24 @@ process.env.SHOPEE_REDIRECT_URI = "http://localhost:3000/auth/callback";
 process.env.TOKEN_FILE = tokenFile;
 process.env.TOKEN_KEEPALIVE_MINUTES = "0";
 
+/**
+ * Thay mang that bang ban gia, PHAI dat truoc khi nap SDK vi SDK giu tham
+ * chieu toi globalThis.fetch ngay luc nap.
+ */
+type FetchHandler = (url: URL) => unknown;
+let fetchHandler: FetchHandler = () => {
+  throw new Error("Kiem thu khong duoc goi mang that");
+};
+const fetchedUrls: URL[] = [];
+globalThis.fetch = (async (input: string | URL | Request) => {
+  const url = new URL(input instanceof Request ? input.url : String(input));
+  fetchedUrls.push(url);
+  return new Response(JSON.stringify(fetchHandler(url)), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}) as typeof fetch;
+
 const { sdk, tokenStorage, tokenStatus } = await import("../src/shopee.js");
 
 /** Token da het han, buoc he thong phai gia han. */
@@ -70,6 +88,10 @@ beforeEach(async () => {
   refreshCalls = 0;
   refreshDelayMs = 20;
   refreshError = null;
+  fetchedUrls.length = 0;
+  fetchHandler = () => {
+    throw new Error("Kiem thu khong duoc goi mang that");
+  };
   await fs.rm(tokenFile, { force: true });
   await fs.rm(`${tokenFile}.lock`, { force: true });
 });
@@ -103,14 +125,53 @@ test("token moi duoc ghi xuong tep, khong chi nam trong bo nho", async () => {
   assert.equal(saved?.refresh_token, "ref-cu-moi-1", "phai luu refresh_token MOI, khong giu cai cu");
 });
 
-test("token con han thi khong gia han them lan nao", async () => {
+test("tien trinh khac vua gia han xong thi dung luon token do, khong gia han them", async () => {
+  // Token con han va vua duoc ghi xong: dung la dau hieu tien trinh khac vua gia han.
   await tokenStorage.store({
-    ...expiredToken("con-han"),
+    ...expiredToken("vua-gia-han"),
     expired_at: Date.now() + 4 * 60 * 60 * 1000,
   });
 
   await sdk.refreshToken();
-  assert.equal(refreshCalls, 0, "token con han ma van goi gia han la lang phi va nguy hiem");
+  assert.equal(refreshCalls, 0, "gia han chong len tien trinh khac la lang phi va nguy hiem");
+});
+
+test("token con han theo dong ho nhung da cu thi goi gia han la gia han that", async () => {
+  // Truong hop SDK goi gia han du token chua het han: Shopee vua tu choi token
+  // (bi thu hoi, het han som). Phai lay token moi, khong duoc tra lai token hong.
+  await tokenStorage.store({
+    ...expiredToken("bi-thu-hoi"),
+    expired_at: Date.now() + 3 * 60 * 60 * 1000,
+    obtained_at: Date.now() - 60 * 60 * 1000,
+  });
+
+  const token = await sdk.refreshToken();
+  assert.equal(refreshCalls, 1);
+  assert.equal(token?.access_token, "acc-moi-1");
+});
+
+test("Shopee tu choi token giua chung thi SDK gia han mot lan roi goi lai thanh cong", async () => {
+  // Tai hien day du duong di that trong SDK: goi API -> Shopee bao
+  // invalid_access_token -> SDK goi gia han -> goi lai voi token moi.
+  await tokenStorage.store({
+    ...expiredToken("bi-thu-hoi"),
+    expired_at: Date.now() + 3 * 60 * 60 * 1000,
+    obtained_at: Date.now() - 60 * 60 * 1000,
+  });
+
+  fetchHandler = (url) => {
+    if (url.searchParams.get("access_token") === "acc-bi-thu-hoi") {
+      return { error: "invalid_access_token", message: "Invalid access_token.", request_id: "r1" };
+    }
+    return { error: "", message: "", request_id: "r2", shop_name: "Shop thu nghiem" };
+  };
+
+  const info = await sdk.shop.getShopInfo();
+
+  assert.equal(refreshCalls, 1, "phai gia han dung mot lan");
+  assert.equal(fetchedUrls.length, 2, "lan dau bi tu choi, lan hai goi lai");
+  assert.equal(fetchedUrls[1]?.searchParams.get("access_token"), "acc-moi-1", "lan goi lai phai dung token moi");
+  assert.equal((info as { shop_name?: string }).shop_name, "Shop thu nghiem");
 });
 
 test("dot gia han thu hai sau khi dot dau xong thi goi lai binh thuong", async () => {

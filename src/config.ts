@@ -52,6 +52,16 @@ export const config = {
   port: optionalNumber("PORT", 3000),
   tokenFile: path.resolve(process.env.TOKEN_FILE?.trim() || "./data/shopee-token.json"),
   keepaliveMinutes: optionalNumber("TOKEN_KEEPALIVE_MINUTES", 60),
+  /**
+   * Ghi de dia chi API va trang uy quyen. Bo trong thi dung mac dinh theo vung.
+   *
+   * Can khi Shopee doi dia chi sandbox: tai lieu cu dung
+   * partner.test-stable.shopeemobile.com, SDK hien dung
+   * openplatform.sandbox.test-stable.shopee.sg. Neu khoa thu nghiem bao loi
+   * voi dia chi nay thi doi sang dia chi kia ma khong phai sua ma nguon.
+   */
+  baseUrl: process.env.SHOPEE_BASE_URL?.trim() || undefined,
+  authUrl: process.env.SHOPEE_AUTH_URL?.trim() || undefined,
 } as const;
 
 /** True khi dang chay tren moi truong thu nghiem cua Shopee. */

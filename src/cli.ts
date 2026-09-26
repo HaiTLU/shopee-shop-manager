@@ -3,12 +3,14 @@
  *
  *   npm run cli -- status              Xem tinh trang token
  *   npm run cli -- auth-url            In duong dan uy quyen shop
+ *   npm run cli -- exchange "<url>"    Doi code lay token tu duong dan sau uy quyen
  *   npm run cli -- refresh             Gia han token ngay
  *   npm run cli -- shop                Thong tin shop
  *   npm run cli -- products [so_luong] Danh sach san pham
  */
 import { config } from "./config.js";
 import { sdk, tokenStatus, startTokenKeepalive } from "./shopee.js";
+import { parseAuthCallback } from "./authCallback.js";
 import {
   ItemStatus,
   type GetItemBaseInfoItem,
@@ -41,6 +43,25 @@ async function main(): Promise<void> {
       console.log(sdk.getAuthorizationUrl(config.redirectUri, { auth_type: "seller" }));
       console.log("\nMo duong dan tren, dang nhap tai khoan nguoi ban va bam dong y.");
       console.log("Nho chay 'npm start' truoc de may chu san sang nhan ket qua tra ve.");
+      break;
+    }
+
+    case "exchange": {
+      const input = args.join(" ");
+      if (!input) {
+        console.error('Cach dung: npm run cli -- exchange "<duong dan tren thanh dia chi sau khi uy quyen>"');
+        process.exitCode = 1;
+        break;
+      }
+      const { code, shopId } = parseAuthCallback(input);
+      const token = await sdk.authenticateWithCode(code, shopId);
+      if (!token || token.error) {
+        throw new Error(
+          `Doi code lay token that bai: ${token?.error ?? "khong ro"} - ${token?.message ?? ""}. ` +
+            "Code chi dung duoc mot lan va het han sau vai phut, hay uy quyen lai roi dan ngay.",
+        );
+      }
+      console.log(`Da ket noi shop ${token.shop_id ?? shopId ?? ""}. Token luu tai ${config.tokenFile}`);
       break;
     }
 
@@ -90,7 +111,7 @@ async function main(): Promise<void> {
 
     default:
       console.error(`Lenh khong ro: ${command}`);
-      console.error("Cac lenh co: status, auth-url, refresh, shop, products");
+      console.error("Cac lenh co: status, auth-url, exchange, refresh, shop, products");
       process.exitCode = 1;
   }
 }
