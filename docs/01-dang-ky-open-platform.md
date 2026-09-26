@@ -2,7 +2,7 @@
 
 Hướng dẫn xin quyền truy cập API cho shop của chính mình.
 
-Lưu ý về độ tin cậy: trang tài liệu chính thức của Shopee và Học viện Shopee bị chặn khi soạn tài liệu này, nên các con số về thời gian duyệt và một số điều kiện lấy từ nguồn thứ cấp. Hãy đối chiếu lại trên `open.shopee.com` trước khi nộp hồ sơ.
+Nguồn: các mục về shop thử, ủy quyền và Go-Live đối chiếu với **Shopee Open API Developer Guide v2.1** (bản Thái Lan, 22/7/2022, tài liệu chính thức của Shopee). Tài liệu này đã hơn 4 năm nên tên menu có thể đổi chút ít. Những điểm còn lại lấy từ nguồn thứ cấp, được ghi rõ ngay tại chỗ.
 
 ## Bước 1: Kiểm tra điều kiện
 
@@ -20,8 +20,8 @@ Có nguồn cho biết shop phải đạt Shop Yêu Thích hoặc Shopee Mall m�
 
 | Loại ứng dụng | Dùng khi nào | Hồ sơ | Thời gian duyệt |
 |---|---|---|---|
-| Tự dùng (in-house) | Chỉ kết nối shop của chính mình | Nhẹ | Khoảng 3 đến 5 ngày làm việc |
-| Đối tác bên thứ ba | Bán dịch vụ cho nhiều shop khác | Cần giấy phép kinh doanh, website chạy HTTPS thật, sản phẩm đã vận hành, tài khoản dùng thử cho Shopee kiểm tra | Khoảng 1 đến 2 tuần |
+| Tự dùng (in-house) | Chỉ kết nối shop của chính mình | Nhẹ | 3 đến 5 ngày làm việc |
+| Đối tác bên thứ ba | Bán dịch vụ cho nhiều shop khác | Cần giấy phép kinh doanh, website chạy HTTPS thật, sản phẩm đã vận hành, tài khoản dùng thử cho Shopee kiểm tra | 10 đến 12 ngày làm việc |
 
 Với mục đích tự quản lý shop của mình thì chọn **tự dùng**. Đăng ký và dùng API cơ bản đều miễn phí.
 
@@ -43,7 +43,9 @@ Xem khóa trong **App Management > App List**. Điền vào tệp `.env` của d
 
 **Không bao giờ đưa `partner_key` vào mã nguồn, đẩy lên git, hay dán vào khung chat.**
 
-Khi bấm Go-Live, theo hướng dẫn thực tế của một đơn vị đã làm (Qxpress Smartship), Shopee có thể hỏi: địa chỉ hệ thống, một tài khoản đăng nhập thử để họ kiểm tra, và danh sách IP máy chủ. Nghĩa là trước khi Go-Live nên có sẵn máy chủ IP cố định. Cùng nguồn đó cho biết Shopee yêu cầu **xác nhận lại danh sách IP 90 ngày một lần**. Hai điểm này chưa đối chiếu được với tài liệu chính thức.
+Khi bấm Go-Live (**Console > App List > chọn ứng dụng > Go-Live**), Shopee hỏi tài khoản đăng nhập thử vào hệ thống của mình. Theo tài liệu chính thức: nếu hệ thống chỉ dùng nội bộ, **điền dấu `-` vào cả hai ô Test Account User Name và Password**, rồi ghi lý do ở ô Brief Introduction. Nghĩa là không cần đưa trang quản lý ra ngoài cho Shopee vào xem.
+
+Theo một đơn vị đã làm (Qxpress Smartship), Shopee yêu cầu **xác nhận lại danh sách IP 90 ngày một lần**. Điểm này chưa đối chiếu được với tài liệu chính thức.
 
 ## Bước 5: Khai IP máy chủ
 
@@ -75,14 +77,28 @@ Việt Nam nằm trong vùng `GLOBAL`, không có địa chỉ riêng.
 
 Chỉ đổi sang `GLOBAL` khi đã chạy thông trên môi trường thử nghiệm. Sau khi đổi, mọi thay đổi giá và tồn kho đều có hiệu lực thật ngay lập tức.
 
-## Bước 8: Ủy quyền shop
+## Bước 8: Tạo shop thử
+
+Môi trường thử nghiệm là một Shopee riêng. **Tài khoản shop thật không tồn tại ở đó**, nên đăng nhập bằng tài khoản thật sẽ luôn thất bại. Phải tạo shop thử:
+
+1. Vào **Console > Tools > Test Shop > Create Test Shop**.
+2. Loại tài khoản chọn **Local Shop**, khu vực chọn **Vietnam**. Không chọn Cross Border (loại đó dành cho người bán ở Trung Quốc, Hồng Kông, Nhật, Hàn), vì hai loại khác nhau về ngành hàng và đơn vị vận chuyển.
+3. Ghi lại tên đăng nhập và mật khẩu Console cấp cho shop thử. Mỗi tài khoản lập trình viên tạo được tối đa 8 shop thử loại Local.
+
+Tài liệu chính thức dặn: **làm mọi thao tác thử nghiệm trong cửa sổ ẩn danh** (Chrome: Cmd+Shift+N), để trình duyệt không lẫn phiên đăng nhập Kênh Người Bán thật với phiên thử nghiệm.
+
+Muốn tạo sản phẩm, đơn hàng giả để thử thì đăng nhập Kênh Người Bán thử nghiệm bằng chính tài khoản shop thử. Bản Thái Lan ở `seller.test-stable.shopee.co.th`, bản Việt Nam nhiều khả năng là `seller.test-stable.shopee.vn` (chưa kiểm chứng). Trước khi thử luồng đơn hàng phải khai địa chỉ người bán trong đó.
+
+## Bước 9: Ủy quyền shop
 
 1. Chạy `npm start`.
-2. Mở `http://localhost:3000`, bấm "Kết nối shop Shopee".
-3. Đăng nhập tài khoản người bán, bấm đồng ý.
-4. Shopee chuyển về `/auth/callback`, hệ thống tự đổi mã lấy token và lưu lại.
+2. Trong **cửa sổ ẩn danh**, mở `http://localhost:3000`, bấm "Kết nối shop Shopee".
+3. Ở trang của Shopee, chọn khu vực **VN**, đăng nhập bằng **tài khoản shop thử** ở Bước 8. Nếu bị hỏi mã OTP thì nhập **`123456`** (mã cố định của môi trường thử nghiệm).
+4. Bấm **Confirm Authorization**. Shopee chuyển về `/auth/callback`, hệ thống tự đổi mã lấy token và lưu lại.
 
 Đường dẫn ủy quyền chỉ sống 5 phút. Nếu để lâu quá thì bấm lại từ đầu.
+
+Khi lên shop thật: người đăng nhập ở bước 3 là người giữ tài khoản Kênh Người Bán của shop. **Mỗi lần ủy quyền có hiệu lực 365 ngày**, hết hạn phải ủy quyền lại, kể cả khi token vẫn được gia hạn đều.
 
 ## Sau khi xong
 
