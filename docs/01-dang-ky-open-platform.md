@@ -49,20 +49,23 @@ Theo một đơn vị đã làm (Qxpress Smartship), Shopee yêu cầu **xác nh
 
 ## Bước 5: Khai IP máy chủ
 
-Vào **Console > App list > IP Address Whitelist**, khai IP của máy chủ sẽ gọi API.
+Biểu mẫu Go-Live có mục **IP Address Whitelist** gồm hai phần:
 
-Đây là bước hay bị quên nhất. Nếu không khai, mọi lệnh gọi trả về lỗi `source_ip_undeclared`.
+- **APP IP Address Management** (bắt buộc): khai ít nhất một IP. Lấy IP mạng hiện tại bằng lệnh `curl -s https://api.ipify.org`.
+- **Enable IP Address Whitelist** (công tắc): khi **bật**, Shopee chỉ nhận lệnh gọi từ các IP đã khai, sai IP thì báo `source_ip_undeclared`. Khi **tắt**, gọi từ đâu cũng được.
 
-Hệ quả thực tế: không đặt ứng dụng trên các dịch vụ có IP thay đổi liên tục (Vercel, Netlify, các nền tảng không máy chủ). Cần một máy chủ ảo có IP cố định.
+Chạy trên máy cá nhân ở nhà hoặc văn phòng thì IP hay đổi, nên **để tắt**. Đổi lại phải giữ Partner Key thật kín, vì ai có Key là gọi được từ máy khác. Khi chuyển lên máy chủ IP cố định thì bật công tắc cho chặt chẽ.
 
-Chiều ngược lại: nếu dùng thông báo đẩy từ Shopee, nên chỉ cho phép dải IP của Shopee gọi vào. Lấy dải IP bằng lệnh gọi `/public/get_shopee_ip_ranges`.
+Nếu dùng thông báo đẩy từ Shopee, nên chỉ cho phép dải IP của Shopee gọi vào. Lấy dải IP bằng lệnh gọi `/public/get_shopee_ip_ranges`.
 
 ## Bước 6: Khai địa chỉ nhận ủy quyền
 
-Khai chính xác địa chỉ callback trong Console, phải **giống hệt** giá trị `SHOPEE_REDIRECT_URI` trong `.env`, kể cả dấu gạch chéo ở cuối.
+Console **không nhận tên `localhost`** ở ô Test/Live Redirect URL Domain. Dùng tên miền `localtest.me`: đây là tên miền công khai luôn trỏ về `127.0.0.1`, tức chính máy đang mở trình duyệt, nên Shopee chấp nhận mà trình duyệt vẫn quay về máy chủ chạy trên máy mình.
 
-- Khi chạy thử trên máy: `http://localhost:3000/auth/callback`
-- Khi chạy thật: `https://ten-mien-cua-ban/auth/callback`
+- Trong Console, hai ô Redirect URL Domain điền: `http://localtest.me` (chỉ tên miền, không kèm cổng hay đường dẫn)
+- Trong tệp cấu hình: `SHOPEE_REDIRECT_URI=http://localtest.me:3000/auth/callback`
+
+Kiểm tra mạng có dùng được không: chạy `npm start` rồi mở `http://localtest.me:3000`. Một số bộ phát wifi chặn kiểu tên miền trỏ về máy nội bộ; khi đó phải dùng tên miền riêng.
 
 ## Bước 7: Thử trên môi trường thử nghiệm trước
 

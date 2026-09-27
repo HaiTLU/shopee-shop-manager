@@ -4,15 +4,23 @@
  * Bao loi som va noi ro thieu gi, thay vi de Shopee tra ve loi kho hieu
  * sau khi da chay duoc nua chung.
  */
-import "dotenv/config";
 import path from "node:path";
+import dotenv from "dotenv";
 import { ShopeeRegion } from "@congminh1254/shopee-sdk/schemas";
+
+/**
+ * Tep cau hinh dang dung. Mac dinh la .env (moi truong thu nghiem).
+ * Shop that dung tep rieng: ENV_FILE=.env.live (lenh npm run start:live).
+ * Tach hai tep de khoa va token cua hai moi truong khong bao gio lan nhau.
+ */
+export const envFile = process.env.ENV_FILE?.trim() || ".env";
+dotenv.config({ path: envFile });
 
 function required(name: string): string {
   const value = process.env[name];
   if (!value || value.trim() === "") {
     throw new Error(
-      `Thieu bien moi truong ${name}. Hay sao chep .env.example thanh .env va dien gia tri.`,
+      `Thieu bien moi truong ${name} trong tep ${envFile}. Sao chep tu tep mau (.env.example hoac .env.live.example) roi dien gia tri.`,
     );
   }
   return value.trim();

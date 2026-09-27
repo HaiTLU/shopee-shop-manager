@@ -25,6 +25,17 @@ Mở `http://localhost:3000`, bấm "Kết nối shop Shopee", đăng nhập tà
 
 Lần đầu nên để `SHOPEE_REGION=TEST_GLOBAL` (môi trường thử nghiệm của Shopee). Chỉ đổi sang `GLOBAL` khi đã chắc chắn, vì lúc đó mọi thay đổi giá và tồn kho đều có hiệu lực thật.
 
+## Thử nghiệm và shop thật: hai tệp cấu hình riêng
+
+| | Thử nghiệm (sandbox) | Shop thật |
+|---|---|---|
+| Tệp cấu hình | `.env` (mẫu: `.env.example`) | `.env.live` (mẫu: `.env.live.example`) |
+| Chạy máy chủ | `npm start` | `npm run start:live` |
+| Dòng lệnh | `npm run cli -- ...` | `npm run cli:live -- ...` |
+| Tệp token | `data/shopee-token.json` | `data/shopee-token-live.json` |
+
+Tách riêng để khóa và token của hai môi trường không bao giờ lẫn nhau. Máy chủ và lệnh `status` luôn in ra tên tệp cấu hình đang dùng. Cả hai tệp đều bị chặn khỏi git.
+
 ## Công cụ dòng lệnh
 
 ```bash
@@ -43,7 +54,7 @@ npm run cli -- tao-san-pham-thu 3  # Tạo 3 sản phẩm thử, CHỈ chạy tr
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 34 bài kiểm thử
+npm test            # 36 bài kiểm thử
 ```
 
 ## Cấu trúc

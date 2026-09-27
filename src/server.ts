@@ -7,7 +7,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
-import { config, isSandbox } from "./config.js";
+import { config, envFile, isSandbox } from "./config.js";
 import { startTokenKeepalive, tokenStorage, tokenStatus } from "./shopee.js";
 import { authRouter } from "./routes/auth.js";
 import { apiRouter } from "./routes/api.js";
@@ -48,6 +48,7 @@ app.use(express.static(publicDir));
 
 app.listen(config.port, () => {
   console.log(`Dang chay tai http://localhost:${config.port}`);
+  console.log(`Tep cau hinh: ${envFile}`);
   console.log(`Vung: ${config.region}${isSandbox ? " (moi truong thu nghiem)" : " (moi truong that)"}`);
   console.log(`Dia chi nhan uy quyen: ${config.redirectUri}`);
   console.log(`Token luu tai: ${config.tokenFile}`);

@@ -9,7 +9,7 @@
  *   npm run cli -- shop                Thong tin shop
  *   npm run cli -- products [so_luong] Danh sach san pham
  */
-import { config } from "./config.js";
+import { config, envFile } from "./config.js";
 import { sdk, tokenStatus, startTokenKeepalive } from "./shopee.js";
 import { parseAuthCallback } from "./authCallback.js";
 import { seedTestProducts } from "./seed.js";
@@ -28,6 +28,7 @@ async function main(): Promise<void> {
   switch (command) {
     case "status": {
       const status = await tokenStatus();
+      console.log(`Tep cau hinh:    ${envFile}`);
       console.log(`Vung:            ${config.region}`);
       console.log(`Da ket noi:      ${status.connected ? "co" : "chua"}`);
       if (status.connected) {

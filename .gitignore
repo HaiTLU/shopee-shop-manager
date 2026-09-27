@@ -1,6 +1,8 @@
 node_modules/
 .env
-.env.local
+# Moi tep cau hinh that (.env.live, .env.local...) deu chua khoa bi mat
+.env.*
+!.env*.example
 
 # Token cua shop - tuyet doi khong day len git
 data/
