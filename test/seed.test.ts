@@ -25,6 +25,10 @@ const channels = [
 ];
 const calls: { path: string; body: unknown }[] = [];
 let nextItemId = 9001;
+/** Muc gia toi da cua don vi van chuyen gia; mac dinh khong gioi han. */
+let priceLimit = Number.POSITIVE_INFINITY;
+/** Loi khac gia de kiem tra lenh KHONG thu lai voi loi khong lien quan. */
+let otherAddItemError: string | null = null;
 
 const ok = (response: unknown) => ({ error: "", message: "", request_id: "r", response });
 
@@ -54,8 +58,19 @@ function reply(apiPath: string, body: unknown): unknown {
       });
     case "/api/v2/media_space/upload_image":
       return ok({ image_info: { image_id: `img-${calls.length}` } });
-    case "/api/v2/product/add_item":
+    case "/api/v2/product/add_item": {
+      if (otherAddItemError) return { error: otherAddItemError, message: "gia lap loi khac", request_id: "r" };
+      if ((body as { original_price: number }).original_price > priceLimit) {
+        // Nguyen van cau loi Shopee sandbox tra ve tren may PM ngay 27/9/2026.
+        return {
+          error: "product.error_busi",
+          message: "The max price of the product is over max limit. Channel detail:  Sandbox SPX Express(Don't modify)",
+          debug_message: 'validation: [Rule Type: logistics.channel.price.max.limit, Detail: {"code":1315}]',
+          request_id: "r",
+        };
+      }
       return ok({ item_id: nextItemId++ });
+    }
     default:
       throw new Error(`Kiem thu khong ngo toi duong dan ${apiPath}`);
   }
@@ -167,4 +182,34 @@ test("tren shop that (GLOBAL) thi tu choi, khong goi Shopee", () => {
   }
   assert.equal(code, 1);
   assert.match(output, /Tu choi/);
+});
+
+test("gia vuot muc toi da cua don vi van chuyen thi tu ha gia va thu lai", async () => {
+  priceLimit = 30000;
+  const start = calls.length;
+  const logs: string[] = [];
+  const ids = await seed.seedTestProducts(2, (m) => logs.push(m));
+  priceLimit = Number.POSITIVE_INFINITY;
+
+  assert.equal(ids.length, 2, "ca 2 san pham phai tao duoc sau khi ha gia");
+  const prices = calls
+    .slice(start)
+    .filter((c) => c.path.endsWith("/add_item"))
+    .map((c) => (c.body as { original_price: number }).original_price);
+  // San pham 1: 100.000 bi tu choi, 50.000 bi tu choi, 25.000 duoc.
+  // San pham 2: bat dau luon tu 25.000 (muc da biet la duoc), khong do lai.
+  assert.deepEqual(prices, [100000, 50000, 25000, 25000]);
+  assert.ok(logs.some((l) => l.includes("vuot muc toi da")), "phai bao cho nguoi dung biet vi sao ha gia");
+});
+
+test("loi khong lien quan toi gia thi khong thu lai, bao loi ngay", async () => {
+  otherAddItemError = "product.error_param";
+  const start = calls.length;
+  const logs: string[] = [];
+  const ids = await seed.seedTestProducts(1, (m) => logs.push(m));
+  otherAddItemError = null;
+
+  assert.equal(ids.length, 0);
+  assert.equal(calls.slice(start).filter((c) => c.path.endsWith("/add_item")).length, 1);
+  assert.ok(logs.some((l) => l.includes("LOI") && l.includes("product.error_param")));
 });

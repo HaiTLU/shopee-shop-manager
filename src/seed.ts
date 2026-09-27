@@ -11,6 +11,7 @@
 import zlib from "node:zlib";
 import type {
   AddItemAttribute,
+  AddItemRequest,
   GetAttributeTreeAttributeTree,
   GetCategoryCategory,
 } from "@congminh1254/shopee-sdk/schemas";
@@ -198,6 +199,33 @@ async function pickCategory(log: Log) {
   return best!;
 }
 
+/**
+ * Don vi van chuyen thu nghiem co muc gia toi da rieng, thap hon ngoai that
+ * nhieu, va Shopee khong tra muc nay qua API. Gap loi nay thi ha gia xuong
+ * mot nua (lam tron nghin dong) roi thu lai, den khi duoc hoac cham san.
+ */
+const PRICE_LIMIT_ERROR = /price\.max\.limit|max price of the product is over max limit/i;
+const MIN_PRICE = 1000;
+
+async function addItemLoweringPrice(
+  label: string,
+  startPrice: number,
+  log: Log,
+  build: (price: number) => AddItemRequest,
+) {
+  let price = startPrice;
+  for (;;) {
+    try {
+      return { result: await sdk.product.addItem(build(price)), price, lowered: price < startPrice };
+    } catch (error) {
+      const next = Math.max(MIN_PRICE, Math.floor(price / 2 / 1000) * 1000);
+      if (!PRICE_LIMIT_ERROR.test(describe(error)) || next >= price) throw error;
+      log(`  ${label}: gia ${price.toLocaleString("vi-VN")}d vuot muc toi da cua don vi van chuyen thu nghiem, thu ${next.toLocaleString("vi-VN")}d`);
+      price = next;
+    }
+  }
+}
+
 const COLORS: [number, number, number][] = [
   [238, 77, 45],
   [36, 99, 235],
@@ -216,6 +244,9 @@ export async function seedTestProducts(count: number, log: Log = console.log): P
   const logistics = await ensureLogistics(log);
   const { category, attributes } = await pickCategory(log);
   const created: number[] = [];
+  // Chi dat tran khi da thuc su phai ha gia: luc do biet muc toi da nam o
+  // quanh day, san pham sau bat dau tu day de khong phai do lai tu dau.
+  let acceptedCeiling = Number.POSITIVE_INFINITY;
 
   for (let i = 1; i <= count; i++) {
     const label = `San pham thu ${i}`;
@@ -225,13 +256,13 @@ export async function seedTestProducts(count: number, log: Log = console.log): P
       const imageId = upload.response?.image_info?.image_id ?? upload.response?.image_info_list?.[0]?.image_info?.image_id;
       if (!imageId) throw new Error("Shopee khong tra ve image_id khi tai anh");
 
-      const result = await sdk.product.addItem({
+      const { result, price, lowered } = await addItemLoweringPrice(label, Math.min(100000 * i, acceptedCeiling), log, (originalPrice) => ({
         item_name: `Sản phẩm thử nghiệm số ${i} - tạo qua API`,
         description:
           `Đây là sản phẩm thử nghiệm số ${i} được tạo tự động qua Shopee Open API ` +
           "để kiểm tra chức năng sửa giá và tồn kho của trang quản lý shop. " +
           "Sản phẩm chỉ tồn tại trên môi trường thử nghiệm, không bán thật.",
-        original_price: 100000 * i,
+        original_price: originalPrice,
         seller_stock: [{ stock: 20 * i }],
         weight: 0.3,
         dimension: { package_length: 20, package_width: 15, package_height: 5 },
@@ -243,9 +274,10 @@ export async function seedTestProducts(count: number, log: Log = console.log): P
         item_sku: `THU-${i}`,
         image: { image_id_list: [imageId] },
         logistic_info: logistics,
-      });
+      }));
+      if (lowered) acceptedCeiling = Math.min(acceptedCeiling, price);
       const itemId = result.response?.item_id;
-      log(`${label}: da tao, ma san pham ${itemId}`);
+      log(`${label}: da tao, ma san pham ${itemId}, gia ${price.toLocaleString("vi-VN")}d`);
       if (itemId) created.push(itemId);
     } catch (error) {
       log(`${label}: LOI ${describe(error)}`);

@@ -43,7 +43,7 @@ npm run cli -- tao-san-pham-thu 3  # Tạo 3 sản phẩm thử, CHỈ chạy tr
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 32 bài kiểm thử
+npm test            # 34 bài kiểm thử
 ```
 
 ## Cấu trúc
