@@ -21,6 +21,21 @@ npm run cli -- status
 
 Hoặc mở `http://localhost:3000/healthz`.
 
+## Khóa Live có hạn dùng
+
+Khóa Live (Live API Partner Key) **có ngày hết hạn**, ghi ở dòng *Live API Partner Key Expire Time* trong Console > App List. Khóa hiện tại của Combi Home APP hết hạn **22:59 ngày 27/03/2027**. Đã đặt nhắc việc trên Google Calendar ngày 13/03/2027.
+
+Quá hạn thì mọi lệnh gọi bị từ chối với lỗi `error_partner_key_expired`. Cách gia hạn:
+
+1. Console > App List > Combi Home APP, lấy khóa Live mới.
+2. Thay dòng `SHOPEE_PARTNER_KEY` trong `.env.live`.
+3. Khởi động lại: Ctrl+C rồi `npm run start:live`.
+4. Kiểm tra: `npm run -s cli:live -- status`.
+
+## Quyền dữ liệu nhạy cảm
+
+Console ghi *Access to Sensitive Data: No access*. Ứng dụng không xem được thông tin cá nhân người mua (tên, số điện thoại, địa chỉ); Shopee che các trường này trong đơn hàng. Sửa giá, sửa tồn kho không cần quyền này. Khi làm tính năng xử lý đơn cần địa chỉ người nhận thì xin thêm quyền trong Console.
+
 ## Đồng bộ đồng hồ máy chủ
 
 Bắt buộc, vì `timestamp` lệch quá 5 phút là mọi lệnh gọi đều bị từ chối.
