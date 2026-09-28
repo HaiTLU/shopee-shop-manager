@@ -20,6 +20,9 @@ colors:
   carbon-label: "#1a1f3a"
   carbon-ink: "#9fb3ff"
   carbon-print: "#e7e9f4"
+  carbon-print-soft: "#a7acc5"
+  carbon-rule: "#272d4b"
+  carbon-rule-strong: "#414a78"
   carbon-red: "#ff8f86"
 typography:
   headline:
@@ -45,6 +48,27 @@ typography:
     fontWeight: 600
     lineHeight: 1.3
     fontFeature: "tnum"
+  title-phone:
+    fontFamily: "Be Vietnam Pro, system-ui, sans-serif"
+    fontSize: "18px"
+    fontWeight: 700
+    lineHeight: 1.3
+  control:
+    fontFamily: "Be Vietnam Pro, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 600
+    lineHeight: 1
+  figure-phone:
+    fontFamily: "Be Vietnam Pro, system-ui, sans-serif"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: 1.3
+    fontFeature: "tnum"
+  meta:
+    fontFamily: "Be Vietnam Pro, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: 1.45
   label:
     fontFamily: "Be Vietnam Pro, system-ui, sans-serif"
     fontSize: "12px"
@@ -60,6 +84,7 @@ rounded:
   stamp: "3px"
   control: "4px"
   label: "6px"
+  switch: "13px"
 spacing:
   xs: "4px"
   sm: "8px"
@@ -149,7 +174,7 @@ Hai loại mực trên nền giấy trắng hơi xanh, cộng bút chì cho môi
 - **Dòng kẻ** (`rule-line`) và **dòng kẻ đậm** (`rule-line-strong`): ngăn dòng sổ, gạch chân ô nhập, viền ô trống.
 - **Kẻ ô ly** (`oly-line`, `oly-line-strong`): lưới nền, rất nhạt để không tranh với chữ.
 - **Bìa sổ** (`notebook-cover`): chỗ đặt màu thương hiệu Combi Home; hiện dùng màu mực xanh đậm.
-- **Giấy than** (`carbon-paper`, `carbon-label`, `carbon-ink`, `carbon-print`, `carbon-red`): bộ màu chế độ tối.
+- **Giấy than** (`carbon-paper`, `carbon-label`, `carbon-ink`, `carbon-print`, `carbon-print-soft`, `carbon-rule`, `carbon-rule-strong`, `carbon-red`): bộ màu chế độ tối.
 
 ### Named Rules
 **The One Ink Rule - Luật một mực.** Dữ liệu và thao tác chỉ viết bằng mực bi xanh. Không thêm màu xanh lá cho "thành công" hay màu cam cho "cảnh báo": thành công là mực xanh kèm dấu tích, lỗi là bút đỏ kèm dấu chéo.
@@ -170,7 +195,9 @@ Hai loại mực trên nền giấy trắng hơi xanh, cộng bút chì cho môi
 - **Title** (700, 20px, 1.3; 18px trên điện thoại): tiêu đề trang sổ ("Sản phẩm đang bán", "Đang đẩy 3/5 ô").
 - **Body** (400, 15px, 1.6): tên sản phẩm (600), lời giải thích tối đa 72 ký tự mỗi dòng.
 - **Figure** (600, 16px, 1.3, số dạng bảng; 17px trên điện thoại): số trong ô sửa giá và tồn.
-- **Label** (500-600, 12px): tên cột, tên trường trên nhãn vở, mã sản phẩm (13px).
+- **Control** (600, 14px): chữ trên nút, thẻ chuyển trang, nhãn dòng "Giá gốc", "Tồn kho" trên điện thoại.
+- **Meta** (400, 13px, 1.45): mã sản phẩm, SKU, ghi chú dưới ô, lời giải thích.
+- **Label** (500-600, 12px): tên cột, tên trường trên nhãn vở, nhãn ô tìm và sắp xếp.
 - **Stamp** (700, 12px, giãn chữ 0,06em, chữ hoa): chỉ cho con dấu môi trường.
 
 ### Named Rules
@@ -202,7 +229,7 @@ Góc gần vuông như giấy và dụng cụ văn phòng: 2px cho dấu trạng
 ## Components
 
 ### Buttons
-- **Shape:** góc vuông nhẹ (4px), cao 40px trên máy tính (nút nhỏ 32px), 44px trên điện thoại.
+- **Shape:** góc vuông nhẹ (4px), cao 40px trên máy tính (nút nhỏ 32px), 44px trên điện thoại. Công tắc bật tắt là ngoại lệ duy nhất có góc tròn hẳn (13px).
 - **Primary:** nền mực bi xanh, chữ trắng 600 14px, đệm ngang 16px. Dùng cho "Lưu giá", "Lưu tồn", "Kết nối shop Shopee".
 - **Hover / Focus:** nền chuyển mực bi đậm trong 0,15 giây; vòng tập trung 2px mực xanh cách 2px.
 - **Line:** nền trong, viền 1,5px và chữ mực xanh; rê chuột phủ nền mực rất nhạt. Dùng cho "Đẩy ngay", "Trang trước", "Trang sau", "Thử lại".
@@ -225,6 +252,15 @@ Thành phần đặc trưng. Khi số trong ô khác số đã lưu: số cũ hi
 
 ### Boost Slots (năm ô đẩy)
 Hàng năm ô cố định bằng giới hạn của Shopee. Ô đang đẩy: viền mực xanh, số thứ tự ô, tên sản phẩm (tối đa 2 dòng), thời gian còn lại và thanh 4px vơi dần theo 4 giờ. Ô trống: viền đứt nét, chữ "Ô trống". Điện thoại: mỗi ô một dòng, thanh nằm dưới.
+
+### Search and Sort (tìm và sắp xếp)
+Hai ô cùng kiểu dòng điền trong sổ: nhãn nhỏ phía trên, không khung, một dòng kẻ dưới; ô tìm có biểu tượng kính lúp, ô sắp xếp có mũi tên. Tìm không cần gõ dấu ("giay thom" ra "Giấy thơm"), tìm cả tên phân loại và SKU; khớp ở phân loại thì tự mở phân loại đó. Cách sắp xếp được nhớ trên máy người dùng.
+
+### Variant Rows (dòng phân loại)
+Sản phẩm có phân loại hiện khoảng giá và tổng tồn ở dòng chính, kèm liên kết "Sửa N phân loại" có mũi tên xoay khi mở. Các dòng phân loại nằm ngay dưới, thụt vào, ngăn bằng dòng kẻ chấm, mỗi dòng có ô chữa sổ riêng.
+
+### Bulk Preview (xem trước sửa hàng loạt)
+Ba bước đánh số bằng mực xanh; ô thả tệp viền đứt nét, sáng mực khi kéo tệp vào. Bảng xem trước dùng lại kiểu chữa sổ: số cũ gạch đỏ, mũi tên nhạt, số mới mực xanh đậm; dòng lỗi liệt kê riêng bằng bút đỏ kèm số dòng trong tệp; cảnh báo giá đổi lớn ghi "Kiểm tra lại" bằng bút đỏ ngay dưới tên. Nút áp dụng đếm số dòng đang chọn; ở shop thật phải bấm hai lần, lần đầu nút chuyển đỏ và nói rõ số dòng sẽ đổi. Khi gửi, thanh tiến độ mực xanh chạy và từng dòng nhận dấu tích hoặc dấu chéo kèm lý do.
 
 ### Status Marks
 Trạng thái luôn có chữ kèm dấu hình: ô vuông đặc mực xanh cho "Đang đẩy, còn ...", ô vuông rỗng cho "Chờ lượt"; dấu tích và dấu chéo vẽ bằng nét, không dùng ký tự hay biểu tượng cảm xúc.

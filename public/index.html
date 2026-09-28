@@ -340,6 +340,75 @@
   .rot .c-last { width: 170px; }
   .rot .c-act { width: 150px; text-align: right; }
 
+  /* ---------- Tim, sap xep ---------- */
+  .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 24px; margin-bottom: 8px; }
+  .tool { display: grid; gap: 2px; }
+  .tool.search { flex: 1 1 320px; max-width: 480px; }
+  .tool-label { font-size: 12px; font-weight: 600; color: var(--print-soft); }
+  .tool-field { position: relative; display: flex; align-items: center; gap: 8px; border-bottom: 1.5px solid var(--rule-strong); }
+  .tool-field:hover { border-bottom-color: var(--ink); }
+  .tool-field:focus-within { border-bottom: 2px solid var(--ink); background: var(--ink-wash); }
+  .tool-field .icon { color: var(--print-soft); }
+  .search-input, .sort-select {
+    width: 100%; min-height: 40px; padding: 4px 2px;
+    border: 0; border-radius: 0; background: transparent; color: var(--print);
+    /* 16px: duoi muc nay iPhone tu phong to trang khi cham vao o nhap. */
+    font: 500 16px/1.3 var(--font);
+  }
+  .search-input:focus, .sort-select:focus { outline: none; }
+  .search-input::placeholder { color: var(--print-soft); opacity: .85; }
+  .sort-select { appearance: none; -webkit-appearance: none; padding-right: 28px; cursor: pointer; }
+  .sort-select option { background: var(--paper); color: var(--print); }
+  .sort-select + .icon { position: absolute; right: 2px; pointer-events: none; }
+
+  /* ---------- Dong phan loai ---------- */
+  .sum { margin: 4px 0 0; text-align: right; font-weight: 600; }
+  .sum-label { display: none; }
+  .toggle { margin-top: 4px; padding-left: 0; }
+  .toggle .icon svg { transition: transform .2s cubic-bezier(.16, 1, .3, 1); }
+  .toggle[aria-expanded="true"] .icon svg { transform: rotate(180deg); }
+  .model-row td { padding-top: 10px; padding-bottom: 10px; border-bottom: 1px dotted var(--rule-strong); }
+  .model-row .c-name { padding-left: 28px; }
+  .model-name { font-weight: 500; line-height: 1.4; }
+  .meta.err { color: var(--red); }
+
+  /* ---------- Sua hang loat ---------- */
+  .steps { margin: 16px 0 0; padding-left: 24px; display: grid; gap: 20px; max-width: 76ch; }
+  .steps li { padding-left: 4px; }
+  .steps li::marker { font-weight: 700; color: var(--ink); }
+  .steps li > p { margin-bottom: 10px; }
+  .dropzone {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    padding: 20px; border: 1.5px dashed var(--rule-strong); border-radius: 4px;
+    color: var(--print-soft); transition: border-color .15s ease-out, background-color .15s ease-out;
+  }
+  .dropzone.over { border-color: var(--ink); background: var(--ink-wash); }
+  .dropzone:focus-within label.btn { outline: 2px solid var(--ink); outline-offset: 2px; }
+  label.btn { cursor: pointer; }
+  #preview { margin-top: 32px; }
+  .summary { margin-bottom: 16px; }
+  .problems { margin-bottom: 24px; }
+  .problems h3 { margin: 0 0 8px; font-size: 15px; color: var(--red); }
+  .problems ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 90ch; }
+  .problems li { display: flex; align-items: flex-start; gap: 6px; font-size: 14px; }
+  .problems .icon { color: var(--red); }
+  .problems .icon svg { width: 16px; height: 16px; margin-top: 3px; }
+  .changes .c-pick { width: 56px; }
+  .changes .c-price, .changes .c-stock { width: 210px; text-align: right; white-space: nowrap; }
+  .changes .c-result { width: 260px; }
+  .change { display: inline-flex; align-items: baseline; gap: 6px; }
+  .change .fix-old { display: inline; }
+  .change .arrow { display: inline-flex; align-self: center; color: var(--print-soft); }
+  .change .arrow svg { width: 14px; height: 14px; }
+  .change .new { color: var(--ink); font-weight: 600; }
+  .c-result .fix-note { justify-content: flex-start; max-width: none; text-align: left; }
+  .apply-bar { display: grid; justify-items: start; gap: 12px; margin-top: 20px; }
+  .btn.armed, .btn.armed:hover { background: var(--red); border-color: var(--red); }
+  .progress { display: grid; gap: 6px; width: min(100%, 480px); }
+  .progress[hidden] { display: none; }
+  .progress .slot-bar { margin-top: 0; height: 6px; }
+  .progress .slot-bar i { width: 0; transition: width .3s ease-out; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
   }
@@ -433,6 +502,32 @@
       border-bottom: 1px solid var(--rule);
     }
     .rot .c-state, .rot .c-last, .rot .c-act { width: auto; }
+    .toolbar { gap: 12px; }
+    .tool, .tool.search { flex: 1 1 100%; max-width: none; }
+    .sum { display: flex; justify-content: space-between; text-align: left; }
+    .sum-label { display: inline; font-weight: 400; color: var(--print-soft); }
+    .products .model-row { padding: 12px 0; border-bottom: 1px dotted var(--rule-strong); }
+    .model-row .c-name { padding-left: 0; }
+    .products .model-row .c-sell:empty, .products .c-boost:empty { display: none; }
+
+    .changes tr {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      grid-template-areas: "pick name" "pick price" "pick stock" "pick result";
+      gap: 6px 8px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .changes .c-pick { grid-area: pick; }
+    .changes .c-name { grid-area: name; }
+    .changes .c-price { grid-area: price; text-align: left; }
+    .changes .c-stock { grid-area: stock; text-align: left; }
+    .changes .c-result { grid-area: result; }
+    .changes .c-price::before { content: "Giá gốc: "; color: var(--print-soft); font-size: 13px; }
+    .changes .c-stock::before { content: "Tồn kho: "; color: var(--print-soft); font-size: 13px; }
+    .changes .c-pick, .changes .c-price, .changes .c-stock, .changes .c-result { width: auto; }
+    .dropzone { padding: 16px; }
+
     .rot .c-name { grid-area: name; }
     .rot .c-state { grid-area: state; }
     .rot .c-last { grid-area: last; font-size: 13px; color: var(--print-soft); }
@@ -455,7 +550,7 @@
 <main class="sheet" id="content"></main>
 
 <script>
-const state = { offset: 0, pageSize: 20, status: null, boostIds: [], boostNote: null };
+const state = { status: null, boostIds: [], boostNote: null, catalog: null, query: "", sort: "recent", page: 1, pageSize: 30, open: new Set() };
 let uid = 0;
 let boostQueue = Promise.resolve();
 
@@ -476,6 +571,12 @@ const ICONS = {
   boost: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5V7"/><path d="M6.5 12.5 12 7l5.5 5.5"/><path d="M5 3.5h14"/></svg>',
   tick: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>',
   cross: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5 12 15l5.5-5.5"/></svg>',
+  search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>',
+  sheet: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 9.5v10"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4.5"/><path d="M7.5 9 12 4.5 16.5 9"/><path d="M4.5 15.5v3a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-3"/></svg>',
+  download: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5v11"/><path d="M7.5 11 12 15.5 16.5 11"/><path d="M4.5 15.5v3a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-3"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12h15M14 6.5l5.5 5.5-5.5 5.5"/></svg>',
   reload: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5V9H15"/></svg>',
 };
 function icon(name) {
@@ -625,7 +726,7 @@ function renderConnect() {
  * Mot o sua gia hoac ton. Sua xong, so cu hien gach do, so moi viet muc xanh;
  * bam Luu (hoac Enter) moi gui len Shopee, Esc de tra lai so cu.
  */
-function fixField({ label, unit, value, min, action, save, extra }) {
+function fixField({ label, unit, value, min, action, save, onSaved, extra }) {
   let saved = typeof value === "number" ? value : null;
   const id = `f${++uid}`;
   const wrap = el("div", { className: "fix" });
@@ -691,6 +792,7 @@ function fixField({ label, unit, value, min, action, save, extra }) {
     saveBtn.textContent = "Đang lưu...";
     try {
       await save(v);
+      onSaved?.(v);
       old.textContent = saved == null ? "" : money(saved);
       saved = v;
       input.value = money(v);
@@ -734,8 +836,8 @@ function fixField({ label, unit, value, min, action, save, extra }) {
 }
 
 function boostTick(item) {
-  const input = el("input", { type: "checkbox", checked: state.boostIds.includes(item.item_id) });
-  input.setAttribute("aria-label", `Đưa ${item.item_name ?? "sản phẩm"} vào danh sách đẩy tự động`);
+  const input = el("input", { type: "checkbox", checked: state.boostIds.includes(item.itemId) });
+  input.setAttribute("aria-label", `Đưa ${item.name} vào danh sách đẩy tự động`);
   const msg = el("span", { className: "tick-note", attrs: { role: "status" } });
 
   input.addEventListener("change", () => {
@@ -744,8 +846,8 @@ function boostTick(item) {
     // Xep hang tung lan luu de hai o bam lien nhau khong de mat nhau.
     boostQueue = boostQueue.then(async () => {
       const next = wanted
-        ? [...new Set([...state.boostIds, item.item_id])]
-        : state.boostIds.filter((id) => id !== item.item_id);
+        ? [...new Set([...state.boostIds, item.itemId])]
+        : state.boostIds.filter((id) => id !== item.itemId);
       try {
         const saved = await api("/api/boost", send("PUT", { itemIds: next }));
         state.boostIds = saved.itemIds;
@@ -773,87 +875,289 @@ function boostTick(item) {
 
 // ---------- San pham ----------
 
-function productRow(item) {
-  return el("tr", {}, [
-    el("td", { className: "c-img" }, item.image
-      ? el("img", { className: "thumb", src: item.image, alt: "", loading: "lazy" })
-      : el("span", { className: "thumb" })),
+/** Bo dau de tim "giay thom" ra "Giấy thơm". */
+const fold = (text) =>
+  String(text ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[đĐ]/g, "d").toLowerCase();
+
+const SORTS = [
+  { id: "recent", label: "Mới cập nhật trước" },
+  { id: "name", label: "Tên A đến Z" },
+  { id: "price-asc", label: "Giá thấp đến cao" },
+  { id: "price-desc", label: "Giá cao đến thấp" },
+  { id: "stock-asc", label: "Tồn ít đến nhiều" },
+  { id: "stock-desc", label: "Tồn nhiều đến ít" },
+];
+
+function readPref(key, fallback) {
+  try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
+}
+function writePref(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* trinh duyet chan luu tru, bo qua */ }
+}
+
+/** Tinh lai khoang gia, tong ton sau khi sua mot phan loai. */
+function summarize(item) {
+  const src = item.hasModel ? item.models : [item];
+  const prices = src.map((m) => m.price).filter((x) => typeof x === "number");
+  const stocks = src.map((m) => m.stock).filter((x) => typeof x === "number");
+  item.priceMin = prices.length ? Math.min(...prices) : undefined;
+  item.priceMax = prices.length ? Math.max(...prices) : undefined;
+  item.stockTotal = stocks.length ? stocks.reduce((a, b) => a + b, 0) : undefined;
+}
+
+const range = (min, max) =>
+  typeof min !== "number" ? "-" : min === max ? `${money(min)} ₫` : `${money(min)} - ${money(max)} ₫`;
+
+function matches(item, words) {
+  if (!words.length) return { hit: true, inModel: false };
+  const own = fold(`${item.name} ${item.itemId} ${item.sku ?? ""}`);
+  const models = item.models.map((m) => fold(`${m.name} ${m.modelId} ${m.sku ?? ""}`));
+  const hay = `${own} ${models.join(" ")}`;
+  const hit = words.every((w) => hay.includes(w));
+  return { hit, inModel: hit && !words.every((w) => own.includes(w)) };
+}
+
+function sortItems(items, sort) {
+  const list = [...items];
+  const last = (v, dir) => (typeof v === "number" ? v : dir > 0 ? Infinity : -Infinity);
+  const by = {
+    name: (a, b) => a.name.localeCompare(b.name, "vi"),
+    "price-asc": (a, b) => last(a.priceMin, 1) - last(b.priceMin, 1),
+    "price-desc": (a, b) => last(b.priceMax, -1) - last(a.priceMax, -1),
+    "stock-asc": (a, b) => last(a.stockTotal, 1) - last(b.stockTotal, 1),
+    "stock-desc": (a, b) => last(b.stockTotal, -1) - last(a.stockTotal, -1),
+  }[sort];
+  return by ? list.sort(by) : list;
+}
+
+/** `sellEl`: o "Gia dang ban" cua dong. Khong dang giam gia thi gia ban doi theo gia goc. */
+function priceField(item, model, sellEl) {
+  const target = model ?? item;
+  return fixField({
+    label: "Giá gốc", unit: "₫", value: target.price, min: 1, action: "Lưu giá",
+    save: (v) => api(`/api/products/${item.itemId}/price`, send("POST", { original_price: v, model_id: model ? model.modelId : 0 })),
+    onSaved: (v) => {
+      if (target.currentPrice === target.price) {
+        target.currentPrice = v;
+        if (sellEl) sellEl.textContent = `${money(v)} ₫`;
+      }
+      target.price = v;
+      summarize(item);
+      refreshSummary(item);
+    },
+  });
+}
+
+function stockField(item, model) {
+  const target = model ?? item;
+  return fixField({
+    label: "Tồn kho", unit: "", value: target.stock, min: 0, action: "Lưu tồn",
+    save: (v) => api(`/api/products/${item.itemId}/stock`, send("POST", { stock: v, model_id: model ? model.modelId : 0 })),
+    onSaved: (v) => { target.stock = v; summarize(item); refreshSummary(item); },
+    extra: target.reserved ? `Giữ cho khuyến mại: ${money(target.reserved)}` : null,
+  });
+}
+
+/** Cap nhat khoang gia, tong ton tren dong san pham sau khi sua mot phan loai. */
+function refreshSummary(item) {
+  const body = document.querySelector(`tbody[data-item="${item.itemId}"]`);
+  if (!body || !item.hasModel) return;
+  body.querySelector(".sum-price").textContent = range(item.priceMin, item.priceMax);
+  body.querySelector(".sum-stock").textContent = typeof item.stockTotal === "number" ? money(item.stockTotal) : "-";
+}
+
+function modelRow(item, m) {
+  const sell = el("span", { className: "num", textContent: `${money(m.currentPrice)} ₫` });
+  return el("tr", { className: "model-row" }, [
+    el("td", { className: "c-img" }),
     el("td", { className: "c-name" }, [
-      el("p", { className: "name", textContent: item.item_name ?? "(không tên)" }),
-      el("p", { className: "meta num", textContent: `Mã ${item.item_id}${item.item_sku ? " · SKU " + item.item_sku : ""}` }),
-      item.has_model ? el("p", { className: "meta", textContent: "Có phân loại: sửa ở đây chỉ đổi phân loại mặc định." }) : null,
+      el("p", { className: "model-name", textContent: m.name }),
+      el("p", { className: "meta num", textContent: `Mã phân loại ${m.modelId}${m.sku ? " · SKU " + m.sku : ""}` }),
     ]),
-    el("td", { className: "c-price" }, fixField({
-      label: "Giá gốc", unit: "₫", value: item.original_price, min: 1, action: "Lưu giá",
-      save: (v) => api(`/api/products/${item.item_id}/price`, send("POST", { original_price: v })),
-    })),
-    el("td", { className: "c-stock" }, fixField({
-      label: "Tồn kho", unit: "", value: item.available_stock, min: 0, action: "Lưu tồn",
-      save: (v) => api(`/api/products/${item.item_id}/stock`, send("POST", { stock: v })),
-      extra: item.reserved_stock ? `Giữ cho khuyến mại: ${money(item.reserved_stock)}` : null,
-    })),
-    el("td", { className: "c-sell" }, [
-      el("span", { className: "sell-label", textContent: "Đang bán " }),
-      el("span", { className: "num", textContent: `${money(item.current_price)} ₫` }),
-    ]),
-    el("td", { className: "c-boost" }, boostTick(item)),
+    el("td", { className: "c-price" }, priceField(item, m, sell)),
+    el("td", { className: "c-stock" }, stockField(item, m)),
+    el("td", { className: "c-sell" }, [el("span", { className: "sell-label", textContent: "Đang bán " }), sell]),
+    el("td", { className: "c-boost" }),
   ]);
 }
 
-async function renderProducts() {
+/** Moi san pham mot tbody: dong san pham, va cac dong phan loai khi mo ra. */
+function productBody(item, openNow) {
+  const body = el("tbody", { className: "item" });
+  body.dataset.item = item.itemId;
+  const nameCell = el("td", { className: "c-name" }, [
+    el("p", { className: "name", textContent: item.name }),
+    el("p", { className: "meta num", textContent: `Mã ${item.itemId}${item.sku ? " · SKU " + item.sku : ""}` }),
+    item.problem ? el("p", { className: "meta err", textContent: item.problem }) : null,
+  ]);
+
+  let priceCell, stockCell, sellText;
+  const sell = el("span", { className: "num" });
+  if (item.hasModel) {
+    priceCell = el("td", { className: "c-price" }, el("p", { className: "sum" }, [
+      el("span", { className: "sum-label", textContent: "Giá gốc " }),
+      el("span", { className: "sum-price num", textContent: range(item.priceMin, item.priceMax) }),
+    ]));
+    stockCell = el("td", { className: "c-stock" }, el("p", { className: "sum" }, [
+      el("span", { className: "sum-label", textContent: "Tổng tồn " }),
+      el("span", { className: "sum-stock num", textContent: typeof item.stockTotal === "number" ? money(item.stockTotal) : "-" }),
+    ]));
+    const cur = item.models.map((m) => m.currentPrice).filter((x) => typeof x === "number");
+    sellText = cur.length ? range(Math.min(...cur), Math.max(...cur)) : "-";
+  } else {
+    priceCell = el("td", { className: "c-price" }, priceField(item, null, sell));
+    stockCell = el("td", { className: "c-stock" }, stockField(item));
+    sellText = `${money(item.currentPrice)} ₫`;
+  }
+
+  sell.textContent = sellText;
+  body.append(el("tr", { className: "item-row" }, [
+    el("td", { className: "c-img" }, item.image
+      ? el("img", { className: "thumb", src: item.image, alt: "", loading: "lazy" })
+      : el("span", { className: "thumb" })),
+    nameCell,
+    priceCell,
+    stockCell,
+    el("td", { className: "c-sell" }, [el("span", { className: "sell-label", textContent: "Đang bán " }), sell]),
+    el("td", { className: "c-boost" }, boostTick(item)),
+  ]));
+
+  if (item.hasModel && item.models.length) {
+    const toggle = el("button", { type: "button", className: "link ink toggle" }, [
+      icon("chevron"),
+      el("span", { textContent: `${item.models.length} phân loại` }),
+    ]);
+    let rows = null;
+    // Chi nho khi nguoi dung tu bam; mo tu dong luc tim thi khong giu lai.
+    const setOpen = (open, remember) => {
+      if (open && !rows) {
+        rows = item.models.map((m) => modelRow(item, m));
+        body.append(...rows);
+      }
+      rows?.forEach((r) => { r.hidden = !open; });
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.lastChild.textContent = open ? `Ẩn ${item.models.length} phân loại` : `Sửa ${item.models.length} phân loại`;
+      if (remember) {
+        if (open) state.open.add(item.itemId); else state.open.delete(item.itemId);
+      }
+    };
+    toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true", true));
+    nameCell.append(toggle);
+    setOpen(openNow, false);
+  }
+  return body;
+}
+
+function renderList() {
+  const box = $("list");
+  if (!box || !state.catalog) return;
+  const words = fold(state.query).split(/\s+/).filter(Boolean);
+  const found = [];
+  for (const item of state.catalog.items) {
+    const m = matches(item, words);
+    if (m.hit) found.push({ item, open: m.inModel || state.open.has(item.itemId) });
+  }
+  const sorted = sortItems(found.map((f) => f.item), state.sort);
+  const openIds = new Set(found.filter((f) => f.open).map((f) => f.item.itemId));
+  const pages = Math.max(1, Math.ceil(sorted.length / state.pageSize));
+  state.page = Math.min(state.page, pages);
+  const slice = sorted.slice((state.page - 1) * state.pageSize, state.page * state.pageSize);
+
+  $("count").textContent = words.length
+    ? `Tìm thấy ${money(sorted.length)} / ${money(state.catalog.items.length)} sản phẩm`
+    : `${money(state.catalog.items.length)} sản phẩm`;
+
+  if (!slice.length) {
+    box.replaceChildren(el("div", { className: "empty" }, el("p", {
+      textContent: words.length ? `Không có sản phẩm nào khớp "${state.query.trim()}".` : "Shop chưa có sản phẩm nào đang bán.",
+    })));
+    return;
+  }
+
+  const parts = [el("table", { className: "ledger products" }, [
+    el("thead", {}, el("tr", {}, [
+      el("th", { attrs: { scope: "col" } }, el("span", { className: "sr", textContent: "Ảnh" })),
+      el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm" }),
+      el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá gốc" }),
+      el("th", { className: "r", attrs: { scope: "col" }, textContent: "Tồn kho" }),
+      el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá đang bán" }),
+      el("th", { attrs: { scope: "col" }, textContent: "Đẩy" }),
+    ])),
+    ...slice.map((item) => productBody(item, openIds.has(item.itemId))),
+  ])];
+
+  if (pages > 1) {
+    const go = (page) => { state.page = page; renderList(); $("content").scrollIntoView({ block: "start" }); };
+    const prev = el("button", { type: "button", className: "btn line sm", textContent: "Trang trước", disabled: state.page === 1 });
+    prev.addEventListener("click", () => go(state.page - 1));
+    const next = el("button", { type: "button", className: "btn line sm", textContent: "Trang sau", disabled: state.page === pages });
+    next.addEventListener("click", () => go(state.page + 1));
+    parts.push(el("div", { className: "pager" }, [prev, el("span", { className: "soft num", textContent: `Trang ${state.page}/${pages}` }), next]));
+  }
+  box.replaceChildren(...parts);
+}
+
+async function renderProducts(force = false) {
   const content = $("content");
-  content.replaceChildren(el("p", { className: "loading", textContent: "Đang tải sản phẩm từ Shopee..." }));
+  content.replaceChildren(el("p", { className: "loading", textContent: force || !state.catalog
+    ? "Đang tải toàn bộ sản phẩm và phân loại từ Shopee, shop nhiều sản phẩm có thể mất vài chục giây..."
+    : "Đang mở danh sách..." }));
   try {
-    const [data, boost] = await Promise.all([
-      api(`/api/products?offset=${state.offset}&page_size=${state.pageSize}`),
+    const [catalog, boost] = await Promise.all([
+      !force && state.catalog ? state.catalog : api(`/api/catalog${force ? "?refresh=1" : ""}`),
       api("/api/boost/settings"),
     ]);
+    state.catalog = catalog;
     state.boostIds = boost.itemIds;
-    const page = Math.floor(state.offset / state.pageSize) + 1;
-    const pages = Math.max(1, Math.ceil(data.total_count / state.pageSize));
 
+    const loaded = new Date(catalog.loadedAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
     const head = el("div", { className: "sheet-head" }, [
       el("h2", { textContent: "Sản phẩm đang bán" }),
-      el("p", { className: "soft num", textContent: `${money(data.total_count)} sản phẩm` }),
+      el("p", { className: "soft num" }, [el("span", { id: "count" }), ` · số liệu lúc ${loaded}`]),
       el("span", { className: "grow" }),
-      reloadButton(renderProducts),
+      reloadButton(() => renderProducts(true)),
     ]);
     const envNote = state.status.sandbox
       ? el("p", { className: "env-note soft", textContent: "Shop thử nghiệm: sửa thoải mái, không ảnh hưởng khách mua." })
       : el("p", { className: "env-note live", textContent: "Shop thật: bấm Lưu là khách mua thấy giá, tồn mới ngay." });
 
-    content.replaceChildren(head, envNote);
+    const search = el("input", {
+      type: "search", id: "search", className: "search-input", value: state.query,
+      placeholder: "Tên, mã sản phẩm, SKU, phân loại...", autocomplete: "off",
+    });
+    let timer = 0;
+    search.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { state.query = search.value; state.page = 1; renderList(); }, 150);
+    });
+    const sort = el("select", { id: "sort", className: "sort-select" },
+      SORTS.map((s) => el("option", { value: s.id, textContent: s.label, selected: s.id === state.sort })));
+    sort.addEventListener("change", () => {
+      state.sort = sort.value;
+      writePref("sort", sort.value);
+      state.page = 1;
+      renderList();
+    });
+
+    const toolbar = el("div", { className: "toolbar", attrs: { role: "search" } }, [
+      el("label", { className: "tool search" }, [
+        el("span", { className: "tool-label", textContent: "Tìm" }),
+        el("span", { className: "tool-field" }, [icon("search"), search]),
+      ]),
+      el("label", { className: "tool" }, [
+        el("span", { className: "tool-label", textContent: "Sắp xếp" }),
+        el("span", { className: "tool-field" }, [sort, icon("chevron")]),
+      ]),
+    ]);
+
+    content.replaceChildren(head, envNote, toolbar, el("div", { id: "list" }));
     if (state.connectedBanner) {
       content.prepend(el("p", { className: "banner", attrs: { role: "status" } }, note("ok", "Đã kết nối shop thành công.")));
       state.connectedBanner = false;
     }
-
-    if (!data.items.length) {
-      content.append(el("div", { className: "empty" }, el("p", { textContent: "Shop chưa có sản phẩm nào đang bán." })));
-      return;
-    }
-
-    content.append(el("table", { className: "ledger products" }, [
-      el("thead", {}, el("tr", {}, [
-        el("th", { attrs: { scope: "col" } }, el("span", { className: "sr", textContent: "Ảnh" })),
-        el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm" }),
-        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá gốc" }),
-        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Tồn kho" }),
-        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá đang bán" }),
-        el("th", { attrs: { scope: "col" }, textContent: "Đẩy" }),
-      ])),
-      el("tbody", {}, data.items.map(productRow)),
-    ]));
-
-    if (pages > 1) {
-      const prev = el("button", { type: "button", className: "btn line sm", textContent: "Trang trước", disabled: state.offset === 0 });
-      prev.addEventListener("click", () => { state.offset = Math.max(0, state.offset - state.pageSize); renderProducts(); });
-      const next = el("button", { type: "button", className: "btn line sm", textContent: "Trang sau", disabled: !data.has_next_page });
-      next.addEventListener("click", () => { state.offset = data.next_offset; renderProducts(); });
-      content.append(el("div", { className: "pager" }, [prev, el("span", { className: "soft num", textContent: `Trang ${page}/${pages}` }), next]));
-    }
+    renderList();
   } catch (error) {
-    content.replaceChildren(problem(error.message, renderProducts));
+    content.replaceChildren(problem(error.message, () => renderProducts(true)));
   }
 }
 
@@ -1013,10 +1317,215 @@ async function renderBoost() {
   }
 }
 
+// ---------- Sua hang loat bang Excel ----------
+
+function renderBulk() {
+  const content = $("content");
+  const fileInput = el("input", { type: "file", id: "bulk-file", className: "sr", accept: ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  const drop = el("div", { className: "dropzone" }, [
+    el("p", { textContent: "Kéo tệp .xlsx đã sửa vào đây, hoặc" }),
+    el("label", { className: "btn line", htmlFor: "bulk-file" }, [icon("upload"), "Chọn tệp đã sửa"]),
+    fileInput,
+  ]);
+  const preview = el("div", { id: "preview" });
+
+  const take = (file) => { if (file) previewFile(file, preview); };
+  fileInput.addEventListener("change", () => { take(fileInput.files[0]); fileInput.value = ""; });
+  drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    drop.classList.remove("over");
+    take(e.dataTransfer.files[0]);
+  });
+
+  content.replaceChildren(
+    el("div", { className: "sheet-head" }, [el("h2", { textContent: "Sửa giá, tồn hàng loạt bằng Excel" })]),
+    el("ol", { className: "steps" }, [
+      el("li", {}, [
+        el("p", {}, [el("strong", { textContent: "Tải tệp giá, tồn hiện tại. " }), "Mỗi sản phẩm hoặc mỗi phân loại là một dòng, có sẵn giá và tồn đang bán."]),
+        el("a", { className: "btn", href: "/api/excel/template", download: "" }, [icon("download"), "Tải tệp Excel"]),
+      ]),
+      el("li", {}, el("p", {}, [el("strong", { textContent: "Điền cột nền xanh nhạt " }), '"Giá gốc mới", "Tồn kho mới". Ô để trống là giữ nguyên. Không sửa cột mã.'])),
+      el("li", {}, [el("p", {}, [el("strong", { textContent: "Tải tệp lên để xem trước. " }), "Chưa có gì được gửi lên Shopee cho tới khi anh chị bấm Áp dụng."]), drop]),
+    ]),
+    preview,
+  );
+}
+
+async function previewFile(file, box) {
+  box.replaceChildren(el("p", { className: "loading", textContent: `Đang đọc "${file.name}" và so với số liệu Shopee lúc này...` }));
+  try {
+    const res = await fetch("/api/excel/preview", { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: file });
+    const data = await res.json().catch(() => ({ error: `Lỗi HTTP ${res.status}` }));
+    if (!res.ok) throw new Error(data.error || `Lỗi HTTP ${res.status}`);
+    showPreview(file.name, data, box);
+  } catch (error) {
+    box.replaceChildren(problem(error.message));
+  }
+}
+
+function showPreview(fileName, data, box) {
+  const parts = [];
+  parts.push(el("p", { className: "summary num" }, [
+    `Đã đọc ${money(data.rowsRead)} dòng trong "${fileName}": `,
+    el("strong", { className: "ok", textContent: `${money(data.changes.length)} dòng thay đổi` }),
+    `, ${money(data.unchanged)} dòng giữ nguyên`,
+    data.problems.length ? ", " : ".",
+    data.problems.length ? el("strong", { className: "err", textContent: `${money(data.problems.length)} dòng lỗi (không áp dụng).` }) : null,
+  ]));
+
+  if (data.problems.length) {
+    parts.push(el("section", { className: "problems" }, [
+      el("h3", { textContent: "Dòng lỗi" }),
+      el("ul", {}, data.problems.map((p) => el("li", {}, [icon("cross"), el("span", {}, [el("strong", { className: "num", textContent: `Dòng ${p.row}: ` }), p.message])]))),
+    ]));
+  }
+
+  if (!data.changes.length) {
+    parts.push(el("div", { className: "empty" }, el("p", { textContent: "Không có dòng nào cần đổi. Kiểm tra đã điền cột Giá gốc mới, Tồn kho mới và lưu tệp chưa." })));
+    box.replaceChildren(...parts);
+    return;
+  }
+
+  const checks = new Map();
+  const resultCells = new Map();
+  const all = el("input", { type: "checkbox", checked: true });
+  all.setAttribute("aria-label", "Chọn tất cả");
+
+  const cell = (oldV, newV, unit) => newV === undefined
+    ? el("span", { className: "soft num", textContent: typeof oldV === "number" ? `${money(oldV)}${unit}` : "-" })
+    : el("span", { className: "change num" }, [
+        el("s", { className: "fix-old", textContent: typeof oldV === "number" ? money(oldV) : "-" }),
+        el("span", { className: "arrow", attrs: { "aria-hidden": "true" } }, icon("arrow")),
+        el("span", { className: "new", textContent: `${money(newV)}${unit}` }),
+      ]);
+
+  const rows = data.changes.map((c) => {
+    const pick = el("input", { type: "checkbox", checked: true });
+    pick.setAttribute("aria-label", `Chọn dòng ${c.row}: ${c.name}${c.modelName ? " - " + c.modelName : ""}`);
+    checks.set(c.key, pick);
+    const result = el("td", { className: "c-result" });
+    resultCells.set(c.key, result);
+    return el("tr", {}, [
+      el("td", { className: "c-pick" }, el("label", { className: "tick" }, [pick, el("span", { className: "tick-box", attrs: { "aria-hidden": "true" } }, icon("tick"))])),
+      el("td", { className: "c-name" }, [
+        el("p", { className: "name", textContent: c.name }),
+        c.modelName ? el("p", { className: "model-name", textContent: c.modelName }) : null,
+        el("p", { className: "meta num", textContent: `Dòng ${c.row} trong tệp` }),
+        ...c.warnings.map((w) => el("p", { className: "meta err" }, [el("strong", { textContent: "Kiểm tra lại: " }), w])),
+      ]),
+      el("td", { className: "c-price" }, cell(c.oldPrice, c.newPrice, " ₫")),
+      el("td", { className: "c-stock" }, cell(c.oldStock, c.newStock, "")),
+      result,
+    ]);
+  });
+
+  const applyBtn = el("button", { type: "button", className: "btn" });
+  const progress = el("div", { className: "progress", hidden: true }, [
+    el("span", { className: "slot-bar" }, el("i")),
+    el("p", { className: "run-note num", attrs: { role: "status" } }),
+  ]);
+  const chosen = () => data.changes.filter((c) => checks.get(c.key).checked);
+  let armed = false;
+  let armTimer = 0;
+  const label = () => {
+    const n = chosen().length;
+    applyBtn.disabled = n === 0;
+    applyBtn.textContent = armed
+      ? `Bấm lần nữa để đổi ${n} dòng trên shop thật`
+      : `Áp dụng ${n} thay đổi lên Shopee`;
+    applyBtn.classList.toggle("armed", armed);
+  };
+  checks.forEach((b) => b.addEventListener("change", () => {
+    all.checked = [...checks.values()].every((x) => x.checked);
+    armed = false;
+    label();
+  }));
+  all.addEventListener("change", () => { checks.forEach((b) => { b.checked = all.checked; }); armed = false; label(); });
+
+  applyBtn.addEventListener("click", async () => {
+    // Shop that: bam hai lan moi gui, tranh bam nham.
+    if (!data.sandbox && !armed) {
+      armed = true;
+      label();
+      clearTimeout(armTimer);
+      armTimer = setTimeout(() => { armed = false; label(); }, 6000);
+      return;
+    }
+    clearTimeout(armTimer);
+    const list = chosen();
+    applyBtn.disabled = true;
+    applyBtn.textContent = "Đang gửi lên Shopee...";
+    all.disabled = true;
+    checks.forEach((b) => { b.disabled = true; });
+    progress.hidden = false;
+    try {
+      const { jobId, total } = await api("/api/excel/apply", send("POST", { previewId: data.previewId, keys: list.map((c) => c.key) }));
+      await follow(jobId, total, resultCells, progress);
+      state.catalog = null; // trang San pham tai lai so moi
+      applyBtn.remove();
+    } catch (error) {
+      progress.querySelector(".run-note").className = "run-note err";
+      progress.querySelector(".run-note").textContent = error.message;
+      applyBtn.textContent = "Chọn lại tệp để thử lại";
+    }
+  });
+  label();
+
+  parts.push(
+    el("table", { className: "ledger changes" }, [
+      el("thead", {}, el("tr", {}, [
+        el("th", { attrs: { scope: "col" } }, el("label", { className: "tick" }, [all, el("span", { className: "tick-box", attrs: { "aria-hidden": "true" } }, icon("tick"))])),
+        el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm, phân loại" }),
+        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá gốc" }),
+        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Tồn kho" }),
+        el("th", { attrs: { scope: "col" }, textContent: "Kết quả" }),
+      ])),
+      el("tbody", {}, rows),
+    ]),
+    el("div", { className: "apply-bar" }, [
+      data.sandbox
+        ? el("p", { className: "env-note soft", textContent: "Shop thử nghiệm: áp dụng thoải mái." })
+        : el("p", { className: "env-note live", textContent: "Shop thật: sau khi áp dụng, khách mua thấy giá, tồn mới ngay." }),
+      applyBtn,
+      progress,
+    ]),
+  );
+  box.replaceChildren(...parts);
+}
+
+/** Hoi tien do cho toi khi xong, dien ket qua vao tung dong. */
+async function follow(jobId, total, resultCells, progress) {
+  const bar = progress.querySelector("i");
+  const text = progress.querySelector(".run-note");
+  let shown = 0;
+  for (;;) {
+    const job = await api(`/api/excel/jobs/${jobId}`);
+    for (const r of job.results.slice(shown)) {
+      const cell = resultCells.get(r.key);
+      if (cell) {
+        cell.append(el("p", { className: `fix-note ${r.ok ? "ok" : "err"}` },
+          note(r.ok ? "ok" : "err", `${r.field === "price" ? "Giá" : "Tồn"}: ${r.ok ? "Shopee đã nhận" : r.message}`)));
+      }
+    }
+    shown = job.results.length;
+    bar.style.width = `${total ? Math.round((shown / total) * 100) : 100}%`;
+    const failed = job.results.filter((r) => !r.ok).length;
+    text.textContent = job.finished
+      ? `Xong: ${shown - failed} thay đổi Shopee đã nhận${failed ? `, ${failed} bị từ chối (xem cột Kết quả)` : ""}.`
+      : `Đã gửi ${shown}/${total} thay đổi...`;
+    text.className = `run-note ${job.finished && failed ? "err" : job.finished ? "ok" : ""}`;
+    if (job.finished) return;
+    await new Promise((resolve) => setTimeout(resolve, 700));
+  }
+}
+
 // ---------- Chuyen trang ----------
 
 const TABS = [
-  { id: "products", label: "Sản phẩm", icon: "tag", render: renderProducts },
+  { id: "products", label: "Sản phẩm", icon: "tag", render: () => renderProducts() },
+  { id: "bulk", label: "Sửa hàng loạt", icon: "sheet", render: renderBulk },
   { id: "boost", label: "Đẩy sản phẩm", icon: "boost", render: renderBoost },
 ];
 
@@ -1045,6 +1554,7 @@ function showTab(id) {
     state.connectedBanner = true;
     history.replaceState(null, "", location.pathname);
   }
+  state.sort = SORTS.some((x) => x.id === readPref("sort", "")) ? readPref("sort", "") : "recent";
   const status = await loadStatus();
   if (!status) return;
   if (!status.connected) {

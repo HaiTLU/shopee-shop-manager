@@ -16,6 +16,8 @@ import { config } from "../config.js";
 import { sdk } from "../shopee.js";
 import { fetchBoostedNow, runBoostCycle, saveBoostSettings, MAX_BOOST_SLOTS } from "../boost.js";
 import { readState } from "../stateStore.js";
+import { getCatalog, patchCatalog } from "../catalog.js";
+import { excelRouter } from "./excel.js";
 
 /**
  * Va kieu bi dat nham cho trong SDK.
@@ -79,6 +81,19 @@ apiRouter.get(
     res.json(info.response ?? info);
   }),
 );
+
+/**
+ * Toan bo san pham dang ban kem gia, ton tung phan loai. Giao dien tim va sap
+ * xep ngay tren trinh duyet. ?refresh=1 de tai lai tu Shopee.
+ */
+apiRouter.get(
+  "/catalog",
+  handle(async (req, res) => {
+    res.json(await getCatalog({ force: req.query.refresh === "1" }));
+  }),
+);
+
+apiRouter.use("/excel", excelRouter);
 
 /**
  * Danh sach san pham kem gia va ton kho.
@@ -183,6 +198,7 @@ apiRouter.post(
       res.status(422).json({ error: "Shopee từ chối cập nhật giá", failure_list: result.failure_list });
       return;
     }
+    patchCatalog(itemId, typeof modelId === "number" ? modelId : 0, { price: originalPrice });
     res.json({ ok: true, result });
   }),
 );
@@ -225,6 +241,7 @@ apiRouter.post(
       res.status(422).json({ error: "Shopee từ chối cập nhật tồn kho", failure_list: result.failure_list });
       return;
     }
+    patchCatalog(itemId, typeof modelId === "number" ? modelId : 0, { stock });
     res.json({ ok: true, result });
   }),
 );

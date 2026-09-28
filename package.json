@@ -20,6 +20,7 @@
   "dependencies": {
     "@congminh1254/shopee-sdk": "^2.6.0",
     "dotenv": "^18.0.1",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1"
   },
   "devDependencies": {

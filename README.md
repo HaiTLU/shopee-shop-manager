@@ -1,6 +1,6 @@
 # Quản lý shop Shopee
 
-Trang web tự quản lý shop Shopee qua Open Platform API v2: xem danh sách sản phẩm, sửa giá và tồn kho, xem đơn hàng.
+Trang web tự quản lý shop Shopee qua Open Platform API v2: xem, tìm, sắp xếp sản phẩm; sửa giá và tồn kho từng sản phẩm, từng phân loại hoặc hàng loạt bằng Excel; đẩy sản phẩm tự động.
 
 Toàn bộ khóa bí mật và token nằm trên máy chủ. Trình duyệt không bao giờ nhìn thấy `partner_key` hay `access_token`.
 
@@ -36,12 +36,29 @@ Lần đầu nên để `SHOPEE_REGION=TEST_GLOBAL` (môi trường thử nghi�
 
 Tách riêng để khóa và token của hai môi trường không bao giờ lẫn nhau. Máy chủ và lệnh `status` luôn in ra tên tệp cấu hình đang dùng. Cả hai tệp đều bị chặn khỏi git.
 
+## Sản phẩm có phân loại, tìm và sắp xếp
+
+Sản phẩm có phân loại (mùi, cỡ, combo...) thì Shopee lưu giá và tồn ở từng phân loại, không lưu ở cấp sản phẩm. Trang tải toàn bộ sản phẩm kèm từng phân loại một lần (giữ 10 phút, bấm **Tải lại** để lấy số mới), dòng sản phẩm hiện khoảng giá và tổng tồn, bấm **Sửa N phân loại** để sửa riêng từng phân loại.
+
+Ô **Tìm** không cần gõ dấu, tìm theo tên, mã, SKU và cả tên phân loại. Ô **Sắp xếp** theo mới cập nhật, tên, giá hoặc tồn kho.
+
+## Sửa giá, tồn hàng loạt bằng Excel
+
+Thẻ **Sửa hàng loạt**:
+
+1. **Tải tệp Excel**: mỗi sản phẩm hoặc phân loại một dòng, có sẵn giá và tồn hiện tại. Tên tệp theo dạng `YYMMDD_TenShop_SuaGiaTon.xlsx`.
+2. Điền hai cột nền xanh nhạt **Giá gốc mới**, **Tồn kho mới**. Ô trống là giữ nguyên. Không sửa cột mã.
+3. Tải tệp lên: hệ thống so với số liệu Shopee ngay lúc đó, liệt kê từng thay đổi (số cũ gạch đỏ, số mới mực xanh), dòng lỗi kèm số dòng trong tệp, và đánh dấu dòng giá đổi bất thường (gấp rưỡi trở lên hoặc còn một nửa trở xuống) để kiểm tra lại.
+4. Bỏ chọn dòng không muốn đổi rồi bấm **Áp dụng**. Ở shop thật phải bấm hai lần. Hệ thống gửi dần lên Shopee (gom theo sản phẩm, tối đa 50 phân loại mỗi lệnh, nghỉ giữa các lệnh, tự thử lại khi Shopee báo bận) và báo kết quả từng dòng.
+
+Bản xem trước giữ trên máy chủ 30 phút và chỉ áp dụng được một lần, nên số được gửi đúng là số người dùng đã xem.
+
 ## Đẩy sản phẩm tự động
 
 Shopee cho đẩy tối đa 5 sản phẩm cùng lúc, mỗi lượt 4 giờ. Trên trang web:
 
-1. Thẻ **San pham**: tick ô **Day** ở những sản phẩm muốn đẩy (tối đa 50, không giới hạn ở 5).
-2. Thẻ **Day san pham**: bấm **Bat day tu dong**. Cứ 10 phút hệ thống kiểm tra, còn chỗ trống thì đẩy tiếp sản phẩm lâu chưa đẩy nhất, xoay vòng cả danh sách. **Chay ngay** để đẩy liền không chờ.
+1. Thẻ **Sản phẩm**: đánh dấu ô **Đẩy** ở những sản phẩm muốn đẩy (tối đa 50, không giới hạn ở 5).
+2. Thẻ **Đẩy sản phẩm**: bật công tắc **Tự động đẩy**. Cứ 10 phút hệ thống kiểm tra, còn chỗ trống thì đẩy tiếp sản phẩm lâu chưa đẩy nhất, xoay vòng cả danh sách. **Đẩy ngay** để đẩy liền không chờ.
 
 Chỉ chạy khi máy chủ đang chạy. Danh sách lưu riêng cho từng môi trường (`data/state-<vùng>-<partner_id>.json`). Đổi chu kỳ bằng `BOOST_CHECK_MINUTES` trong tệp cấu hình.
 
@@ -65,7 +82,7 @@ npm run cli -- day-ngay            # Chạy một vòng đẩy sản phẩm ngay
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 42 bài kiểm thử
+npm test            # 52 bài kiểm thử
 ```
 
 ## Cấu trúc
@@ -78,6 +95,10 @@ src/
   server.ts          Máy chủ web
   routes/auth.ts     Luồng ủy quyền shop
   routes/api.ts      API nội bộ cho giao diện
+  routes/excel.ts    Tải tệp, xem trước, áp dụng sửa hàng loạt
+  catalog.ts         Toàn bộ sản phẩm kèm từng phân loại, giữ trong bộ nhớ
+  excel.ts           Tạo, đọc tệp Excel, so sánh thay đổi, gửi dần lên Shopee
+  boost.ts           Đẩy sản phẩm tự động
   authCallback.ts    Tách code và shop_id từ đường dẫn sau ủy quyền
   cli.ts             Công cụ dòng lệnh
 public/index.html    Giao diện, không cần bước biên dịch
@@ -106,14 +127,14 @@ Lớp bảo vệ cũng xử lý trường hợp Shopee từ chối một token m
 
 - **Tệp `.env` và thư mục `data/` không bao giờ được đẩy lên git.** Đã chặn sẵn trong `.gitignore`.
 - **Sửa tồn kho:** Shopee chỉ cho sửa phần tồn của người bán. Tồn mới phải lớn hơn hoặc bằng phần đang bị giữ cho khuyến mại, nếu không Shopee từ chối. Giao diện có hiển thị số đang bị giữ.
-- **Sản phẩm có biến thể:** giao diện hiện tại chỉ sửa được biến thể mặc định. Muốn sửa từng biến thể thì dùng `/api/products/:itemId/models` rồi gọi cập nhật kèm `model_id`.
+- **Sản phẩm có phân loại:** giá và tồn sửa ở từng phân loại (gửi kèm `model_id`), cả trên trang và trong tệp Excel.
 - **Một chỗ vá tạm:** SDK khai báo nhầm vị trí trường tồn kho `stock_info_v2`. Dự án khai báo lại cho khớp dữ liệu Shopee trả về thật. Xem chú thích trong `src/routes/api.ts`. Khi nâng cấp SDK nên kiểm lại chỗ này.
 
 ## Việc chưa làm
 
 Đây là nền móng chạy được, chưa phải bản đầy đủ. Những phần có thể làm tiếp:
 
-- Sửa giá và tồn theo lô cho nhiều sản phẩm cùng lúc (đang làm)
+- Tự trả lời đánh giá theo mẫu (đang làm)
 - Quản lý đơn hàng: in vận đơn, cập nhật trạng thái
 - Mã giảm giá, khuyến mại, flash sale
 - Nhận thông báo đẩy từ Shopee thay vì hỏi liên tục
