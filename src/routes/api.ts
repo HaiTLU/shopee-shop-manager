@@ -12,6 +12,7 @@ import {
   type GetItemBaseInfoItem,
   type GetItemBaseInfoStockInfoV2,
 } from "@congminh1254/shopee-sdk/schemas";
+import { config } from "../config.js";
 import { sdk } from "../shopee.js";
 import { fetchBoostedNow, runBoostCycle, saveBoostSettings, MAX_BOOST_SLOTS } from "../boost.js";
 import { readState } from "../stateStore.js";
@@ -71,7 +72,11 @@ function intParam(raw: unknown, fallback: number, min: number, max: number): num
 apiRouter.get(
   "/shop",
   handle(async (_req, res) => {
-    res.json(unwrap(await sdk.shop.getShopInfo()));
+    // Shopee tra ket qua get_shop_info o cap ngoai cung (shop_name, region...),
+    // khong boc trong "response" nhu SDK khai bao. Dung unwrap se ra rong.
+    const info = await sdk.shop.getShopInfo();
+    if (info.error) throw new Error(`${info.error}: ${info.message || "không có mô tả"}`);
+    res.json(info.response ?? info);
   }),
 );
 
@@ -254,8 +259,12 @@ apiRouter.get(
     const { boost } = await readState();
     const boostedNow = await fetchBoostedNow();
     const names = new Map<number, string>();
-    if (boost.itemIds.length) {
-      const detail = unwrap(await sdk.product.getItemBaseInfo({ item_id_list: boost.itemIds }));
+    // Lay ten ca san pham dang duoc day nhung da bo khoi danh sach (hoac day tay tren Kenh Nguoi Ban).
+    // Danh sach toi da 50 cong 5 o dang day co the vuot 50 ma moi lan hoi, nen chia lo.
+    const nameIds = [...new Set([...boost.itemIds, ...boostedNow.map((b) => b.itemId)])];
+    for (let i = 0; i < nameIds.length; i += MAX_ITEM_DETAIL_BATCH) {
+      const batch = nameIds.slice(i, i + MAX_ITEM_DETAIL_BATCH);
+      const detail = unwrap(await sdk.product.getItemBaseInfo({ item_id_list: batch }));
       for (const item of detail.item_list ?? []) {
         if (item.item_id) names.set(item.item_id, item.item_name ?? "");
       }
@@ -264,9 +273,10 @@ apiRouter.get(
     res.json({
       enabled: boost.enabled,
       maxSlots: MAX_BOOST_SLOTS,
+      checkMinutes: config.boostCheckMinutes,
       lastRunAt: boost.lastRunAt ?? null,
       lastResult: boost.lastResult ?? null,
-      boostedNow,
+      boostedNow: boostedNow.map((b) => ({ ...b, name: names.get(b.itemId) ?? null })),
       items: boost.itemIds.map((itemId) => ({
         itemId,
         name: names.get(itemId) ?? "(không tìm thấy, có thể đã xóa hoặc ẩn)",

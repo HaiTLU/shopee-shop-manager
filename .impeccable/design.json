@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T04:59:36+00:00",
+  "title": "Design System: Quản lý shop Combi Home",
+  "extensions": {
+    "colorMeta": {
+      "ballpoint-ink": {
+        "role": "primary",
+        "displayName": "Mực bi xanh",
+        "canonical": "#1f3fae",
+        "tonalRamp": [
+          "#0c0056",
+          "#06007a",
+          "#1531a0",
+          "#3055c6",
+          "#4f79ed",
+          "#6f9eff",
+          "#92c3ff",
+          "#c9edff"
+        ]
+      },
+      "ballpoint-ink-deep": {
+        "role": "primary",
+        "displayName": "Mực bi đậm",
+        "canonical": "#162f86",
+        "tonalRamp": [
+          "#050048",
+          "#06136b",
+          "#1d388f",
+          "#395ab4",
+          "#587ddb",
+          "#79a1ff",
+          "#9cc6ff",
+          "#c9edff"
+        ]
+      },
+      "red-pen": {
+        "role": "secondary",
+        "displayName": "Bút đỏ",
+        "canonical": "#c42b28",
+        "tonalRamp": [
+          "#3d0000",
+          "#650000",
+          "#8c0000",
+          "#b41619",
+          "#dd453d",
+          "#ff6c60",
+          "#ff9283",
+          "#ffcfc3"
+        ]
+      },
+      "pencil-graphite": {
+        "role": "tertiary",
+        "displayName": "Bút chì",
+        "canonical": "#474c5c",
+        "tonalRamp": [
+          "#070a17",
+          "#202433",
+          "#3d4151",
+          "#5b6171",
+          "#7c8293",
+          "#9fa4b7",
+          "#c2c9dc",
+          "#e8eeff"
+        ]
+      },
+      "pencil-graphite-deep": {
+        "role": "tertiary",
+        "displayName": "Bút chì đậm",
+        "canonical": "#30343f",
+        "tonalRamp": [
+          "#080b14",
+          "#21252f",
+          "#3e424d",
+          "#5c616d",
+          "#7d828f",
+          "#a0a5b2",
+          "#c4c9d7",
+          "#e9eefd"
+        ]
+      },
+      "notebook-cover": {
+        "role": "neutral",
+        "displayName": "Bìa sổ (chỗ đặt màu Combi Home)",
+        "canonical": "#1c2b73",
+        "tonalRamp": [
+          "#04003e",
+          "#0f1960",
+          "#283a83",
+          "#455ba8",
+          "#647dcd",
+          "#85a1f4",
+          "#a8c5ff",
+          "#ceebff"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Giấy vở",
+        "canonical": "#fbfcff",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#242527",
+          "#414244",
+          "#606164",
+          "#818285",
+          "#a4a5a8",
+          "#c8c9cc",
+          "#edeef1"
+        ]
+      },
+      "label-white": {
+        "role": "neutral",
+        "displayName": "Nhãn trắng",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "printed-ink": {
+        "role": "neutral",
+        "displayName": "Chữ in",
+        "canonical": "#1b1d2a",
+        "tonalRamp": [
+          "#090a16",
+          "#222431",
+          "#3e4150",
+          "#5d6070",
+          "#7e8192",
+          "#a1a4b5",
+          "#c5c8da",
+          "#eaedff"
+        ]
+      },
+      "printed-soft": {
+        "role": "neutral",
+        "displayName": "Chữ in nhạt",
+        "canonical": "#555a6b",
+        "tonalRamp": [
+          "#070a17",
+          "#202433",
+          "#3d4151",
+          "#5b6172",
+          "#7c8294",
+          "#9fa4b7",
+          "#c3c8dc",
+          "#e8eeff"
+        ]
+      },
+      "rule-line": {
+        "role": "neutral",
+        "displayName": "Dòng kẻ",
+        "canonical": "#dcdfef",
+        "tonalRamp": [
+          "#090a14",
+          "#222430",
+          "#3f414e",
+          "#5e606e",
+          "#7f8190",
+          "#a1a4b3",
+          "#c5c8d8",
+          "#eaedfe"
+        ]
+      },
+      "rule-line-strong": {
+        "role": "neutral",
+        "displayName": "Dòng kẻ đậm",
+        "canonical": "#b7bcda",
+        "tonalRamp": [
+          "#08081d",
+          "#20233a",
+          "#3c4059",
+          "#5b5f7a",
+          "#7c809c",
+          "#9ea3c0",
+          "#c2c7e5",
+          "#e7ecff"
+        ]
+      },
+      "carbon-paper": {
+        "role": "neutral",
+        "displayName": "Giấy than",
+        "canonical": "#11152a",
+        "tonalRamp": [
+          "#06091d",
+          "#1f233a",
+          "#3b4059",
+          "#59607a",
+          "#7a819c",
+          "#9ca4c0",
+          "#c0c8e5",
+          "#e5edff"
+        ]
+      },
+      "carbon-label": {
+        "role": "neutral",
+        "displayName": "Nhãn giấy than",
+        "canonical": "#1a1f3a",
+        "tonalRamp": [
+          "#060820",
+          "#1d233e",
+          "#39405e",
+          "#585f7f",
+          "#7881a2",
+          "#9ba3c6",
+          "#bec7ec",
+          "#e3edff"
+        ]
+      },
+      "carbon-ink": {
+        "role": "primary",
+        "displayName": "Mực giấy than",
+        "canonical": "#9fb3ff",
+        "tonalRamp": [
+          "#050038",
+          "#151b5a",
+          "#2f3b7c",
+          "#4c5ba0",
+          "#6c7dc5",
+          "#8da0eb",
+          "#b0c5ff",
+          "#d5eaff"
+        ]
+      },
+      "carbon-print": {
+        "role": "neutral",
+        "displayName": "Chữ in trên giấy than",
+        "canonical": "#e7e9f4",
+        "tonalRamp": [
+          "#0a0b11",
+          "#23242c",
+          "#40414a",
+          "#5f616a",
+          "#80828b",
+          "#a2a4af",
+          "#c6c8d3",
+          "#eceef9"
+        ]
+      },
+      "carbon-red": {
+        "role": "secondary",
+        "displayName": "Bút đỏ trên giấy than",
+        "canonical": "#ff8f86",
+        "tonalRamp": [
+          "#310000",
+          "#560000",
+          "#7b1417",
+          "#a03a36",
+          "#c75d56",
+          "#ef8078",
+          "#ffa49b",
+          "#ffcfc5"
+        ]
+      },
+      "oly-line": {
+        "role": "neutral",
+        "displayName": "Kẻ ô ly mảnh",
+        "canonical": "rgba(98, 86, 190, .045)"
+      },
+      "oly-line-strong": {
+        "role": "neutral",
+        "displayName": "Kẻ ô ly đậm",
+        "canonical": "rgba(98, 86, 190, .11)"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Tên shop",
+        "purpose": "Tên shop trên nhãn vở."
+      },
+      "title": {
+        "displayName": "Tiêu đề trang sổ",
+        "purpose": "Tiêu đề mỗi trang: Sản phẩm đang bán, Đang đẩy 3/5 ô."
+      },
+      "body": {
+        "displayName": "Chữ thường",
+        "purpose": "Tên sản phẩm, lời giải thích."
+      },
+      "figure": {
+        "displayName": "Số trong ô chữa",
+        "purpose": "Giá, tồn trong ô sửa; số dạng bảng."
+      },
+      "label": {
+        "displayName": "Nhãn",
+        "purpose": "Tên cột, tên trường, mã sản phẩm."
+      },
+      "stamp": {
+        "displayName": "Con dấu",
+        "purpose": "Chỉ cho con dấu môi trường."
+      }
+    },
+    "shadows": [
+      {
+        "name": "label-sticker",
+        "value": "0 1px 2px rgba(15, 20, 60, .2), 0 8px 20px rgba(15, 20, 60, .18)",
+        "purpose": "Chỉ cho nhãn vở dán trên bìa."
+      },
+      {
+        "name": "switch-thumb",
+        "value": "0 1px 2px rgba(0, 0, 0, .25)",
+        "purpose": "Núm công tắc."
+      }
+    ],
+    "motion": [
+      {
+        "name": "strike",
+        "value": ".26s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Nét bút đỏ gạch số cũ khi bắt đầu chữa sổ; tắt khi người dùng chọn giảm chuyển động."
+      },
+      {
+        "name": "switch",
+        "value": ".2s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Núm công tắc trượt."
+      },
+      {
+        "name": "state",
+        "value": ".15s ease-out",
+        "purpose": "Đổi màu nền nút, thẻ, viền ô đánh dấu."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "720px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nút chính",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Nút lưu và kết nối: nền mực bi xanh.",
+      "html": "<button class=\"ds-btn\">Lưu giá</button>",
+      "css": ".ds-btn { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1.5px solid #1f3fae; border-radius: 4px; background: #1f3fae; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color .15s ease-out, border-color .15s ease-out; } .ds-btn:hover { background: #162f86; border-color: #162f86; } .ds-btn:focus-visible { outline: 2px solid #1f3fae; outline-offset: 2px; }"
+    },
+    {
+      "name": "Nút viền",
+      "kind": "button",
+      "refersTo": "button-line",
+      "description": "Thao tác phụ: Đẩy ngay, chuyển trang, thử lại.",
+      "html": "<button class=\"ds-btn-line\">Đẩy ngay</button>",
+      "css": ".ds-btn-line { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1.5px solid #1f3fae; border-radius: 4px; background: transparent; color: #1f3fae; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color .15s ease-out; } .ds-btn-line:hover { background: rgba(31, 63, 174, .07); } .ds-btn-line:focus-visible { outline: 2px solid #1f3fae; outline-offset: 2px; }"
+    },
+    {
+      "name": "Liên kết chữ",
+      "kind": "button",
+      "description": "Hủy, Tải lại, Bỏ khỏi danh sách: chữ in nhạt gạch chân.",
+      "html": "<button class=\"ds-link\">Bỏ khỏi danh sách</button>",
+      "css": ".ds-link { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; min-height: 32px; padding: 0 4px; border: 0; background: none; color: #555a6b; font-size: 13px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; } .ds-link:hover { color: #1f3fae; } .ds-link:focus-visible { outline: 2px solid #1f3fae; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ô chữa sổ",
+      "kind": "input",
+      "refersTo": "input-figure",
+      "description": "Sửa giá hoặc tồn: số cũ gạch đỏ, số mới mực xanh, kết quả ngay dưới.",
+      "html": "<div class=\"ds-fix\"><span class=\"ds-fix-line\"><s class=\"ds-fix-old\">89.000</s><input class=\"ds-fix-input\" value=\"95.000\" aria-label=\"Giá gốc\"><span class=\"ds-fix-unit\">₫</span></span><p class=\"ds-fix-note\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 12.5 9.5 17.5 19.5 6.5\"/></svg><span>Shopee đã nhận lúc 14:32.</span></p></div>",
+      "css": ".ds-fix { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; display: grid; gap: 6px; justify-items: end; } .ds-fix-line { display: inline-flex; align-items: baseline; gap: 6px; } .ds-fix-old { color: #c42b28; font-size: 13px; text-decoration: none; background: linear-gradient(#c42b28, #c42b28) no-repeat 0 60% / 100% 1.5px; } .ds-fix-input { width: 9ch; padding: 4px 2px; border: 0; border-bottom: 1.5px solid #b7bcda; border-radius: 0; background: transparent; color: #1f3fae; font: 600 16px/1.3 \"Be Vietnam Pro\", system-ui, sans-serif; font-variant-numeric: tabular-nums; text-align: right; } .ds-fix-input:hover { border-bottom-color: #1f3fae; } .ds-fix-input:focus { outline: none; border-bottom: 2px solid #1f3fae; background: rgba(31, 63, 174, .07); } .ds-fix-unit { color: #555a6b; font-size: 13px; } .ds-fix-note { display: flex; gap: 4px; align-items: center; margin: 0; color: #1f3fae; font-size: 12px; }"
+    },
+    {
+      "name": "Thẻ chuyển trang",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Thẻ phân trang nhô lên từ mép bìa sổ.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab\" aria-current=\"page\">Sản phẩm</button><button class=\"ds-tab\">Đẩy sản phẩm</button></nav>",
+      "css": ".ds-tabs { display: flex; gap: 4px; padding: 16px 16px 0; background: #1c2b73; } .ds-tab { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; min-height: 44px; padding: 0 16px; border: 0; border-radius: 6px 6px 0 0; background: rgba(255, 255, 255, .14); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color .15s ease-out; } .ds-tab:hover { background: rgba(255, 255, 255, .24); } .ds-tab[aria-current=page] { background: #fbfcff; color: #1b1d2a; } .ds-tab:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }"
+    },
+    {
+      "name": "Nhãn vở",
+      "kind": "custom",
+      "refersTo": "notebook-label",
+      "description": "Nhãn trên bìa: tên shop, mã shop, hạn ủy quyền, con dấu môi trường.",
+      "html": "<div class=\"ds-cover\"><div class=\"ds-label\"><p class=\"ds-shop\"><span class=\"ds-fn\">Shop</span><span class=\"ds-fill\">Combi Home</span></p><span class=\"ds-stamp\">Shop thật</span><p class=\"ds-fields\"><span class=\"ds-fn\">Mã shop</span><span class=\"ds-fill\">123456789</span></p></div></div>",
+      "css": ".ds-cover { padding: 20px; background: #1c2b73; } .ds-label { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; padding: 16px 20px; border-radius: 6px; background: #fff; color: #1b1d2a; box-shadow: 0 1px 2px rgba(15, 20, 60, .2), 0 8px 20px rgba(15, 20, 60, .18); outline: 1px solid #b7bcda; outline-offset: -6px; } .ds-shop { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; } .ds-fields { grid-column: 1 / -1; display: flex; gap: 6px; align-items: baseline; margin: 0; font-size: 14px; } .ds-fn { font-size: 12px; font-weight: 500; color: #555a6b; } .ds-fill { padding: 0 4px 2px; border-bottom: 1px dotted #b7bcda; color: #1f3fae; font-weight: 600; } .ds-stamp { justify-self: end; padding: 2px 10px; border: 3px double currentColor; border-radius: 3px; color: #c42b28; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; transform: rotate(-4deg); }"
+    },
+    {
+      "name": "Ô đẩy",
+      "kind": "card",
+      "refersTo": "boost-slot",
+      "description": "Một trong năm ô đẩy: đang dùng hoặc trống.",
+      "html": "<ol class=\"ds-slots\"><li class=\"ds-slot\"><span class=\"ds-no\">Ô 1</span><span class=\"ds-name\">Túi giặt lưới cỡ lớn</span><span class=\"ds-time\">còn 2 giờ 12 phút</span><span class=\"ds-bar\"><i style=\"width:55%\"></i></span></li><li class=\"ds-slot ds-empty\"><span class=\"ds-no\">Ô 2</span><span class=\"ds-name\">Ô trống</span></li></ol>",
+      "css": ".ds-slots { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 180px); gap: 12px; } .ds-slot { display: grid; align-content: start; gap: 6px; min-height: 124px; padding: 12px; border: 1.5px solid #1f3fae; border-radius: 4px; background: #fbfcff; } .ds-empty { border-style: dashed; border-color: #b7bcda; background: transparent; } .ds-no { font-size: 12px; font-weight: 600; color: #555a6b; } .ds-name { font-weight: 600; line-height: 1.35; color: #1b1d2a; } .ds-empty .ds-name { color: #555a6b; font-weight: 400; } .ds-time { font-size: 13px; font-weight: 600; color: #1f3fae; } .ds-bar { height: 4px; margin-top: auto; border-radius: 2px; background: #dcdfef; overflow: hidden; } .ds-bar i { display: block; height: 100%; background: #1f3fae; }"
+    },
+    {
+      "name": "Công tắc",
+      "kind": "custom",
+      "description": "Bật tắt tự động đẩy, có chữ trạng thái.",
+      "html": "<button class=\"ds-switch\" role=\"switch\" aria-checked=\"true\"><span class=\"ds-track\"><span class=\"ds-thumb\"></span></span><span class=\"ds-st\"><strong>Tự động đẩy</strong><span>Đang bật</span></span></button>",
+      "css": ".ds-switch { font-family: \"Be Vietnam Pro\", system-ui, sans-serif; display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: none; color: #1b1d2a; cursor: pointer; text-align: left; } .ds-track { position: relative; width: 44px; height: 26px; border-radius: 13px; background: #b7bcda; transition: background-color .2s ease-out; } .ds-thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fbfcff; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .2s cubic-bezier(.16, 1, .3, 1); } .ds-switch[aria-checked=true] .ds-track { background: #1f3fae; } .ds-switch[aria-checked=true] .ds-thumb { transform: translateX(18px); } .ds-st { display: grid; line-height: 1.3; } .ds-st span { font-size: 13px; color: #1f3fae; font-weight: 600; } .ds-switch:focus-visible { outline: 2px solid #1f3fae; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Cuốn sổ bán hàng ô ly",
+    "overview": "Trang quản lý là cuốn sổ bán hàng của cửa hàng: bìa màu đặc có nhãn vở trắng ghi tên shop, bên trong là trang giấy kẻ ô ly với một đường lề đỏ, mỗi sản phẩm là một dòng sổ. Sửa giá hay tồn kho là chữa sổ: số cũ bị gạch bằng bút đỏ, số mới viết bằng mực bi xanh, Shopee nhận thì có dấu tích. Người Việt nào cũng từng viết vở ô ly, nên nhân viên mới nhìn là hiểu ngay đâu là chỗ ghi, đâu là chỗ đã chữa.\n\nMật độ cao nhưng yên: dòng kẻ ngang ngăn các dòng sổ, không có thẻ nổi, không có số liệu to khoe khoang. Màu chỉ làm việc: mực xanh cho dữ liệu và nút, bút đỏ cho lề, số bị gạch, lỗi và con dấu \"Shop thật\", bút chì cho shop thử nghiệm. Chế độ tối là giấy than của phiếu xuất kho.\n\nMàu bìa (`notebook-cover`) và logo hiện là chỗ để trống cho nhận diện Combi Home: shop đã có logo và màu riêng nhưng chưa gửi. Khi có, thay màu bìa và đặt logo vào nhãn vở; không bịa màu hay logo thay thế.",
+    "keyCharacteristics": [
+      "Bìa sổ màu đặc, nhãn vở trắng có khung trong, con dấu môi trường nghiêng nhẹ.",
+      "Nền giấy kẻ đúng mẫu vở ô ly, một đường lề đỏ mảnh bên trái nội dung.",
+      "Dòng sổ thay cho thẻ; số liệu là số dạng bảng, căn phải theo cột.",
+      "Chữa sổ: số cũ gạch đỏ, số mới mực xanh, dấu tích khi Shopee nhận.",
+      "Hai môi trường khác nhau bằng mắt: mực xanh và con dấu đỏ cho shop thật, bút chì và con dấu xám cho thử nghiệm."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule - Luật một mực",
+        "body": "Dữ liệu và thao tác chỉ viết bằng mực bi xanh. Không thêm màu xanh lá cho \"thành công\" hay màu cam cho \"cảnh báo\": thành công là mực xanh kèm dấu tích, lỗi là bút đỏ kèm dấu chéo.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Red Jobs Rule - Luật ba việc của bút đỏ",
+        "body": "Bút đỏ chỉ kẻ lề, gạch số cũ và báo lỗi, đóng dấu \"Shop thật\". Nút xóa, nút bỏ khỏi danh sách không dùng màu đỏ.",
+        "section": "colors"
+      },
+      {
+        "name": "The Visible Environment Rule - Luật nhìn là biết môi trường",
+        "body": "Shop thật và shop thử nghiệm phải khác nhau bằng con dấu có chữ, màu mực, màu bìa và tiền tố tiêu đề tab trình duyệt; màu không bao giờ là tín hiệu duy nhất.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Figures Rule - Luật số thẳng cột",
+        "body": "Mọi con số (giá, tồn, số phút, số trang) dùng số dạng bảng và căn phải trong cột.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper Is Flat Rule - Luật giấy phẳng",
+        "body": "Không thêm bóng cho thẻ, ô hay bảng trên trang giấy. Muốn tách, dùng dòng kẻ.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** viết mọi chữ bằng tiếng Việt có dấu, từ thông dụng; nhãn nút nói đúng việc sẽ xảy ra (\"Lưu giá\", \"Bỏ khỏi danh sách\").",
+      "**Do** giữ nút lưu nằm ngay trong dòng sổ và nói kết quả của từng dòng.",
+      "**Do** hiện nguyên văn lý do Shopee từ chối, kèm dấu chéo bút đỏ.",
+      "**Do** cho mọi vùng bấm trên điện thoại cao ít nhất 44px.",
+      "**Do** tôn trọng `prefers-reduced-motion`: tắt nét gạch và chuyển động công tắc.",
+      "**Do** thay màu bìa (`notebook-cover`) và đặt logo vào nhãn vở khi có nhận diện Combi Home."
+    ],
+    "donts": [
+      "**Don't** dùng gạch dài hay gạch vừa; chỉ dùng dấu gạch ngắn `-`.",
+      "**Don't** dùng biểu tượng cảm xúc hay ký tự thay biểu tượng; biểu tượng vẽ bằng SVG nét 1,75px.",
+      "**Don't** dựng trang bằng thẻ số liệu lớn, thanh bên hay màu cam nhái Kênh Người Bán.",
+      "**Don't** thêm màu thứ ba cho trạng thái; thành công là mực xanh, lỗi là bút đỏ.",
+      "**Don't** dùng màu làm tín hiệu duy nhất cho trạng thái hay môi trường.",
+      "**Don't** tự bịa logo hay màu thương hiệu Combi Home."
+    ]
+  }
+}

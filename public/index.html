@@ -2,284 +2,495 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 <title>Quản lý shop Shopee</title>
-<link rel="icon" href="data:,">
+<link rel="icon" id="favicon" href="data:,">
+<link rel="preload" href="/fonts/be-vietnam-pro-vietnamese-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/be-vietnam-pro-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+  /* Be Vietnam Pro (SIL OFL, xem fonts/OFL.txt), luu ngay tren may: trang chay duoc khi khong vao duoc mang ngoai. */
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 400; font-display: swap; src: url(/fonts/be-vietnam-pro-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 500; font-display: swap; src: url(/fonts/be-vietnam-pro-latin-500-normal.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 600; font-display: swap; src: url(/fonts/be-vietnam-pro-latin-600-normal.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 700; font-display: swap; src: url(/fonts/be-vietnam-pro-latin-700-normal.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 400; font-display: swap; src: url(/fonts/be-vietnam-pro-vietnamese-400-normal.woff2) format("woff2"); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 500; font-display: swap; src: url(/fonts/be-vietnam-pro-vietnamese-500-normal.woff2) format("woff2"); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 600; font-display: swap; src: url(/fonts/be-vietnam-pro-vietnamese-600-normal.woff2) format("woff2"); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+  @font-face { font-family: "Be Vietnam Pro"; font-weight: 700; font-display: swap; src: url(/fonts/be-vietnam-pro-vietnamese-700-normal.woff2) format("woff2"); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+
+  /*
+   * Giay vo trang, luoi o ly tim nhat, muc bi xanh cho du lieu va nut,
+   * but do chi de ke le, gach so cu, bao loi va dong dau "Shop that".
+   * --cover la cho mau thuong hieu Combi Home: khi co ma mau, chi can thay dong nay.
+   */
   :root {
-    --bg: #ffffff;
-    --fg: #111111;
-    --muted: #666666;
-    --line: #d5d5d5;
-    --accent: #1a1a1a;
-    --warn-bg: #fff8e1;
-    --warn-line: #e0c060;
-    --ok-bg: #edf7ed;
-    --ok-line: #8fbf8f;
-    --err-bg: #fdecea;
-    --err-line: #d98a80;
+    --paper: #fbfcff;
+    --grid: rgba(98, 86, 190, .045);
+    --grid-strong: rgba(98, 86, 190, .11);
+    --rule: #dcdfef;
+    --rule-strong: #b7bcda;
+    --print: #1b1d2a;
+    --print-soft: #555a6b;
+    --ink: #1f3fae;
+    --ink-strong: #162f86;
+    --ink-wash: rgba(31, 63, 174, .07);
+    --on-ink: #ffffff;
+    --select: rgba(31, 63, 174, .2);
+    --red: #c42b28;
+    --cover: #1c2b73;
+    --cover-ink: #ffffff;
+    --cover-tab: rgba(255, 255, 255, .14);
+    --label: #ffffff;
+    --label-shadow: 0 1px 2px rgba(15, 20, 60, .2), 0 8px 20px rgba(15, 20, 60, .18);
+    --font: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
+  /* Shop thu nghiem: but chi thay muc, bia mau chi, con dau "Thu nghiem". */
+  body[data-env="sandbox"] {
+    --ink: #474c5c;
+    --ink-strong: #30343f;
+    --ink-wash: rgba(71, 76, 92, .08);
+    --select: rgba(71, 76, 92, .2);
+    --cover: #474c5c;
+  }
+  /* Che do toi: giay than cua phieu xuat kho. */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #161616; --fg: #ececec; --muted: #a0a0a0; --line: #3a3a3a; --accent: #ececec;
-      --warn-bg: #3a3320; --warn-line: #7a6a35;
-      --ok-bg: #1f3020; --ok-line: #4a7a4a;
-      --err-bg: #3a2220; --err-line: #8a4a44;
+      --paper: #11152a;
+      --grid: rgba(150, 165, 255, .03);
+      --grid-strong: rgba(150, 165, 255, .07);
+      --rule: #272d4b;
+      --rule-strong: #414a78;
+      --print: #e7e9f4;
+      --print-soft: #a7acc5;
+      --ink: #9fb3ff;
+      --ink-strong: #c6d2ff;
+      --ink-wash: rgba(159, 179, 255, .1);
+      --on-ink: #0c1024;
+      --select: rgba(159, 179, 255, .28);
+      --red: #ff8f86;
+      --cover: #070a1a;
+      --cover-tab: rgba(255, 255, 255, .08);
+      --label: #1a1f3a;
+      --label-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 8px 20px rgba(0, 0, 0, .35);
+    }
+    :root:not([data-theme="light"]) body[data-env="sandbox"] {
+      --ink: #c2c6d4;
+      --ink-strong: #e0e2ea;
+      --ink-wash: rgba(194, 198, 212, .1);
+      --select: rgba(194, 198, 212, .25);
+      --cover: #262935;
     }
   }
+
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0; padding: 24px 16px; background: var(--bg); color: var(--fg);
-    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--paper);
+    /* Vo o ly: o lon 32px ke dam, trong moi o ba dong ke manh cach 8px. */
+    background-image:
+      linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px),
+      linear-gradient(var(--grid-strong) 1px, transparent 1px),
+      linear-gradient(var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px, 32px 32px, 8px 8px;
+    color: var(--print);
+    font: 400 15px/1.6 var(--font);
+    caret-color: var(--ink);
+    scrollbar-color: var(--rule-strong) transparent;
   }
-  main { max-width: 1060px; margin: 0 auto; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
-  .bar {
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-    padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 18px;
+  ::selection { background: var(--select); color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  h1, h2, p { margin: 0; }
+  .num { font-variant-numeric: tabular-nums; }
+  .soft { color: var(--print-soft); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .icon { display: inline-flex; flex: none; }
+  .icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Bia so va nhan vo ---------- */
+  .cover {
+    background-color: var(--cover);
+    color: var(--cover-ink);
+    padding: 24px 24px 0 72px;
   }
-  .bar.ok  { background: var(--ok-bg);  border-color: var(--ok-line); }
-  .bar.warn{ background: var(--warn-bg);border-color: var(--warn-line); }
-  .bar.err { background: var(--err-bg); border-color: var(--err-line); }
-  .bar .grow { flex: 1 1 auto; min-width: 200px; }
-  button, .btn {
-    font: inherit; padding: 7px 14px; border: 1px solid var(--accent); border-radius: 6px;
-    background: var(--accent); color: var(--bg); cursor: pointer; text-decoration: none;
+  .cover-inner { max-width: 1048px; margin: 0 auto; }
+  .label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 16px;
+    align-items: start;
+    max-width: 620px;
+    padding: 16px 20px;
+    border-radius: 6px;
+    background: var(--label);
+    color: var(--print);
+    box-shadow: var(--label-shadow);
+    outline: 1px solid var(--rule-strong);
+    outline-offset: -6px;
   }
-  button.ghost, .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
-  button:disabled { opacity: .5; cursor: default; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle; text-align: center; }
-  th { font-weight: 600; background: transparent; }
-  td.name { text-align: left; max-width: 340px; }
-  td.name small { color: var(--muted); display: block; }
-  input[type=number] {
-    font: inherit; width: 110px; padding: 5px 7px; text-align: right;
-    border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--fg);
+  .shop { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-size: 24px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; }
+  .field-name { flex: none; font-size: 12px; font-weight: 500; letter-spacing: 0; color: var(--print-soft); }
+  .fill { min-width: 0; padding: 0 4px 2px; border-bottom: 1px dotted var(--rule-strong); color: var(--ink); overflow-wrap: anywhere; }
+  .fill.warn { color: var(--red); }
+  .fill.wait { color: var(--print-soft); font-weight: 400; }
+  .fields { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; font-size: 14px; }
+  .field { display: inline-flex; align-items: baseline; gap: 6px; }
+  .fields .fill { font-weight: 600; }
+  .stamp {
+    justify-self: end;
+    padding: 2px 10px;
+    border: 3px double currentColor;
+    border-radius: 3px;
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: rotate(-4deg);
   }
-  .thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid var(--line); }
-  .muted { color: var(--muted); }
-  .rowmsg { font-size: 12px; }
-  .rowmsg.ok { color: #2e7d32; }
-  .rowmsg.err { color: #c62828; }
-  .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
-  .empty { padding: 40px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; }
-  .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 18px; overflow-x: auto; }
-  .tabs button { background: transparent; color: var(--muted); border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 8px 14px; white-space: nowrap; }
-  .tabs button.active { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
-  .panel { border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--line); }
-  .pill.on { background: var(--ok-bg); border-color: var(--ok-line); }
-  input[type=checkbox] { width: 18px; height: 18px; }
+  body[data-env="sandbox"] .stamp { color: var(--print-soft); }
+
+  /* ---------- The chia trang ---------- */
+  .tabs { display: flex; gap: 4px; margin-top: 20px; }
+  .tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 16px;
+    border: 0; border-radius: 6px 6px 0 0;
+    background: var(--cover-tab); color: var(--cover-ink);
+    font: 600 14px/1 var(--font); cursor: pointer;
+    transition: background-color .15s ease-out;
+  }
+  .tab:hover { background: rgba(255, 255, 255, .24); }
+  .tab[aria-current="page"] { background: var(--paper); color: var(--print); }
+  .tab[aria-current="page"] .icon { color: var(--ink); }
+  .tab:focus-visible { outline-color: var(--cover-ink); outline-offset: -4px; }
+
+  /* ---------- Trang so ---------- */
+  .sheet {
+    position: relative;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 24px 64px 72px;
+  }
+  .sheet::before {
+    content: "";
+    position: absolute; top: 0; bottom: 0; left: 48px;
+    width: 1px; background: var(--red); opacity: .5;
+  }
+  .sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 8px; }
+  .sheet-head h2 { font-size: 20px; line-height: 1.3; font-weight: 700; letter-spacing: -0.01em; }
+  .sheet-head .grow { flex: 1; }
+  .env-note { margin-bottom: 16px; font-size: 13px; }
+  .env-note.live { color: var(--red); font-weight: 500; }
+  .banner { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; color: var(--ink); font-weight: 600; }
+  .loading { padding: 32px 0; color: var(--print-soft); }
+  .problem { display: grid; gap: 12px; justify-items: start; padding: 24px 0; color: var(--red); }
+  .problem p { color: var(--print); }
+  .empty { padding: 32px 0; display: grid; gap: 12px; justify-items: start; color: var(--print-soft); max-width: 60ch; }
+  section + section { margin-top: 32px; }
+
+  /* ---------- Nut ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 40px; padding: 0 16px;
+    border: 1.5px solid var(--ink); border-radius: 4px;
+    background: var(--ink); color: var(--on-ink);
+    font: 600 14px/1 var(--font); text-decoration: none; cursor: pointer;
+    transition: background-color .15s ease-out, border-color .15s ease-out;
+  }
+  .btn:hover { background: var(--ink-strong); border-color: var(--ink-strong); }
+  .btn.line { background: transparent; color: var(--ink); }
+  .btn.line:hover { background: var(--ink-wash); }
+  .btn.sm { min-height: 32px; padding: 0 12px; font-size: 13px; }
+  .btn:disabled, .link:disabled { opacity: .5; cursor: default; }
+  .link {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 32px; padding: 0 4px;
+    border: 0; background: none; color: var(--print-soft);
+    font: 500 13px/1 var(--font); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+  }
+  .link:hover { color: var(--ink); }
+  .link.ink { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Bang so ---------- */
+  .ledger { width: 100%; border-collapse: collapse; }
+  .ledger th {
+    padding: 8px 12px; text-align: left;
+    border-bottom: 2px solid var(--rule-strong);
+    font-size: 12px; font-weight: 600; color: var(--print-soft); white-space: nowrap;
+  }
+  .ledger th.r { text-align: right; }
+  .ledger td { padding: 16px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .ledger tr:hover td { background: var(--ink-wash); }
+  .c-img { width: 72px; }
+  .thumb { display: block; width: 48px; height: 48px; object-fit: cover; border-radius: 3px; border: 1px solid var(--rule); background: var(--paper); }
+  .name { font-weight: 600; line-height: 1.4; max-width: 44ch; }
+  .meta { margin-top: 2px; font-size: 13px; color: var(--print-soft); }
+  .c-price { width: 220px; }
+  .c-stock { width: 190px; }
+  .c-sell { width: 130px; text-align: right; white-space: nowrap; }
+  .c-boost { width: 104px; }
+  .sell-label { display: none; }
+
+  /* O sua so: so cu gach do, so moi viet muc xanh */
+  .fix { display: grid; gap: 6px; justify-items: end; }
+  .fix-row { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; width: 100%; }
+  .fix-label, .leader { display: none; }
+  .fix-line { display: inline-flex; align-items: baseline; gap: 6px; }
+  .fix-old {
+    display: none;
+    color: var(--red); font-size: 13px; text-decoration: none;
+    background: linear-gradient(var(--red), var(--red)) no-repeat 0 60% / 100% 1.5px;
+  }
+  .fix-old.draw { animation: strike .26s cubic-bezier(.16, 1, .3, 1) both; }
+  @keyframes strike { from { background-size: 0% 1.5px; } to { background-size: 100% 1.5px; } }
+  .fix[data-state="dirty"] .fix-old,
+  .fix[data-state="saving"] .fix-old,
+  .fix[data-state="error"] .fix-old,
+  .fix[data-state="saved"] .fix-old { display: inline; }
+  .fix-input {
+    width: 9ch; padding: 4px 2px;
+    border: 0; border-bottom: 1.5px solid var(--rule-strong); border-radius: 0;
+    background: transparent; color: var(--print);
+    font: 600 16px/1.3 var(--font); font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .fix-input:hover { border-bottom-color: var(--ink); }
+  .fix-input:focus { outline: none; border-bottom: 2px solid var(--ink); background: var(--ink-wash); }
+  .fix[data-state="dirty"] .fix-input,
+  .fix[data-state="error"] .fix-input,
+  .fix[data-state="saved"] .fix-input { color: var(--ink); }
+  .fix-unit { color: var(--print-soft); font-size: 13px; min-width: 1ch; }
+  .fix-actions { display: none; gap: 4px; }
+  .fix[data-state="dirty"] .fix-actions,
+  .fix[data-state="saving"] .fix-actions,
+  .fix[data-state="error"] .fix-actions { display: flex; }
+  .fix-note { display: flex; align-items: flex-start; gap: 4px; max-width: 30ch; font-size: 12px; line-height: 1.45; text-align: right; }
+  .fix-note:empty { display: none; }
+  .fix .meta { margin: 0; text-align: right; }
+  .fix-note .icon svg, .tick-note .icon svg { width: 16px; height: 16px; }
+  .ok { color: var(--ink); }
+  .err { color: var(--red); }
+
+  /* O danh dau day */
+  .tick-wrap { display: grid; justify-items: center; gap: 4px; }
+  .tick { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; cursor: pointer; }
+  .tick input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .tick-box {
+    display: inline-grid; place-items: center;
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--rule-strong); border-radius: 3px;
+    background: var(--paper); color: transparent;
+    transition: border-color .15s ease-out;
+  }
+  .tick-box svg { width: 18px; height: 18px; stroke-width: 2.25; }
+  .tick:hover .tick-box { border-color: var(--ink); }
+  .tick input:checked + .tick-box { border-color: var(--ink); color: var(--ink); }
+  .tick input:focus-visible + .tick-box { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .tick input:disabled + .tick-box { opacity: .5; }
+  .tick-text { display: none; font-size: 14px; font-weight: 500; }
+  .tick-note { display: flex; align-items: center; gap: 4px; font-size: 12px; text-align: center; white-space: nowrap; }
+  .tick-note:empty { display: none; }
+
+  .pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px; }
+
+  /* ---------- Nam o day ---------- */
+  .slots { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .slot {
+    display: grid; align-content: start; gap: 6px;
+    min-height: 124px; padding: 12px;
+    border: 1.5px solid var(--ink); border-radius: 4px;
+    background: var(--paper);
+  }
+  .slot.empty { border-style: dashed; border-color: var(--rule-strong); background: transparent; }
+  .slot-no { font-size: 12px; font-weight: 600; color: var(--print-soft); }
+  .slot-name { font-weight: 600; line-height: 1.35; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .slot.empty .slot-name { color: var(--print-soft); font-weight: 400; }
+  .slot-time { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .slot-bar { height: 4px; margin-top: auto; border-radius: 2px; background: var(--rule); overflow: hidden; }
+  .slot-bar i { display: block; height: 100%; background: var(--ink); }
+
+  .controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;
+    padding: 16px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  }
+  .controls .grow { flex: 1; }
+  .switch { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--print); font: inherit; cursor: pointer; text-align: left; }
+  .switch-track { position: relative; flex: none; width: 44px; height: 26px; border-radius: 13px; background: var(--rule-strong); transition: background-color .2s ease-out; }
+  .switch-thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--paper); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .2s cubic-bezier(.16, 1, .3, 1); }
+  .switch[aria-checked="true"] .switch-track { background: var(--ink); }
+  .switch[aria-checked="true"] .switch-thumb { transform: translateX(18px); }
+  .switch-text { display: grid; line-height: 1.3; }
+  .switch-text strong { font-weight: 600; }
+  .switch-text span { font-size: 13px; color: var(--print-soft); }
+  .switch[aria-checked="true"] .switch-text span { color: var(--ink); font-weight: 600; }
+  .explain { margin-top: 12px; max-width: 72ch; font-size: 13px; color: var(--print-soft); }
+  .run-note { margin-top: 8px; font-size: 14px; font-weight: 500; }
+  .run-note:empty { display: none; }
+
+  .state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .mark { flex: none; width: 10px; height: 10px; border: 1.5px solid var(--ink); border-radius: 2px; }
+  .mark.on { background: var(--ink); }
+  .state.on { color: var(--ink); font-weight: 600; }
+  .rot .c-state { width: 220px; }
+  .rot .c-last { width: 170px; }
+  .rot .c-act { width: 150px; text-align: right; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+
+  /* ---------- Dien thoai ---------- */
   @media (max-width: 720px) {
-    td.name { max-width: none; }
-    .thumb, .col-img { display: none; }
+    body { font-size: 15px; }
+    .cover { padding: 16px 16px 20px; }
+    .label { padding: 14px 16px; gap: 8px 12px; }
+    .shop { font-size: 20px; }
+    .fields { gap: 4px 16px; font-size: 13px; }
+
+    .tabs {
+      position: fixed; z-index: 10; left: 0; right: 0; bottom: 0;
+      margin: 0; gap: 0;
+      padding: 0 0 env(safe-area-inset-bottom);
+      background: var(--paper);
+      border-top: 1px solid var(--rule-strong);
+    }
+    .tab {
+      flex: 1; flex-direction: column; gap: 4px;
+      min-height: 60px; padding: 8px 4px;
+      border-radius: 0; background: transparent; color: var(--print-soft);
+      font-size: 12px;
+      box-shadow: inset 0 2px 0 transparent;
+    }
+    .tab:hover { background: var(--ink-wash); }
+    .tab[aria-current="page"] { background: transparent; color: var(--ink); box-shadow: inset 0 2px 0 var(--ink); }
+    .tab:focus-visible { outline-color: var(--ink); }
+
+    .sheet { padding: 20px 16px calc(96px + env(safe-area-inset-bottom)) 28px; }
+    .sheet::before { left: 14px; }
+    .sheet-head h2 { font-size: 18px; }
+    .sheet-head .grow { display: none; }
+    .sheet-head .link { margin-left: auto; }
+    .sheet-head > p { order: 3; flex-basis: 100%; }
+
+    .ledger thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .ledger, .ledger tbody, .ledger td { display: block; }
+    .ledger tr:hover td { background: none; }
+    .ledger td { padding: 0; border: 0; width: auto; }
+
+    .products tr {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      grid-template-areas: "img name name" "price price price" "stock stock stock" "sell sell boost";
+      gap: 10px 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .products .c-img { grid-area: img; }
+    .products .c-name { grid-area: name; }
+    .products .c-price { grid-area: price; }
+    .products .c-stock { grid-area: stock; }
+    .products .c-sell { grid-area: sell; align-self: center; text-align: left; font-size: 13px; color: var(--print-soft); }
+    .products .c-boost { grid-area: boost; }
+    .sell-label { display: inline; }
+    .thumb { width: 48px; height: 48px; }
+
+    .fix { justify-items: stretch; }
+    .fix-label { display: block; flex: none; font-size: 14px; color: var(--print-soft); }
+    .leader { display: block; flex: 1; min-width: 12px; border-bottom: 1px dotted var(--rule-strong); transform: translateY(-4px); }
+    .fix-input { width: 11ch; font-size: 17px; }
+    .fix-actions { justify-content: flex-end; }
+    .fix-note { max-width: none; justify-content: flex-end; }
+    .btn, .btn.sm { min-height: 44px; padding: 0 16px; }
+
+    .tick-wrap { justify-items: end; }
+    .tick { min-height: 44px; }
+    .tick-text { display: inline; }
+
+    .slots { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .slot {
+      min-height: 0; padding: 10px 12px;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      grid-template-areas: "no name time" "bar bar bar";
+      align-items: baseline; gap: 6px 8px;
+    }
+    .slot.empty { grid-template-areas: "no name name"; }
+    .slot-no { grid-area: no; }
+    .slot-name { grid-area: name; -webkit-line-clamp: 1; }
+    .slot-time { grid-area: time; white-space: nowrap; }
+    .slot-bar { grid-area: bar; margin-top: 2px; }
+
+    .rot tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: "name name" "state state" "last act";
+      gap: 4px 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .rot .c-state, .rot .c-last, .rot .c-act { width: auto; }
+    .rot .c-name { grid-area: name; }
+    .rot .c-state { grid-area: state; }
+    .rot .c-last { grid-area: last; font-size: 13px; color: var(--print-soft); }
+    .rot .c-act { grid-area: act; align-self: center; }
+    .last-label { display: inline; }
+    .link { min-height: 44px; }
   }
+  @media (min-width: 721px) { .last-label { display: none; } }
 </style>
 </head>
-<body>
-<main>
-  <h1>Quản lý shop Shopee</h1>
-  <p class="sub">Sửa giá và tồn kho trực tiếp. Mọi thay đổi được gửi thẳng lên Shopee.</p>
-
-  <div id="bar" class="bar">
-    <span class="grow">Đang kiểm tra kết nối...</span>
+<body data-env="loading">
+<header class="cover">
+  <div class="cover-inner">
+    <div class="label" id="label">
+      <h1 class="shop"><span class="field-name">Shop</span><span class="fill wait">đang kiểm tra kết nối...</span></h1>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Chọn việc"></nav>
   </div>
-
-  <nav id="tabs" class="tabs"></nav>
-  <div id="content"></div>
-</main>
+</header>
+<main class="sheet" id="content"></main>
 
 <script>
-const state = { offset: 0, pageSize: 20, hasNext: false, total: 0, boostIds: [] };
+const state = { offset: 0, pageSize: 20, status: null, boostIds: [], boostNote: null };
+let uid = 0;
+let boostQueue = Promise.resolve();
 
-const el = (tag, props = {}, children = []) => {
-  const node = Object.assign(document.createElement(tag), props);
+const $ = (id) => document.getElementById(id);
+
+function el(tag, props = {}, children = []) {
+  const { attrs, ...rest } = props;
+  const node = Object.assign(document.createElement(tag), rest);
+  if (attrs) for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
   for (const child of [].concat(children)) {
-    if (child != null) node.append(child);
+    if (child != null && child !== false) node.append(child);
   }
   return node;
+}
+
+const ICONS = {
+  tag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1 1 0 0 1 0 1.4l-7.3 7.3a1 1 0 0 1-1.4 0z"/><circle cx="8" cy="8" r="1.6"/></svg>',
+  boost: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5V7"/><path d="M6.5 12.5 12 7l5.5 5.5"/><path d="M5 3.5h14"/></svg>',
+  tick: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
+  reload: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5V9H15"/></svg>',
 };
-
-const money = (value) =>
-  typeof value === "number" ? value.toLocaleString("vi-VN") : "-";
-
-async function api(path, options) {
-  const res = await fetch(path, options);
-  const text = await res.text();
-  let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text }; }
-  if (!res.ok) throw new Error(data.error || `Lỗi HTTP ${res.status}`);
-  return data;
+function icon(name) {
+  const span = el("span", { className: "icon" });
+  span.innerHTML = ICONS[name];
+  return span;
 }
 
-async function renderStatus() {
-  const bar = document.getElementById("bar");
-  bar.textContent = "";
-  try {
-    const s = await api("/auth/status");
-    if (!s.connected) {
-      bar.className = "bar warn";
-      bar.append(
-        el("span", { className: "grow", textContent: "Chưa kết nối shop nào." }),
-        el("a", { className: "btn", href: "/auth/start", textContent: "Kết nối shop Shopee" }),
-      );
-      return false;
-    }
-    const lowRefresh = s.refreshTokenExpiresInDays <= 3;
-    bar.className = lowRefresh ? "bar warn" : "bar ok";
-    bar.append(
-      el("span", {
-        className: "grow",
-        textContent:
-          `Đã kết nối shop ${s.shopId}. ` +
-          (s.accessTokenExpiresInMinutes > 0 ? `Mã truy cập còn ${s.accessTokenExpiresInMinutes} phút, ` : "Mã truy cập đã hết hạn, sẽ tự gia hạn khi dùng, ") +
-          `mã gia hạn còn ${s.refreshTokenExpiresInDays} ngày.`,
-      }),
-      el("a", { className: "btn ghost", href: "/auth/start", textContent: "Ủy quyền lại" }),
-    );
-    return true;
-  } catch (error) {
-    bar.className = "bar err";
-    bar.textContent = `Không đọc được tình trạng kết nối: ${error.message}`;
-    return false;
-  }
-}
-
-function productRow(item) {
-  const msg = el("div", { className: "rowmsg" });
-  const priceInput = el("input", { type: "number", min: "1", step: "1", value: item.original_price ?? "" });
-  const stockInput = el("input", { type: "number", min: "0", step: "1", value: item.available_stock ?? "" });
-
-  const save = async (kind) => {
-    msg.className = "rowmsg muted";
-    msg.textContent = "Đang lưu...";
-    try {
-      if (kind === "price") {
-        await api(`/api/products/${item.item_id}/price`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ original_price: Number(priceInput.value) }),
-        });
-      } else {
-        await api(`/api/products/${item.item_id}/stock`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ stock: Number(stockInput.value) }),
-        });
-      }
-      msg.className = "rowmsg ok";
-      msg.textContent = "Đã lưu lên Shopee.";
-    } catch (error) {
-      msg.className = "rowmsg err";
-      msg.textContent = error.message;
-    }
-  };
-
-  const priceBtn = el("button", { className: "ghost", textContent: "Lưu giá" });
-  priceBtn.addEventListener("click", () => save("price"));
-  const stockBtn = el("button", { className: "ghost", textContent: "Lưu tồn" });
-  stockBtn.addEventListener("click", () => save("stock"));
-
-  const hasModelNote = item.has_model
-    ? el("small", { className: "muted", textContent: "Có phân loại: sửa ở đây chỉ áp dụng cho phân loại mặc định" })
-    : null;
-
-  const boostBox = el("input", { type: "checkbox", checked: state.boostIds.includes(item.item_id), title: "Đưa vào danh sách đẩy tự động" });
-  boostBox.addEventListener("change", async () => {
-    const next = boostBox.checked
-      ? [...state.boostIds, item.item_id]
-      : state.boostIds.filter((id) => id !== item.item_id);
-    try {
-      const saved = await api("/api/boost", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemIds: next }),
-      });
-      state.boostIds = saved.itemIds;
-      msg.className = "rowmsg ok";
-      msg.textContent = boostBox.checked ? "Đã thêm vào danh sách đẩy." : "Đã bỏ khỏi danh sách đẩy.";
-    } catch (error) {
-      boostBox.checked = !boostBox.checked;
-      msg.className = "rowmsg err";
-      msg.textContent = error.message;
-    }
-  });
-
-  return el("tr", {}, [
-    el("td", {}, boostBox),
-    el("td", { className: "col-img" }, item.image ? el("img", { className: "thumb", src: item.image, alt: "" }) : ""),
-    el("td", { className: "name" }, [
-      el("span", { textContent: item.item_name ?? "(không tên)" }),
-      el("small", { textContent: `Mã ${item.item_id}${item.item_sku ? " - SKU " + item.item_sku : ""}` }),
-      hasModelNote,
-    ]),
-    el("td", {}, [priceInput, el("div", {}, priceBtn)]),
-    el("td", {}, [
-      stockInput,
-      el("div", {}, stockBtn),
-      item.reserved_stock
-        ? el("small", { className: "muted", textContent: `Đang giữ cho khuyến mại: ${item.reserved_stock}` })
-        : null,
-    ]),
-    el("td", {}, [el("div", { className: "muted", textContent: `Giá đang bán: ${money(item.current_price)}` }), msg]),
-  ]);
-}
-
-async function renderProducts() {
-  const content = document.getElementById("content");
-  content.textContent = "";
-  content.append(el("p", { className: "muted", textContent: "Đang tải danh sách sản phẩm..." }));
-
-  try {
-    const [data, boost] = await Promise.all([
-      api(`/api/products?offset=${state.offset}&page_size=${state.pageSize}`),
-      api("/api/boost/settings"),
-    ]);
-    state.boostIds = boost.itemIds;
-    state.hasNext = data.has_next_page;
-    state.total = data.total_count;
-    content.textContent = "";
-
-    if (!data.items.length) {
-      content.append(el("div", { className: "empty", textContent: "Shop chưa có sản phẩm nào đang bán." }));
-      return;
-    }
-
-    const head = el("tr", {}, ["Đẩy", "Ảnh", "Sản phẩm", "Giá gốc", "Tồn kho", "Ghi chú"].map((t) => el("th", { textContent: t, className: t === "Ảnh" ? "col-img" : "" })));
-    const table = el("div", { className: "tablewrap" }, el("table", {}, [
-      el("thead", {}, head),
-      el("tbody", {}, data.items.map(productRow)),
-    ]));
-
-    const prev = el("button", { className: "ghost", textContent: "Trang trước", disabled: state.offset === 0 });
-    prev.addEventListener("click", () => {
-      state.offset = Math.max(0, state.offset - state.pageSize);
-      renderProducts();
-    });
-    const next = el("button", { className: "ghost", textContent: "Trang sau", disabled: !state.hasNext });
-    next.addEventListener("click", () => {
-      state.offset = data.next_offset;
-      renderProducts();
-    });
-
-    content.append(
-      table,
-      el("div", { className: "pager" }, [
-        prev,
-        el("span", { className: "muted", textContent: `Tổng ${state.total} sản phẩm` }),
-        next,
-      ]),
-    );
-  } catch (error) {
-    content.textContent = "";
-    content.append(el("div", { className: "empty", textContent: error.message }));
-  }
-}
-
+const money = (value) => (typeof value === "number" ? value.toLocaleString("vi-VN") : "-");
+const parseAmount = (text) => {
+  const digits = String(text).replace(/[^\d]/g, "");
+  return digits === "" ? NaN : Number(digits);
+};
+const clock = () => new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+const minutesText = (m) => (m >= 60 ? `${Math.floor(m / 60)} giờ ${m % 60} phút` : `${m} phút`);
 const timeAgo = (ms) => {
   if (!ms) return "chưa bao giờ";
   const minutes = Math.round((Date.now() - ms) / 60000);
@@ -289,105 +500,524 @@ const timeAgo = (ms) => {
   return hours < 24 ? `${hours} giờ trước` : `${Math.floor(hours / 24)} ngày trước`;
 };
 
-async function renderBoost() {
-  const content = document.getElementById("content");
-  content.textContent = "";
-  content.append(el("p", { className: "muted", textContent: "Đang tải trạng thái đẩy sản phẩm..." }));
+async function api(path, options) {
+  const res = await fetch(path, options);
+  const text = await res.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text }; }
+  if (!res.ok) {
+    // Shopee tu choi tung dong thi ly do nam trong failure_list: hien nguyen van.
+    const reasons = (data.failure_list ?? []).map((f) => f.failed_reason).filter(Boolean);
+    throw new Error(reasons.length ? reasons.join("; ") : data.error || `Lỗi HTTP ${res.status}`);
+  }
+  return data;
+}
+const send = (method, body) => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
+function note(kind, text) {
+  return [icon(kind === "ok" ? "tick" : "cross"), el("span", { textContent: text })];
+}
+
+function reloadButton(onClick) {
+  const button = el("button", { type: "button", className: "link" }, [icon("reload"), "Tải lại"]);
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function problem(message, retry) {
+  const box = el("div", { className: "problem", attrs: { role: "alert" } }, [
+    el("p", {}, [el("strong", { className: "err", textContent: "Chưa tải được. " }), message]),
+  ]);
+  if (retry) {
+    const again = el("button", { type: "button", className: "btn line sm", textContent: "Thử lại" });
+    again.addEventListener("click", retry);
+    box.append(again);
+  }
+  return box;
+}
+
+// ---------- Bia so ----------
+
+function field(name, value, extraClass = "") {
+  return el("span", { className: "field" }, [
+    el("span", { className: "field-name", textContent: name }),
+    el("span", { className: `fill num ${extraClass}`.trim(), textContent: value }),
+  ]);
+}
+
+function setFavicon() {
+  const cover = getComputedStyle(document.body).getPropertyValue("--cover").trim() || "#1c2b73";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="${cover}"/><rect x="6" y="9" width="20" height="12" rx="2" fill="#fff"/><path d="M9.5 13.5h13M9.5 17h8" stroke="${cover}" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  $("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
+function setTitle(shopName) {
+  const prefix = state.status?.sandbox ? "Thử nghiệm - " : "";
+  document.title = `${prefix}${shopName ? shopName + " - " : ""}Quản lý shop Shopee`;
+}
+
+function renderCover(shopName) {
+  const s = state.status;
+  const label = $("label");
+  label.textContent = "";
+  document.body.dataset.env = s.sandbox ? "sandbox" : "live";
+
+  const name = !s.connected
+    ? el("span", { className: "fill wait", textContent: "chưa kết nối" })
+    : el("span", { className: shopName ? "fill" : "fill wait", id: "shopName", textContent: shopName || "đang tải tên..." });
+
+  label.append(
+    el("h1", { className: "shop" }, [el("span", { className: "field-name", textContent: "Shop" }), name]),
+    el("span", { className: "stamp", textContent: s.sandbox ? "Thử nghiệm" : "Shop thật" }),
+  );
+
+  if (s.connected) {
+    const low = s.refreshTokenExpiresInDays <= 3;
+    const reauth = el("a", { className: low ? "link ink" : "link", href: "/auth/start", textContent: "Ủy quyền lại" });
+    label.append(el("p", { className: "fields" }, [
+      field("Mã shop", String(s.shopId ?? "-")),
+      field("Ủy quyền", low ? `sắp hết hạn, còn ${s.refreshTokenExpiresInDays} ngày` : `còn ${s.refreshTokenExpiresInDays} ngày`, low ? "warn" : ""),
+      reauth,
+    ]));
+  }
+  setFavicon();
+  setTitle(shopName);
+}
+
+async function loadStatus() {
   try {
-    const b = await api("/api/boost");
-    content.textContent = "";
-
-    const toggle = el("button", { textContent: b.enabled ? "Tắt đẩy tự động" : "Bật đẩy tự động", className: b.enabled ? "ghost" : "" });
-    toggle.addEventListener("click", async () => {
-      toggle.disabled = true;
-      try {
-        await api("/api/boost", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ enabled: !b.enabled }),
-        });
-      } catch (error) {
-        alert(error.message);
-      }
-      renderBoost();
-    });
-
-    const runNow = el("button", { className: "ghost", textContent: "Đẩy ngay" });
-    const runMsg = el("span", { className: "muted" });
-    runNow.addEventListener("click", async () => {
-      runNow.disabled = true;
-      runMsg.textContent = "Đang đẩy...";
-      try {
-        const r = await api("/api/boost/run", { method: "POST" });
-        runMsg.textContent = r.message + (r.failed.length ? " Lỗi: " + r.failed.map((f) => `${f.itemId} (${f.reason})`).join("; ") : "");
-        setTimeout(renderBoost, 1500);
-      } catch (error) {
-        runMsg.textContent = error.message;
-        runNow.disabled = false;
-      }
-    });
-
-    content.append(
-      el("div", { className: "panel" }, [
-        el("div", { className: "row" }, [
-          el("span", { className: b.enabled ? "pill on" : "pill", textContent: b.enabled ? "Đang BẬT tự động" : "Đang TẮT tự động" }),
-          el("span", { textContent: `Đang đẩy ${b.boostedNow.length}/${b.maxSlots} sản phẩm` }),
-          el("span", { className: "grow" }),
-          toggle,
-          runNow,
-        ]),
-        el("p", { className: "muted", textContent:
-          "Shopee cho đẩy tối đa 5 sản phẩm, mỗi lượt 4 giờ. Khi bật, cứ 10 phút hệ thống kiểm tra một lần: còn chỗ trống thì đẩy tiếp sản phẩm lâu chưa được đẩy nhất, xoay vòng cả danh sách. " +
-          "Chỉ chạy khi máy chủ đang chạy (cửa sổ Terminal chạy máy chủ vẫn mở)." }),
-        el("p", { className: "muted", textContent: `Lần chạy gần nhất: ${timeAgo(b.lastRunAt)}${b.lastResult ? " - " + b.lastResult : ""}` }),
-        runMsg,
-      ]),
-    );
-
-    if (!b.items.length) {
-      content.append(el("div", { className: "empty", textContent: "Chưa chọn sản phẩm nào. Vào thẻ Sản phẩm, đánh dấu ô \"Đẩy\" ở những sản phẩm muốn đẩy." }));
-      return;
-    }
-
-    const rows = b.items.map((item) => {
-      const remove = el("button", { className: "ghost", textContent: "Bỏ khỏi danh sách" });
-      remove.addEventListener("click", async () => {
-        remove.disabled = true;
-        try {
-          await api("/api/boost", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ itemIds: b.items.map((x) => x.itemId).filter((id) => id !== item.itemId) }),
-          });
-        } catch (error) {
-          alert(error.message);
-        }
-        renderBoost();
-      });
-      return el("tr", {}, [
-        el("td", { className: "name" }, [el("span", { textContent: item.name }), el("small", { textContent: `Mã ${item.itemId}` })]),
-        el("td", {}, item.remainingMinutes > 0
-          ? el("span", { className: "pill on", textContent: `Đang đẩy, còn ${item.remainingMinutes} phút` })
-          : el("span", { className: "pill", textContent: "Chờ lượt" })),
-        el("td", { textContent: timeAgo(item.lastBoostedAt) }),
-        el("td", {}, remove),
-      ]);
-    });
-
-    content.append(el("div", { className: "tablewrap" }, el("table", {}, [
-      el("thead", {}, el("tr", {}, ["Sản phẩm", "Trạng thái", "Lần đẩy gần nhất", ""].map((t) => el("th", { textContent: t })))),
-      el("tbody", {}, rows),
-    ])));
+    state.status = await api("/auth/status");
+    renderCover(null);
+    return state.status;
   } catch (error) {
-    content.textContent = "";
-    content.append(el("div", { className: "empty", textContent: error.message }));
+    const label = $("label");
+    label.textContent = "";
+    label.append(
+      el("h1", { className: "shop" }, [el("span", { className: "field-name", textContent: "Shop" }), el("span", { className: "fill warn", textContent: "không đọc được kết nối" })]),
+    );
+    $("content").replaceChildren(problem(`Máy chủ không trả lời: ${error.message}. Kiểm tra cửa sổ Terminal chạy máy chủ còn mở không.`, () => location.reload()));
+    return null;
   }
 }
 
+async function loadShopName() {
+  try {
+    const shop = await api("/api/shop");
+    if (shop.shop_name) renderCover(shop.shop_name);
+  } catch {
+    const fill = $("shopName");
+    if (fill) fill.textContent = `mã ${state.status.shopId}`;
+  }
+}
+
+function renderConnect() {
+  $("tabs").textContent = "";
+  $("content").replaceChildren(el("section", { className: "empty" }, [
+    el("h2", { className: "sr", textContent: "Kết nối shop" }),
+    el("p", { textContent: "Chưa kết nối shop nào. Bấm nút dưới đây, đăng nhập Shopee bằng tài khoản của shop rồi bấm Đồng ý. Xong việc, Shopee tự đưa anh chị quay lại trang này." }),
+    el("a", { className: "btn", href: "/auth/start", textContent: "Kết nối shop Shopee" }),
+  ]));
+}
+
+// ---------- O sua so ----------
+
+/**
+ * Mot o sua gia hoac ton. Sua xong, so cu hien gach do, so moi viet muc xanh;
+ * bam Luu (hoac Enter) moi gui len Shopee, Esc de tra lai so cu.
+ */
+function fixField({ label, unit, value, min, action, save, extra }) {
+  let saved = typeof value === "number" ? value : null;
+  const id = `f${++uid}`;
+  const wrap = el("div", { className: "fix" });
+  wrap.dataset.state = "clean";
+
+  const old = el("s", { className: "fix-old num" });
+  const input = el("input", {
+    id, className: "fix-input", type: "text", inputMode: "numeric", autocomplete: "off",
+    value: saved == null ? "" : money(saved),
+  });
+  const saveBtn = el("button", { type: "button", className: "btn sm", textContent: action });
+  const cancelBtn = el("button", { type: "button", className: "link", textContent: "Hủy" });
+  const msg = el("p", { className: "fix-note", attrs: { role: "status" } });
+
+  const show = (kind, text) => {
+    msg.className = `fix-note ${kind}`;
+    msg.replaceChildren(...note(kind, text));
+  };
+  const clear = () => { msg.className = "fix-note"; msg.textContent = ""; };
+  const drawStrike = () => {
+    old.classList.remove("draw");
+    void old.offsetWidth;
+    old.classList.add("draw");
+  };
+
+  input.addEventListener("input", () => {
+    const v = parseAmount(input.value);
+    const dirty = input.value.trim() !== "" && v !== saved;
+    if (dirty) {
+      if (wrap.dataset.state !== "dirty" && wrap.dataset.state !== "error") {
+        old.textContent = saved == null ? "" : money(saved);
+        drawStrike();
+      }
+      wrap.dataset.state = "dirty";
+      clear();
+    } else if (wrap.dataset.state !== "saved") {
+      wrap.dataset.state = "clean";
+      clear();
+    }
+  });
+  input.addEventListener("blur", () => {
+    const v = parseAmount(input.value);
+    if (Number.isFinite(v)) input.value = money(v);
+  });
+
+  const revert = () => {
+    input.value = saved == null ? "" : money(saved);
+    wrap.dataset.state = "clean";
+    clear();
+  };
+
+  const commit = async () => {
+    const v = parseAmount(input.value);
+    if (!Number.isInteger(v) || v < min) {
+      wrap.dataset.state = "error";
+      show("err", min > 0 ? "Nhập một số lớn hơn 0." : "Nhập một số từ 0 trở lên.");
+      return;
+    }
+    wrap.dataset.state = "saving";
+    saveBtn.disabled = true;
+    cancelBtn.disabled = true;
+    input.readOnly = true;
+    saveBtn.textContent = "Đang lưu...";
+    try {
+      await save(v);
+      old.textContent = saved == null ? "" : money(saved);
+      saved = v;
+      input.value = money(v);
+      wrap.dataset.state = "saved";
+      show("ok", `Shopee đã nhận lúc ${clock()}.`);
+    } catch (error) {
+      wrap.dataset.state = "error";
+      show("err", `Shopee chưa nhận: ${error.message}`);
+    } finally {
+      saveBtn.disabled = false;
+      cancelBtn.disabled = false;
+      input.readOnly = false;
+      saveBtn.textContent = action;
+    }
+  };
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (wrap.dataset.state === "dirty" || wrap.dataset.state === "error")) {
+      event.preventDefault();
+      commit();
+    } else if (event.key === "Escape") {
+      revert();
+    }
+  });
+  saveBtn.addEventListener("click", commit);
+  cancelBtn.addEventListener("click", revert);
+
+  wrap.append(...[
+    el("div", { className: "fix-row" }, [
+      el("label", { className: "fix-label", htmlFor: id, textContent: label }),
+      el("span", { className: "leader", attrs: { "aria-hidden": "true" } }),
+      el("span", { className: "fix-line" }, [old, input, el("span", { className: "fix-unit", textContent: unit })]),
+    ]),
+    el("div", { className: "fix-actions" }, [cancelBtn, saveBtn]),
+    msg,
+    extra ? el("p", { className: "meta", textContent: extra }) : null,
+  ].filter(Boolean));
+  // Tren may tinh nhan o dau cot bang; ten o nhap van phai doc duoc.
+  input.setAttribute("aria-label", label);
+  return wrap;
+}
+
+function boostTick(item) {
+  const input = el("input", { type: "checkbox", checked: state.boostIds.includes(item.item_id) });
+  input.setAttribute("aria-label", `Đưa ${item.item_name ?? "sản phẩm"} vào danh sách đẩy tự động`);
+  const msg = el("span", { className: "tick-note", attrs: { role: "status" } });
+
+  input.addEventListener("change", () => {
+    const wanted = input.checked;
+    input.disabled = true;
+    // Xep hang tung lan luu de hai o bam lien nhau khong de mat nhau.
+    boostQueue = boostQueue.then(async () => {
+      const next = wanted
+        ? [...new Set([...state.boostIds, item.item_id])]
+        : state.boostIds.filter((id) => id !== item.item_id);
+      try {
+        const saved = await api("/api/boost", send("PUT", { itemIds: next }));
+        state.boostIds = saved.itemIds;
+        msg.className = "tick-note ok";
+        msg.replaceChildren(...note("ok", wanted ? "Đã thêm" : "Đã bỏ"));
+      } catch (error) {
+        input.checked = !wanted;
+        msg.className = "tick-note err";
+        msg.replaceChildren(...note("err", error.message));
+      } finally {
+        input.disabled = false;
+      }
+    });
+  });
+
+  return el("div", { className: "tick-wrap" }, [
+    el("label", { className: "tick" }, [
+      input,
+      el("span", { className: "tick-box", attrs: { "aria-hidden": "true" } }, icon("tick")),
+      el("span", { className: "tick-text", attrs: { "aria-hidden": "true" }, textContent: "Đẩy tự động" }),
+    ]),
+    msg,
+  ]);
+}
+
+// ---------- San pham ----------
+
+function productRow(item) {
+  return el("tr", {}, [
+    el("td", { className: "c-img" }, item.image
+      ? el("img", { className: "thumb", src: item.image, alt: "", loading: "lazy" })
+      : el("span", { className: "thumb" })),
+    el("td", { className: "c-name" }, [
+      el("p", { className: "name", textContent: item.item_name ?? "(không tên)" }),
+      el("p", { className: "meta num", textContent: `Mã ${item.item_id}${item.item_sku ? " · SKU " + item.item_sku : ""}` }),
+      item.has_model ? el("p", { className: "meta", textContent: "Có phân loại: sửa ở đây chỉ đổi phân loại mặc định." }) : null,
+    ]),
+    el("td", { className: "c-price" }, fixField({
+      label: "Giá gốc", unit: "₫", value: item.original_price, min: 1, action: "Lưu giá",
+      save: (v) => api(`/api/products/${item.item_id}/price`, send("POST", { original_price: v })),
+    })),
+    el("td", { className: "c-stock" }, fixField({
+      label: "Tồn kho", unit: "", value: item.available_stock, min: 0, action: "Lưu tồn",
+      save: (v) => api(`/api/products/${item.item_id}/stock`, send("POST", { stock: v })),
+      extra: item.reserved_stock ? `Giữ cho khuyến mại: ${money(item.reserved_stock)}` : null,
+    })),
+    el("td", { className: "c-sell" }, [
+      el("span", { className: "sell-label", textContent: "Đang bán " }),
+      el("span", { className: "num", textContent: `${money(item.current_price)} ₫` }),
+    ]),
+    el("td", { className: "c-boost" }, boostTick(item)),
+  ]);
+}
+
+async function renderProducts() {
+  const content = $("content");
+  content.replaceChildren(el("p", { className: "loading", textContent: "Đang tải sản phẩm từ Shopee..." }));
+  try {
+    const [data, boost] = await Promise.all([
+      api(`/api/products?offset=${state.offset}&page_size=${state.pageSize}`),
+      api("/api/boost/settings"),
+    ]);
+    state.boostIds = boost.itemIds;
+    const page = Math.floor(state.offset / state.pageSize) + 1;
+    const pages = Math.max(1, Math.ceil(data.total_count / state.pageSize));
+
+    const head = el("div", { className: "sheet-head" }, [
+      el("h2", { textContent: "Sản phẩm đang bán" }),
+      el("p", { className: "soft num", textContent: `${money(data.total_count)} sản phẩm` }),
+      el("span", { className: "grow" }),
+      reloadButton(renderProducts),
+    ]);
+    const envNote = state.status.sandbox
+      ? el("p", { className: "env-note soft", textContent: "Shop thử nghiệm: sửa thoải mái, không ảnh hưởng khách mua." })
+      : el("p", { className: "env-note live", textContent: "Shop thật: bấm Lưu là khách mua thấy giá, tồn mới ngay." });
+
+    content.replaceChildren(head, envNote);
+    if (state.connectedBanner) {
+      content.prepend(el("p", { className: "banner", attrs: { role: "status" } }, note("ok", "Đã kết nối shop thành công.")));
+      state.connectedBanner = false;
+    }
+
+    if (!data.items.length) {
+      content.append(el("div", { className: "empty" }, el("p", { textContent: "Shop chưa có sản phẩm nào đang bán." })));
+      return;
+    }
+
+    content.append(el("table", { className: "ledger products" }, [
+      el("thead", {}, el("tr", {}, [
+        el("th", { attrs: { scope: "col" } }, el("span", { className: "sr", textContent: "Ảnh" })),
+        el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm" }),
+        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá gốc" }),
+        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Tồn kho" }),
+        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá đang bán" }),
+        el("th", { attrs: { scope: "col" }, textContent: "Đẩy" }),
+      ])),
+      el("tbody", {}, data.items.map(productRow)),
+    ]));
+
+    if (pages > 1) {
+      const prev = el("button", { type: "button", className: "btn line sm", textContent: "Trang trước", disabled: state.offset === 0 });
+      prev.addEventListener("click", () => { state.offset = Math.max(0, state.offset - state.pageSize); renderProducts(); });
+      const next = el("button", { type: "button", className: "btn line sm", textContent: "Trang sau", disabled: !data.has_next_page });
+      next.addEventListener("click", () => { state.offset = data.next_offset; renderProducts(); });
+      content.append(el("div", { className: "pager" }, [prev, el("span", { className: "soft num", textContent: `Trang ${page}/${pages}` }), next]));
+    }
+  } catch (error) {
+    content.replaceChildren(problem(error.message, renderProducts));
+  }
+}
+
+// ---------- Day san pham ----------
+
+async function renderBoost() {
+  const content = $("content");
+  content.replaceChildren(el("p", { className: "loading", textContent: "Đang xem các ô đẩy trên Shopee..." }));
+  try {
+    const b = await api("/api/boost");
+
+    const slots = [];
+    for (let i = 0; i < b.maxSlots; i++) {
+      const s = b.boostedNow[i];
+      if (!s) {
+        slots.push(el("li", { className: "slot empty" }, [
+          el("span", { className: "slot-no", textContent: `Ô ${i + 1}` }),
+          el("span", { className: "slot-name", textContent: "Ô trống" }),
+        ]));
+        continue;
+      }
+      const bar = el("i");
+      bar.style.width = `${Math.min(100, (s.remainingMinutes / 240) * 100)}%`;
+      slots.push(el("li", { className: "slot" }, [
+        el("span", { className: "slot-no", textContent: `Ô ${i + 1}` }),
+        el("span", { className: "slot-name", textContent: s.name || `Sản phẩm mã ${s.itemId}` }),
+        el("span", { className: "slot-time num", textContent: `còn ${minutesText(s.remainingMinutes)}` }),
+        el("span", { className: "slot-bar", attrs: { "aria-hidden": "true" } }, bar),
+      ]));
+    }
+
+    const toggle = el("button", {
+      type: "button", className: "switch", attrs: { role: "switch", "aria-checked": String(b.enabled) },
+    }, [
+      el("span", { className: "switch-track", attrs: { "aria-hidden": "true" } }, el("span", { className: "switch-thumb" })),
+      el("span", { className: "switch-text" }, [
+        el("strong", { textContent: "Tự động đẩy" }),
+        el("span", { textContent: b.enabled ? "Đang bật" : "Đang tắt" }),
+      ]),
+    ]);
+    const runNote = el("p", { className: "run-note", attrs: { role: "status" } });
+    if (state.boostNote) {
+      runNote.className = `run-note ${state.boostNote.kind}`;
+      runNote.textContent = state.boostNote.text;
+      state.boostNote = null;
+    }
+    toggle.addEventListener("click", async () => {
+      toggle.disabled = true;
+      try {
+        await api("/api/boost", send("PUT", { enabled: !b.enabled }));
+        renderBoost();
+      } catch (error) {
+        toggle.disabled = false;
+        runNote.className = "run-note err";
+        runNote.textContent = error.message;
+      }
+    });
+
+    const runNow = el("button", { type: "button", className: "btn line", textContent: "Đẩy ngay" });
+    runNow.addEventListener("click", async () => {
+      runNow.disabled = true;
+      runNow.textContent = "Đang đẩy...";
+      try {
+        const r = await api("/api/boost/run", { method: "POST" });
+        // Ket qua thanh cong da hien o dong "Lan chay gan nhat"; chi can noi them khi co san pham loi.
+        if (r.failed.length) {
+          state.boostNote = { kind: "err", text: "Không đẩy được: " + r.failed.map((f) => `mã ${f.itemId} (${f.reason})`).join("; ") + "." };
+        }
+        renderBoost();
+      } catch (error) {
+        runNote.className = "run-note err";
+        runNote.textContent = error.message;
+        runNow.disabled = false;
+        runNow.textContent = "Đẩy ngay";
+      }
+    });
+
+    const used = b.boostedNow.length;
+    const head = el("div", { className: "sheet-head" }, [
+      el("h2", { className: "num", textContent: `Đang đẩy ${used}/${b.maxSlots} ô` }),
+      el("p", { className: "soft", textContent: "Mỗi lượt đẩy kéo dài 4 giờ." }),
+      el("span", { className: "grow" }),
+      reloadButton(renderBoost),
+    ]);
+
+    const every = b.checkMinutes > 0 ? `cứ ${b.checkMinutes} phút` : "định kỳ";
+    const controls = el("section", {}, [
+      el("h2", { className: "sr", textContent: "Cài đặt đẩy" }),
+      el("div", { className: "controls" }, [toggle, runNow]),
+      el("p", { className: "explain", textContent: `Khi bật, ${every} hệ thống xem còn ô trống không; còn thì đẩy tiếp sản phẩm lâu chưa được đẩy nhất trong danh sách, xoay vòng hết lượt. Chỉ chạy khi máy chủ đang chạy (cửa sổ Terminal còn mở).` }),
+      el("p", { className: "explain" }, [
+        "Lần chạy gần nhất: ",
+        el("strong", { textContent: timeAgo(b.lastRunAt) }),
+        b.lastResult ? ` - ${b.lastResult}` : "",
+      ]),
+      runNote,
+    ]);
+
+    const list = el("section", {}, [
+      el("div", { className: "sheet-head" }, [
+        el("h2", { textContent: "Danh sách xoay vòng" }),
+        el("p", { className: "soft num", textContent: `${b.items.length} sản phẩm` }),
+      ]),
+    ]);
+
+    if (!b.items.length) {
+      const go = el("button", { type: "button", className: "btn line sm", textContent: "Chọn sản phẩm để đẩy" });
+      go.addEventListener("click", () => showTab("products"));
+      list.append(el("div", { className: "empty" }, [
+        el("p", { textContent: "Chưa chọn sản phẩm nào. Ở trang Sản phẩm, đánh dấu ô Đẩy ở những sản phẩm muốn đẩy." }),
+        go,
+      ]));
+    } else {
+      list.append(el("table", { className: "ledger rot" }, [
+        el("thead", {}, el("tr", {}, [
+          el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm" }),
+          el("th", { attrs: { scope: "col" }, textContent: "Trạng thái" }),
+          el("th", { attrs: { scope: "col" }, textContent: "Lần đẩy gần nhất" }),
+          el("th", { attrs: { scope: "col" } }, el("span", { className: "sr", textContent: "Thao tác" })),
+        ])),
+        el("tbody", {}, b.items.map((item) => {
+          const remove = el("button", { type: "button", className: "link", textContent: "Bỏ khỏi danh sách" });
+          remove.addEventListener("click", async () => {
+            remove.disabled = true;
+            try {
+              await api("/api/boost", send("PUT", { itemIds: b.items.map((x) => x.itemId).filter((id) => id !== item.itemId) }));
+              state.boostNote = { kind: "ok", text: `Đã bỏ "${item.name}" khỏi danh sách.` };
+            } catch (error) {
+              state.boostNote = { kind: "err", text: error.message };
+            }
+            renderBoost();
+          });
+          const on = item.remainingMinutes > 0;
+          return el("tr", {}, [
+            el("td", { className: "c-name" }, [
+              el("p", { className: "name", textContent: item.name }),
+              el("p", { className: "meta num", textContent: `Mã ${item.itemId}` }),
+            ]),
+            el("td", { className: "c-state" }, el("span", { className: on ? "state on" : "state" }, [
+              el("span", { className: on ? "mark on" : "mark", attrs: { "aria-hidden": "true" } }),
+              on ? `Đang đẩy, còn ${minutesText(item.remainingMinutes)}` : "Chờ lượt",
+            ])),
+            el("td", { className: "c-last" }, [el("span", { className: "last-label", textContent: "Lần gần nhất: " }), timeAgo(item.lastBoostedAt)]),
+            el("td", { className: "c-act" }, remove),
+          ]);
+        })),
+      ]));
+    }
+
+    content.replaceChildren(
+      el("section", {}, [head, el("ol", { className: "slots", attrs: { "aria-label": "Năm ô đẩy của Shopee" } }, slots)]),
+      controls,
+      list,
+    );
+  } catch (error) {
+    content.replaceChildren(problem(error.message, renderBoost));
+  }
+}
+
+// ---------- Chuyen trang ----------
+
 const TABS = [
-  { id: "products", label: "Sản phẩm", render: renderProducts },
-  { id: "boost", label: "Đẩy sản phẩm", render: renderBoost },
+  { id: "products", label: "Sản phẩm", icon: "tag", render: renderProducts },
+  { id: "boost", label: "Đẩy sản phẩm", icon: "boost", render: renderBoost },
 ];
 
 function readSavedTab() {
@@ -397,18 +1027,32 @@ function readSavedTab() {
 function showTab(id) {
   const tab = TABS.find((t) => t.id === id) ?? TABS[0];
   try { localStorage.setItem("tab", tab.id); } catch { /* trinh duyet chan luu tru, bo qua */ }
-  const nav = document.getElementById("tabs");
+  const nav = $("tabs");
   nav.textContent = "";
   for (const t of TABS) {
-    const button = el("button", { textContent: t.label, className: t.id === tab.id ? "active" : "" });
+    const button = el("button", { type: "button", className: "tab" }, [icon(t.icon), el("span", { textContent: t.label })]);
+    if (t.id === tab.id) button.setAttribute("aria-current", "page");
     button.addEventListener("click", () => showTab(t.id));
     nav.append(button);
   }
+  window.scrollTo(0, 0);
   tab.render();
 }
 
 (async () => {
-  if (await renderStatus()) showTab(readSavedTab());
+  const params = new URLSearchParams(location.search);
+  if (params.has("connected")) {
+    state.connectedBanner = true;
+    history.replaceState(null, "", location.pathname);
+  }
+  const status = await loadStatus();
+  if (!status) return;
+  if (!status.connected) {
+    renderConnect();
+    return;
+  }
+  loadShopName();
+  showTab(readSavedTab());
 })();
 </script>
 </body>

@@ -13,3 +13,7 @@ token.json
 *.log
 .DS_Store
 dist/
+
+# Anh chup kiem tra giao dien va cai dat rieng tung may cua cong cu thiet ke
+.impeccable/review/
+.impeccable/config.local.json

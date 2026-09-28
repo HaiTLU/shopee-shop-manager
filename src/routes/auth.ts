@@ -8,7 +8,7 @@
  */
 import crypto from "node:crypto";
 import { Router } from "express";
-import { config } from "../config.js";
+import { config, isSandbox } from "../config.js";
 import { sdk, tokenStorage, tokenStatus } from "../shopee.js";
 
 /**
@@ -96,8 +96,9 @@ authRouter.get("/callback", async (req, res) => {
   }
 });
 
+/** Kem ca moi truong de giao dien phan biet ro shop thu nghiem voi shop that. */
 authRouter.get("/status", async (_req, res) => {
-  res.json(await tokenStatus());
+  res.json({ ...(await tokenStatus()), sandbox: isSandbox });
 });
 
 /** Ngat ket noi: xoa token da luu. Shop van con tren Shopee, chi la het uy quyen o day. */
