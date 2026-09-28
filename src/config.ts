@@ -72,5 +72,21 @@ export const config = {
   authUrl: process.env.SHOPEE_AUTH_URL?.trim() || undefined,
 } as const;
 
+/**
+ * Dia chi mo trang tren trinh duyet, lay tu SHOPEE_REDIRECT_URI (vi du
+ * http://localtest.me). Dung chung mot goc voi dia chi Shopee chuyen ve,
+ * cong 80 thi khong ghi so cong.
+ */
+export const appUrl = (() => {
+  try {
+    return new URL(config.redirectUri).origin;
+  } catch {
+    throw new Error(
+      `SHOPEE_REDIRECT_URI trong tep ${envFile} khong phai dia chi hop le: ${config.redirectUri}. ` +
+        "Vi du dung: http://localtest.me/auth/callback",
+    );
+  }
+})();
+
 /** True khi dang chay tren moi truong thu nghiem cua Shopee. */
 export const isSandbox = config.region.startsWith("TEST_");

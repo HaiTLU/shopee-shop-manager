@@ -63,7 +63,10 @@ Nếu dùng thông báo đẩy từ Shopee, nên chỉ cho phép dải IP của 
 Console **không nhận tên `localhost`** ở ô Test/Live Redirect URL Domain. Dùng tên miền `localtest.me`: đây là tên miền công khai luôn trỏ về `127.0.0.1`, tức chính máy đang mở trình duyệt, nên Shopee chấp nhận mà trình duyệt vẫn quay về máy chủ chạy trên máy mình.
 
 - Trong Console, hai ô Redirect URL Domain điền: `http://localtest.me` (chỉ tên miền, không kèm cổng hay đường dẫn)
-- Trong tệp cấu hình: `SHOPEE_REDIRECT_URI=http://localtest.me:3000/auth/callback`
+- Thử nghiệm (`.env`): `SHOPEE_REDIRECT_URI=http://localtest.me:3000/auth/callback`, `PORT=3000`. Môi trường thử nghiệm bỏ qua số cổng nên vẫn chạy.
+- Shop thật (`.env.live`): `SHOPEE_REDIRECT_URI=http://localtest.me/auth/callback`, `PORT=80`. **Shopee thật so khớp tuyệt đối cả số cổng**: để `:3000` thì báo lỗi *The domain of redirect_uri is not consistent with the Redirect URL Domain declared in console*. Cổng 80 là cổng mặc định của web nên địa chỉ không cần ghi số cổng, khớp đúng tên miền đã khai. Mở trang bằng `http://localtest.me`.
+
+Máy Mac từ bản Mojave cho chương trình thường dùng cổng 80. Nếu máy báo `EACCES` hoặc cổng đã bị chiếm, cách thay thế là sửa ô Live Redirect URL Domain trong Console thành `http://localtest.me:3000` và giữ cổng 3000.
 
 Kiểm tra mạng có dùng được không: chạy `npm start` rồi mở `http://localtest.me:3000`. Một số bộ phát wifi chặn kiểu tên miền trỏ về máy nội bộ; khi đó phải dùng tên miền riêng.
 

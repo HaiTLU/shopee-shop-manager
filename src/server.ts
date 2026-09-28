@@ -7,7 +7,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
-import { config, envFile, isSandbox } from "./config.js";
+import { appUrl, config, envFile, isSandbox } from "./config.js";
 import { startTokenKeepalive, tokenStorage, tokenStatus } from "./shopee.js";
 import { authRouter } from "./routes/auth.js";
 import { apiRouter } from "./routes/api.js";
@@ -47,7 +47,7 @@ app.get("/healthz", async (_req, res) => {
 app.use(express.static(publicDir));
 
 app.listen(config.port, () => {
-  console.log(`Dang chay tai http://localhost:${config.port}`);
+  console.log(`Dang chay tai ${appUrl} (cong ${config.port})`);
   console.log(`Tep cau hinh: ${envFile}`);
   console.log(`Vung: ${config.region}${isSandbox ? " (moi truong thu nghiem)" : " (moi truong that)"}`);
   console.log(`Dia chi nhan uy quyen: ${config.redirectUri}`);

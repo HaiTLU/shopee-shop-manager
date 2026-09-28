@@ -9,7 +9,7 @@
  *   npm run cli -- shop                Thong tin shop
  *   npm run cli -- products [so_luong] Danh sach san pham
  */
-import { config, envFile } from "./config.js";
+import { appUrl, config, envFile } from "./config.js";
 import { sdk, tokenStatus, startTokenKeepalive } from "./shopee.js";
 import { parseAuthCallback } from "./authCallback.js";
 import { seedTestProducts } from "./seed.js";
@@ -48,7 +48,7 @@ async function main(): Promise<void> {
       }
       if (status.needsReauthorization) {
         console.log(
-          `Can uy quyen: chay '${startCommand()}', mo http://localtest.me:${config.port} tren trinh duyet ` +
+          `Can uy quyen: chay '${startCommand()}', mo ${appUrl} tren trinh duyet ` +
             "roi bam 'Ket noi shop Shopee'.",
         );
       }
@@ -91,7 +91,7 @@ async function main(): Promise<void> {
       const count = Math.min(Math.max(Number(args[0]) || 3, 1), 5);
       console.log(`Dang tao ${count} san pham thu tren shop thu nghiem...`);
       const ids = await seedTestProducts(count);
-      console.log(`\nXong: tao duoc ${ids.length}/${count} san pham. Tai lai http://localhost:${config.port} de xem.`);
+      console.log(`\nXong: tao duoc ${ids.length}/${count} san pham. Tai lai ${appUrl} de xem.`);
       if (ids.length < count) process.exitCode = 1;
       break;
     }
