@@ -36,6 +36,15 @@ Lần đầu nên để `SHOPEE_REGION=TEST_GLOBAL` (môi trường thử nghi�
 
 Tách riêng để khóa và token của hai môi trường không bao giờ lẫn nhau. Máy chủ và lệnh `status` luôn in ra tên tệp cấu hình đang dùng. Cả hai tệp đều bị chặn khỏi git.
 
+## Đẩy sản phẩm tự động
+
+Shopee cho đẩy tối đa 5 sản phẩm cùng lúc, mỗi lượt 4 giờ. Trên trang web:
+
+1. Thẻ **San pham**: tick ô **Day** ở những sản phẩm muốn đẩy (tối đa 50, không giới hạn ở 5).
+2. Thẻ **Day san pham**: bấm **Bat day tu dong**. Cứ 10 phút hệ thống kiểm tra, còn chỗ trống thì đẩy tiếp sản phẩm lâu chưa đẩy nhất, xoay vòng cả danh sách. **Chay ngay** để đẩy liền không chờ.
+
+Chỉ chạy khi máy chủ đang chạy. Danh sách lưu riêng cho từng môi trường (`data/state-<vùng>-<partner_id>.json`). Đổi chu kỳ bằng `BOOST_CHECK_MINUTES` trong tệp cấu hình.
+
 ## Công cụ dòng lệnh
 
 ```bash
@@ -46,6 +55,8 @@ npm run cli -- refresh      # Gia hạn token ngay
 npm run cli -- shop         # Thông tin shop
 npm run cli -- products 20  # Liệt kê 20 sản phẩm đầu
 npm run cli -- tao-san-pham-thu 3  # Tạo 3 sản phẩm thử, CHỈ chạy trên môi trường thử nghiệm
+npm run cli -- trang-thai-day      # Danh sách đẩy và sản phẩm đang được đẩy
+npm run cli -- day-ngay            # Chạy một vòng đẩy sản phẩm ngay
 ```
 
 **Hoàn tất ủy quyền bằng tay:** nếu sau khi bấm đồng ý trên Shopee mà trình duyệt báo không mở được trang (máy chủ chưa chạy, hoặc chạy ở máy khác), đừng bấm lại. Chép nguyên đường dẫn trên thanh địa chỉ, dán vào lệnh `exchange` trong vòng vài phút. Mã `code` trong đường dẫn chỉ dùng được một lần.
@@ -54,7 +65,7 @@ npm run cli -- tao-san-pham-thu 3  # Tạo 3 sản phẩm thử, CHỈ chạy tr
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 36 bài kiểm thử
+npm test            # 42 bài kiểm thử
 ```
 
 ## Cấu trúc
@@ -102,7 +113,7 @@ Lớp bảo vệ cũng xử lý trường hợp Shopee từ chối một token m
 
 Đây là nền móng chạy được, chưa phải bản đầy đủ. Những phần có thể làm tiếp:
 
-- Sửa giá và tồn theo lô cho nhiều sản phẩm cùng lúc
+- Sửa giá và tồn theo lô cho nhiều sản phẩm cùng lúc (đang làm)
 - Quản lý đơn hàng: in vận đơn, cập nhật trạng thái
 - Mã giảm giá, khuyến mại, flash sale
 - Nhận thông báo đẩy từ Shopee thay vì hỏi liên tục

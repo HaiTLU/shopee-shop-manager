@@ -17,6 +17,7 @@ import type {
 } from "@congminh1254/shopee-sdk/schemas";
 import type { GetChannelListLogisticsChannel } from "@congminh1254/shopee-sdk/schemas/logistics";
 import { isSandbox } from "./config.js";
+import { describeError } from "./errors.js";
 import { sdk } from "./shopee.js";
 
 type Log = (message: string) => void;
@@ -136,13 +137,6 @@ export function logisticInfoFrom(channels: GetChannelListLogisticsChannel[]) {
 
 // ---------- Quy trinh chinh ----------
 
-/** Loi cua SDK de chi tiet Shopee trong truong `data`; in ra de biet sai o dau. */
-function describe(error: unknown): string {
-  const e = error as { message?: string; data?: { error?: string; message?: string } };
-  const api = e.data?.error ? ` [${e.data.error}: ${e.data.message ?? ""}]` : "";
-  return `${e.message ?? String(error)}${api}`;
-}
-
 async function ensureLogistics(log: Log) {
   const list = (await sdk.logistics.getChannelList()).response?.logistics_channel_list ?? [];
   let usable = logisticInfoFrom(list);
@@ -158,7 +152,7 @@ async function ensureLogistics(log: Log) {
       await sdk.logistics.updateChannel({ logistics_channel_id: channel.logistics_channel_id, enabled: true });
       log(`  Da bat: ${channel.logistics_channel_name ?? channel.logistics_channel_id}`);
     } catch (error) {
-      log(`  Khong bat duoc ${channel.logistics_channel_name ?? channel.logistics_channel_id}: ${describe(error)}`);
+      log(`  Khong bat duoc ${channel.logistics_channel_name ?? channel.logistics_channel_id}: ${describeError(error)}`);
     }
   }
   const again = (await sdk.logistics.getChannelList()).response?.logistics_channel_list ?? [];
@@ -219,7 +213,7 @@ async function addItemLoweringPrice(
       return { result: await sdk.product.addItem(build(price)), price, lowered: price < startPrice };
     } catch (error) {
       const next = Math.max(MIN_PRICE, Math.floor(price / 2 / 1000) * 1000);
-      if (!PRICE_LIMIT_ERROR.test(describe(error)) || next >= price) throw error;
+      if (!PRICE_LIMIT_ERROR.test(describeError(error)) || next >= price) throw error;
       log(`  ${label}: gia ${price.toLocaleString("vi-VN")}d vuot muc toi da cua don vi van chuyen thu nghiem, thu ${next.toLocaleString("vi-VN")}d`);
       price = next;
     }
@@ -280,7 +274,7 @@ export async function seedTestProducts(count: number, log: Log = console.log): P
       log(`${label}: da tao, ma san pham ${itemId}, gia ${price.toLocaleString("vi-VN")}d`);
       if (itemId) created.push(itemId);
     } catch (error) {
-      log(`${label}: LOI ${describe(error)}`);
+      log(`${label}: LOI ${describeError(error)}`);
     }
   }
   return created;

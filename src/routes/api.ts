@@ -13,6 +13,8 @@ import {
   type GetItemBaseInfoStockInfoV2,
 } from "@congminh1254/shopee-sdk/schemas";
 import { sdk } from "../shopee.js";
+import { fetchBoostedNow, runBoostCycle, saveBoostSettings, MAX_BOOST_SLOTS } from "../boost.js";
+import { readState } from "../stateStore.js";
 
 /**
  * Va kieu bi dat nham cho trong SDK.
@@ -240,5 +242,66 @@ apiRouter.get(
     );
 
     res.json(result);
+  }),
+);
+
+// ---------- Day san pham tu dong ----------
+
+/** Trang thai: danh sach xoay vong kem ten, san pham dang duoc day, lan chay gan nhat. */
+apiRouter.get(
+  "/boost",
+  handle(async (_req, res) => {
+    const { boost } = await readState();
+    const boostedNow = await fetchBoostedNow();
+    const names = new Map<number, string>();
+    if (boost.itemIds.length) {
+      const detail = unwrap(await sdk.product.getItemBaseInfo({ item_id_list: boost.itemIds }));
+      for (const item of detail.item_list ?? []) {
+        if (item.item_id) names.set(item.item_id, item.item_name ?? "");
+      }
+    }
+    const remaining = new Map(boostedNow.map((b) => [b.itemId, b.remainingMinutes]));
+    res.json({
+      enabled: boost.enabled,
+      maxSlots: MAX_BOOST_SLOTS,
+      lastRunAt: boost.lastRunAt ?? null,
+      lastResult: boost.lastResult ?? null,
+      boostedNow,
+      items: boost.itemIds.map((itemId) => ({
+        itemId,
+        name: names.get(itemId) ?? "(khong tim thay, co the da xoa hoac an)",
+        remainingMinutes: remaining.get(itemId) ?? 0,
+        lastBoostedAt: boost.lastBoosted[String(itemId)] ?? null,
+      })),
+    });
+  }),
+);
+
+/** Chi doc cai dat da luu, khong goi Shopee. Trang san pham dung de danh dau o "Day". */
+apiRouter.get(
+  "/boost/settings",
+  handle(async (_req, res) => {
+    const { boost } = await readState();
+    res.json({ enabled: boost.enabled, itemIds: boost.itemIds });
+  }),
+);
+
+/** Luu danh sach va/hoac cong tac bat tat. */
+apiRouter.put(
+  "/boost",
+  handle(async (req, res) => {
+    try {
+      res.json(await saveBoostSettings(req.body ?? {}));
+    } catch (error) {
+      res.status(400).json({ error: (error as Error).message });
+    }
+  }),
+);
+
+/** Chay mot vong ngay, ke ca khi cong tac dang tat. */
+apiRouter.post(
+  "/boost/run",
+  handle(async (_req, res) => {
+    res.json(await runBoostCycle({ force: true }));
   }),
 );

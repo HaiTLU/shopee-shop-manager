@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quan ly shop Shopee</title>
+<link rel="icon" href="data:,">
 <style>
   :root {
     --bg: #ffffff;
@@ -64,9 +65,18 @@
   .rowmsg.err { color: #c62828; }
   .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
   .empty { padding: 40px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; }
+  .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 18px; overflow-x: auto; }
+  .tabs button { background: transparent; color: var(--muted); border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 8px 14px; white-space: nowrap; }
+  .tabs button.active { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
+  .panel { border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--line); }
+  .pill.on { background: var(--ok-bg); border-color: var(--ok-line); }
+  input[type=checkbox] { width: 18px; height: 18px; }
   @media (max-width: 720px) {
     td.name { max-width: none; }
-    .thumb { display: none; }
+    .thumb, .col-img { display: none; }
   }
 </style>
 </head>
@@ -79,11 +89,12 @@
     <span class="grow">Dang kiem tra ket noi...</span>
   </div>
 
+  <nav id="tabs" class="tabs"></nav>
   <div id="content"></div>
 </main>
 
 <script>
-const state = { offset: 0, pageSize: 20, hasNext: false, total: 0 };
+const state = { offset: 0, pageSize: 20, hasNext: false, total: 0, boostIds: [] };
 
 const el = (tag, props = {}, children = []) => {
   const node = Object.assign(document.createElement(tag), props);
@@ -177,8 +188,30 @@ function productRow(item) {
     ? el("small", { className: "muted", textContent: "Co bien the - sua o day chi ap cho bien the mac dinh" })
     : null;
 
+  const boostBox = el("input", { type: "checkbox", checked: state.boostIds.includes(item.item_id), title: "Dua vao danh sach day tu dong" });
+  boostBox.addEventListener("change", async () => {
+    const next = boostBox.checked
+      ? [...state.boostIds, item.item_id]
+      : state.boostIds.filter((id) => id !== item.item_id);
+    try {
+      const saved = await api("/api/boost", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemIds: next }),
+      });
+      state.boostIds = saved.itemIds;
+      msg.className = "rowmsg ok";
+      msg.textContent = boostBox.checked ? "Da them vao danh sach day." : "Da bo khoi danh sach day.";
+    } catch (error) {
+      boostBox.checked = !boostBox.checked;
+      msg.className = "rowmsg err";
+      msg.textContent = error.message;
+    }
+  });
+
   return el("tr", {}, [
-    el("td", {}, item.image ? el("img", { className: "thumb", src: item.image, alt: "" }) : ""),
+    el("td", {}, boostBox),
+    el("td", { className: "col-img" }, item.image ? el("img", { className: "thumb", src: item.image, alt: "" }) : ""),
     el("td", { className: "name" }, [
       el("span", { textContent: item.item_name ?? "(khong ten)" }),
       el("small", { textContent: `Ma ${item.item_id}${item.item_sku ? " - SKU " + item.item_sku : ""}` }),
@@ -202,7 +235,11 @@ async function renderProducts() {
   content.append(el("p", { className: "muted", textContent: "Dang tai danh sach san pham..." }));
 
   try {
-    const data = await api(`/api/products?offset=${state.offset}&page_size=${state.pageSize}`);
+    const [data, boost] = await Promise.all([
+      api(`/api/products?offset=${state.offset}&page_size=${state.pageSize}`),
+      api("/api/boost/settings"),
+    ]);
+    state.boostIds = boost.itemIds;
     state.hasNext = data.has_next_page;
     state.total = data.total_count;
     content.textContent = "";
@@ -212,11 +249,11 @@ async function renderProducts() {
       return;
     }
 
-    const head = el("tr", {}, ["Anh", "San pham", "Gia goc", "Ton kho", "Ghi chu"].map((t) => el("th", { textContent: t })));
-    const table = el("table", {}, [
+    const head = el("tr", {}, ["Day", "Anh", "San pham", "Gia goc", "Ton kho", "Ghi chu"].map((t) => el("th", { textContent: t, className: t === "Anh" ? "col-img" : "" })));
+    const table = el("div", { className: "tablewrap" }, el("table", {}, [
       el("thead", {}, head),
       el("tbody", {}, data.items.map(productRow)),
-    ]);
+    ]));
 
     const prev = el("button", { className: "ghost", textContent: "Trang truoc", disabled: state.offset === 0 });
     prev.addEventListener("click", () => {
@@ -243,8 +280,135 @@ async function renderProducts() {
   }
 }
 
+const timeAgo = (ms) => {
+  if (!ms) return "chua bao gio";
+  const minutes = Math.round((Date.now() - ms) / 60000);
+  if (minutes < 1) return "vua xong";
+  if (minutes < 60) return `${minutes} phut truoc`;
+  const hours = Math.floor(minutes / 60);
+  return hours < 24 ? `${hours} gio truoc` : `${Math.floor(hours / 24)} ngay truoc`;
+};
+
+async function renderBoost() {
+  const content = document.getElementById("content");
+  content.textContent = "";
+  content.append(el("p", { className: "muted", textContent: "Dang tai trang thai day san pham..." }));
+
+  try {
+    const b = await api("/api/boost");
+    content.textContent = "";
+
+    const toggle = el("button", { textContent: b.enabled ? "Tat day tu dong" : "Bat day tu dong", className: b.enabled ? "ghost" : "" });
+    toggle.addEventListener("click", async () => {
+      toggle.disabled = true;
+      try {
+        await api("/api/boost", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enabled: !b.enabled }),
+        });
+      } catch (error) {
+        alert(error.message);
+      }
+      renderBoost();
+    });
+
+    const runNow = el("button", { className: "ghost", textContent: "Chay ngay" });
+    const runMsg = el("span", { className: "muted" });
+    runNow.addEventListener("click", async () => {
+      runNow.disabled = true;
+      runMsg.textContent = "Dang day...";
+      try {
+        const r = await api("/api/boost/run", { method: "POST" });
+        runMsg.textContent = r.message + (r.failed.length ? " Loi: " + r.failed.map((f) => `${f.itemId} (${f.reason})`).join("; ") : "");
+        setTimeout(renderBoost, 1500);
+      } catch (error) {
+        runMsg.textContent = error.message;
+        runNow.disabled = false;
+      }
+    });
+
+    content.append(
+      el("div", { className: "panel" }, [
+        el("div", { className: "row" }, [
+          el("span", { className: b.enabled ? "pill on" : "pill", textContent: b.enabled ? "Dang BAT tu dong" : "Dang TAT tu dong" }),
+          el("span", { textContent: `Dang day ${b.boostedNow.length}/${b.maxSlots} san pham` }),
+          el("span", { className: "grow" }),
+          toggle,
+          runNow,
+        ]),
+        el("p", { className: "muted", textContent:
+          "Shopee cho day toi da 5 san pham, moi luot 4 gio. Khi bat, cu 10 phut he thong kiem tra, con cho trong thi day tiep san pham lau chua day nhat, xoay vong ca danh sach. " +
+          "Chi chay khi may chu dang chay (cua so Terminal npm start van mo)." }),
+        el("p", { className: "muted", textContent: `Lan chay gan nhat: ${timeAgo(b.lastRunAt)}${b.lastResult ? " - " + b.lastResult : ""}` }),
+        runMsg,
+      ]),
+    );
+
+    if (!b.items.length) {
+      content.append(el("div", { className: "empty", textContent: "Chua chon san pham nao. Vao the San pham, tick o \"Day\" o nhung san pham muon day." }));
+      return;
+    }
+
+    const rows = b.items.map((item) => {
+      const remove = el("button", { className: "ghost", textContent: "Bo khoi danh sach" });
+      remove.addEventListener("click", async () => {
+        remove.disabled = true;
+        try {
+          await api("/api/boost", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ itemIds: b.items.map((x) => x.itemId).filter((id) => id !== item.itemId) }),
+          });
+        } catch (error) {
+          alert(error.message);
+        }
+        renderBoost();
+      });
+      return el("tr", {}, [
+        el("td", { className: "name" }, [el("span", { textContent: item.name }), el("small", { textContent: `Ma ${item.itemId}` })]),
+        el("td", {}, item.remainingMinutes > 0
+          ? el("span", { className: "pill on", textContent: `Dang day, con ${item.remainingMinutes} phut` })
+          : el("span", { className: "pill", textContent: "Cho luot" })),
+        el("td", { textContent: timeAgo(item.lastBoostedAt) }),
+        el("td", {}, remove),
+      ]);
+    });
+
+    content.append(el("div", { className: "tablewrap" }, el("table", {}, [
+      el("thead", {}, el("tr", {}, ["San pham", "Trang thai", "Lan day gan nhat", ""].map((t) => el("th", { textContent: t })))),
+      el("tbody", {}, rows),
+    ])));
+  } catch (error) {
+    content.textContent = "";
+    content.append(el("div", { className: "empty", textContent: error.message }));
+  }
+}
+
+const TABS = [
+  { id: "products", label: "San pham", render: renderProducts },
+  { id: "boost", label: "Day san pham", render: renderBoost },
+];
+
+function readSavedTab() {
+  try { return localStorage.getItem("tab"); } catch { return null; }
+}
+
+function showTab(id) {
+  const tab = TABS.find((t) => t.id === id) ?? TABS[0];
+  try { localStorage.setItem("tab", tab.id); } catch { /* trinh duyet chan luu tru, bo qua */ }
+  const nav = document.getElementById("tabs");
+  nav.textContent = "";
+  for (const t of TABS) {
+    const button = el("button", { textContent: t.label, className: t.id === tab.id ? "active" : "" });
+    button.addEventListener("click", () => showTab(t.id));
+    nav.append(button);
+  }
+  tab.render();
+}
+
 (async () => {
-  if (await renderStatus()) await renderProducts();
+  if (await renderStatus()) showTab(readSavedTab());
 })();
 </script>
 </body>

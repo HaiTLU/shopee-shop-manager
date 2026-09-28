@@ -60,6 +60,8 @@ export const config = {
   port: optionalNumber("PORT", 3000),
   tokenFile: path.resolve(process.env.TOKEN_FILE?.trim() || "./data/shopee-token.json"),
   keepaliveMinutes: optionalNumber("TOKEN_KEEPALIVE_MINUTES", 60),
+  /** Chu ky kiem tra de day san pham tu dong (phut). Dat 0 de tat han bo hen gio. */
+  boostCheckMinutes: optionalNumber("BOOST_CHECK_MINUTES", 10),
   /**
    * Ghi de dia chi API va trang uy quyen. Bo trong thi dung mac dinh theo vung.
    *

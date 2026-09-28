@@ -5,6 +5,8 @@
  *   npm run cli -- auth-url            In duong dan uy quyen shop
  *   npm run cli -- exchange "<url>"    Doi code lay token tu duong dan sau uy quyen
  *   npm run cli -- tao-san-pham-thu 3  Tao san pham thu tren shop thu (chi sandbox)
+ *   npm run cli -- trang-thai-day      Xem danh sach day san pham va luot dang day
+ *   npm run cli -- day-ngay            Chay mot vong day san pham ngay
  *   npm run cli -- refresh             Gia han token ngay
  *   npm run cli -- shop                Thong tin shop
  *   npm run cli -- products [so_luong] Danh sach san pham
@@ -13,6 +15,8 @@ import { appUrl, config, envFile } from "./config.js";
 import { sdk, tokenStatus, startTokenKeepalive } from "./shopee.js";
 import { parseAuthCallback } from "./authCallback.js";
 import { seedTestProducts } from "./seed.js";
+import { readState } from "./stateStore.js";
+import { fetchBoostedNow, runBoostCycle, MAX_BOOST_SLOTS } from "./boost.js";
 import {
   ItemStatus,
   type GetItemBaseInfoItem,
@@ -96,6 +100,25 @@ async function main(): Promise<void> {
       break;
     }
 
+    case "trang-thai-day": {
+      const { boost } = await readState();
+      const now = await fetchBoostedNow();
+      console.log(`Tu dong:        ${boost.enabled ? "BAT" : "TAT"}`);
+      console.log(`Danh sach day:  ${boost.itemIds.length} san pham`);
+      console.log(`Dang day:       ${now.length}/${MAX_BOOST_SLOTS}`);
+      for (const b of now) console.log(`  ${b.itemId}  con ${b.remainingMinutes} phut`);
+      if (boost.lastResult) console.log(`Lan chay gan nhat: ${boost.lastResult}`);
+      break;
+    }
+
+    case "day-ngay": {
+      const result = await runBoostCycle({ force: true });
+      console.log(result.message);
+      for (const f of result.failed) console.log(`  Loi ${f.itemId}: ${f.reason}`);
+      if (result.failed.length) process.exitCode = 1;
+      break;
+    }
+
     case "refresh": {
       const token = await sdk.refreshToken();
       console.log(token ? "Da gia han token." : "Khong gia han duoc.");
@@ -142,7 +165,7 @@ async function main(): Promise<void> {
 
     default:
       console.error(`Lenh khong ro: ${command}`);
-      console.error("Cac lenh co: status, auth-url, exchange, refresh, shop, products, tao-san-pham-thu");
+      console.error("Cac lenh co: status, auth-url, exchange, refresh, shop, products, tao-san-pham-thu, trang-thai-day, day-ngay");
       process.exitCode = 1;
   }
 }
