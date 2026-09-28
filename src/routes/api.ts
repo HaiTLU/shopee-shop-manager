@@ -43,7 +43,7 @@ export const apiRouter: Router = Router();
  */
 function unwrap<T>(response: FetchResponse<T>): T {
   if (response.error) {
-    throw new Error(`${response.error}: ${response.message || "khong co mo ta"}`);
+    throw new Error(`${response.error}: ${response.message || "không có mô tả"}`);
   }
   return response.response;
 }
@@ -63,7 +63,7 @@ function intParam(raw: unknown, fallback: number, min: number, max: number): num
   if (typeof raw !== "string" || raw.trim() === "") return fallback;
   const value = Number(raw);
   if (!Number.isInteger(value)) {
-    throw new Error(`Tham so phai la so nguyen, dang nhan duoc: ${raw}`);
+    throw new Error(`Tham số phải là số nguyên, đang nhận được: ${raw}`);
   }
   return Math.min(Math.max(value, min), max);
 }
@@ -138,7 +138,7 @@ apiRouter.get(
   handle(async (req, res) => {
     const itemId = Number(req.params.itemId);
     if (!Number.isInteger(itemId)) {
-      res.status(400).json({ error: `item_id khong hop le: ${req.params.itemId}` });
+      res.status(400).json({ error: `item_id không hợp lệ: ${req.params.itemId}` });
       return;
     }
     res.json(unwrap(await sdk.product.getModelList({ item_id: itemId })));
@@ -158,11 +158,11 @@ apiRouter.post(
     const { original_price: originalPrice, model_id: modelId } = req.body ?? {};
 
     if (!Number.isInteger(itemId)) {
-      res.status(400).json({ error: `item_id khong hop le: ${req.params.itemId}` });
+      res.status(400).json({ error: `item_id không hợp lệ: ${req.params.itemId}` });
       return;
     }
     if (typeof originalPrice !== "number" || !Number.isFinite(originalPrice) || originalPrice <= 0) {
-      res.status(400).json({ error: "original_price phai la so duong." });
+      res.status(400).json({ error: "Giá gốc phải là số dương." });
       return;
     }
 
@@ -175,7 +175,7 @@ apiRouter.post(
 
     // Shopee co the tra ve thanh cong o cap lenh goi nhung that bai o tung dong.
     if (result.failure_list?.length) {
-      res.status(422).json({ error: "Shopee tu choi cap nhat gia", failure_list: result.failure_list });
+      res.status(422).json({ error: "Shopee từ chối cập nhật giá", failure_list: result.failure_list });
       return;
     }
     res.json({ ok: true, result });
@@ -196,11 +196,11 @@ apiRouter.post(
     const { stock, model_id: modelId } = req.body ?? {};
 
     if (!Number.isInteger(itemId)) {
-      res.status(400).json({ error: `item_id khong hop le: ${req.params.itemId}` });
+      res.status(400).json({ error: `item_id không hợp lệ: ${req.params.itemId}` });
       return;
     }
     if (!Number.isInteger(stock) || stock < 0) {
-      res.status(400).json({ error: "stock phai la so nguyen khong am." });
+      res.status(400).json({ error: "Tồn kho phải là số nguyên không âm." });
       return;
     }
 
@@ -217,7 +217,7 @@ apiRouter.post(
     );
 
     if (result.failure_list?.length) {
-      res.status(422).json({ error: "Shopee tu choi cap nhat ton kho", failure_list: result.failure_list });
+      res.status(422).json({ error: "Shopee từ chối cập nhật tồn kho", failure_list: result.failure_list });
       return;
     }
     res.json({ ok: true, result });
@@ -269,7 +269,7 @@ apiRouter.get(
       boostedNow,
       items: boost.itemIds.map((itemId) => ({
         itemId,
-        name: names.get(itemId) ?? "(khong tim thay, co the da xoa hoac an)",
+        name: names.get(itemId) ?? "(không tìm thấy, có thể đã xóa hoặc ẩn)",
         remainingMinutes: remaining.get(itemId) ?? 0,
         lastBoostedAt: boost.lastBoosted[String(itemId)] ?? null,
       })),

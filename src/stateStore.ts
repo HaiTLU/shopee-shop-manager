@@ -49,7 +49,7 @@ export async function readState(): Promise<AppState> {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return withDefaults({});
     if (error instanceof SyntaxError) {
-      throw new Error(`Tep cai dat ${stateFile} bi hong. Xoa tep nay de dung cai dat mac dinh.`);
+      throw new Error(`Tệp cài đặt ${stateFile} bị hỏng. Xóa tệp này để dùng cài đặt mặc định.`);
     }
     throw error;
   }

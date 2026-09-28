@@ -74,9 +74,9 @@ test("chon san pham: bo san pham dang day, uu tien chua day bao gio theo thu tu,
 
 test("danh sach nguoi dung gui len duoc chuan hoa va kiem tra", () => {
   assert.deepEqual(boost.normalizeItemIds([3, "3", 7]), [3, 7], "bo trung, nhan chu so");
-  assert.throws(() => boost.normalizeItemIds([1, -2]), /so nguyen duong/);
-  assert.throws(() => boost.normalizeItemIds("1,2"), /danh sach/);
-  assert.throws(() => boost.normalizeItemIds(Array.from({ length: 51 }, (_, i) => i + 1)), /Toi da 50/);
+  assert.throws(() => boost.normalizeItemIds([1, -2]), /số nguyên dương/);
+  assert.throws(() => boost.normalizeItemIds("1,2"), /danh sách/);
+  assert.throws(() => boost.normalizeItemIds(Array.from({ length: 51 }, (_, i) => i + 1)), /Tối đa 50/);
 });
 
 test("dang tat thi lich tu dong khong day, bam Chay ngay thi van day", async () => {
@@ -84,7 +84,7 @@ test("dang tat thi lich tu dong khong day, bam Chay ngay thi van day", async () 
 
   const auto = await boost.runBoostCycle();
   assert.equal(boostCalls.length, 0);
-  assert.match(auto.message, /tat/);
+  assert.match(auto.message, /tắt/);
 
   const manual = await boost.runBoostCycle({ force: true });
   assert.deepEqual(boostCalls, [[11, 12]]);
@@ -101,7 +101,7 @@ test("chi day dung so cho con trong, vong sau xoay tiep phan con lai", async () 
 
   const second = await boost.runBoostCycle();
   assert.equal(boostCalls.length, 1, "du 5 cho thi khong goi day");
-  assert.match(second.message, /Du 5/);
+  assert.match(second.message, /đủ 5/);
 
   // Het 4 gio: Shopee khong con san pham nao dang day.
   boostedOnShopee.clear();

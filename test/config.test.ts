@@ -39,10 +39,10 @@ test("ENV_FILE tro toi tep cau hinh shop that thi dung dung vung GLOBAL va tep t
   );
 
   const output = runStatus({ ENV_FILE: live });
-  assert.match(output, new RegExp(`Tep cau hinh:\\s+${live.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`));
-  assert.match(output, /Vung:\s+GLOBAL/);
-  assert.match(output, /Da ket noi:\s+chua/, "tep token shop that rieng, chua co gi");
-  assert.doesNotMatch(output, /chay 'npm start'/, "che do shop that khong duoc nhac lenh cua moi truong thu nghiem");
+  assert.match(output, new RegExp(`Tệp cấu hình:\\s+${live.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`));
+  assert.match(output, /Vùng:\s+GLOBAL/);
+  assert.match(output, /Đã kết nối:\s+chưa/, "tep token shop that rieng, chua co gi");
+  assert.doesNotMatch(output, /chạy 'npm start'/, "che do shop that khong duoc nhac lenh cua moi truong thu nghiem");
 });
 
 test("thieu khoa trong tep cau hinh thi bao ro ten tep", async () => {
@@ -56,5 +56,5 @@ test("thieu khoa trong tep cau hinh thi bao ro ten tep", async () => {
     const e = error as { stdout: string; stderr: string };
     output = e.stdout + e.stderr;
   }
-  assert.match(output, /Thieu bien moi truong SHOPEE_PARTNER_KEY trong tep .*\.env\.thieu/);
+  assert.match(output, /Thiếu biến môi trường SHOPEE_PARTNER_KEY trong tệp .*\.env\.thieu/);
 });

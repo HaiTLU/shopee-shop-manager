@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quan ly shop Shopee</title>
+<title>Quản lý shop Shopee</title>
 <link rel="icon" href="data:,">
 <style>
   :root {
@@ -82,11 +82,11 @@
 </head>
 <body>
 <main>
-  <h1>Quan ly shop Shopee</h1>
-  <p class="sub">Sua gia va ton kho truc tiep. Moi thay doi duoc day thang len Shopee.</p>
+  <h1>Quản lý shop Shopee</h1>
+  <p class="sub">Sửa giá và tồn kho trực tiếp. Mọi thay đổi được gửi thẳng lên Shopee.</p>
 
   <div id="bar" class="bar">
-    <span class="grow">Dang kiem tra ket noi...</span>
+    <span class="grow">Đang kiểm tra kết nối...</span>
   </div>
 
   <nav id="tabs" class="tabs"></nav>
@@ -112,7 +112,7 @@ async function api(path, options) {
   const text = await res.text();
   let data = {};
   try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text }; }
-  if (!res.ok) throw new Error(data.error || `Loi HTTP ${res.status}`);
+  if (!res.ok) throw new Error(data.error || `Lỗi HTTP ${res.status}`);
   return data;
 }
 
@@ -124,8 +124,8 @@ async function renderStatus() {
     if (!s.connected) {
       bar.className = "bar warn";
       bar.append(
-        el("span", { className: "grow", textContent: "Chua ket noi shop nao." }),
-        el("a", { className: "btn", href: "/auth/start", textContent: "Ket noi shop Shopee" }),
+        el("span", { className: "grow", textContent: "Chưa kết nối shop nào." }),
+        el("a", { className: "btn", href: "/auth/start", textContent: "Kết nối shop Shopee" }),
       );
       return false;
     }
@@ -135,16 +135,16 @@ async function renderStatus() {
       el("span", {
         className: "grow",
         textContent:
-          `Da ket noi shop ${s.shopId}. ` +
-          (s.accessTokenExpiresInMinutes > 0 ? `Token con ${s.accessTokenExpiresInMinutes} phut, ` : "Token da het han, se tu gia han khi dung, ") +
-          `ma gia han con ${s.refreshTokenExpiresInDays} ngay.`,
+          `Đã kết nối shop ${s.shopId}. ` +
+          (s.accessTokenExpiresInMinutes > 0 ? `Mã truy cập còn ${s.accessTokenExpiresInMinutes} phút, ` : "Mã truy cập đã hết hạn, sẽ tự gia hạn khi dùng, ") +
+          `mã gia hạn còn ${s.refreshTokenExpiresInDays} ngày.`,
       }),
-      el("a", { className: "btn ghost", href: "/auth/start", textContent: "Uy quyen lai" }),
+      el("a", { className: "btn ghost", href: "/auth/start", textContent: "Ủy quyền lại" }),
     );
     return true;
   } catch (error) {
     bar.className = "bar err";
-    bar.textContent = `Khong doc duoc tinh trang ket noi: ${error.message}`;
+    bar.textContent = `Không đọc được tình trạng kết nối: ${error.message}`;
     return false;
   }
 }
@@ -156,7 +156,7 @@ function productRow(item) {
 
   const save = async (kind) => {
     msg.className = "rowmsg muted";
-    msg.textContent = "Dang luu...";
+    msg.textContent = "Đang lưu...";
     try {
       if (kind === "price") {
         await api(`/api/products/${item.item_id}/price`, {
@@ -172,23 +172,23 @@ function productRow(item) {
         });
       }
       msg.className = "rowmsg ok";
-      msg.textContent = "Da luu len Shopee.";
+      msg.textContent = "Đã lưu lên Shopee.";
     } catch (error) {
       msg.className = "rowmsg err";
       msg.textContent = error.message;
     }
   };
 
-  const priceBtn = el("button", { className: "ghost", textContent: "Luu gia" });
+  const priceBtn = el("button", { className: "ghost", textContent: "Lưu giá" });
   priceBtn.addEventListener("click", () => save("price"));
-  const stockBtn = el("button", { className: "ghost", textContent: "Luu ton" });
+  const stockBtn = el("button", { className: "ghost", textContent: "Lưu tồn" });
   stockBtn.addEventListener("click", () => save("stock"));
 
   const hasModelNote = item.has_model
-    ? el("small", { className: "muted", textContent: "Co bien the - sua o day chi ap cho bien the mac dinh" })
+    ? el("small", { className: "muted", textContent: "Có phân loại: sửa ở đây chỉ áp dụng cho phân loại mặc định" })
     : null;
 
-  const boostBox = el("input", { type: "checkbox", checked: state.boostIds.includes(item.item_id), title: "Dua vao danh sach day tu dong" });
+  const boostBox = el("input", { type: "checkbox", checked: state.boostIds.includes(item.item_id), title: "Đưa vào danh sách đẩy tự động" });
   boostBox.addEventListener("change", async () => {
     const next = boostBox.checked
       ? [...state.boostIds, item.item_id]
@@ -201,7 +201,7 @@ function productRow(item) {
       });
       state.boostIds = saved.itemIds;
       msg.className = "rowmsg ok";
-      msg.textContent = boostBox.checked ? "Da them vao danh sach day." : "Da bo khoi danh sach day.";
+      msg.textContent = boostBox.checked ? "Đã thêm vào danh sách đẩy." : "Đã bỏ khỏi danh sách đẩy.";
     } catch (error) {
       boostBox.checked = !boostBox.checked;
       msg.className = "rowmsg err";
@@ -213,8 +213,8 @@ function productRow(item) {
     el("td", {}, boostBox),
     el("td", { className: "col-img" }, item.image ? el("img", { className: "thumb", src: item.image, alt: "" }) : ""),
     el("td", { className: "name" }, [
-      el("span", { textContent: item.item_name ?? "(khong ten)" }),
-      el("small", { textContent: `Ma ${item.item_id}${item.item_sku ? " - SKU " + item.item_sku : ""}` }),
+      el("span", { textContent: item.item_name ?? "(không tên)" }),
+      el("small", { textContent: `Mã ${item.item_id}${item.item_sku ? " - SKU " + item.item_sku : ""}` }),
       hasModelNote,
     ]),
     el("td", {}, [priceInput, el("div", {}, priceBtn)]),
@@ -222,17 +222,17 @@ function productRow(item) {
       stockInput,
       el("div", {}, stockBtn),
       item.reserved_stock
-        ? el("small", { className: "muted", textContent: `Dang giu cho khuyen mai: ${item.reserved_stock}` })
+        ? el("small", { className: "muted", textContent: `Đang giữ cho khuyến mại: ${item.reserved_stock}` })
         : null,
     ]),
-    el("td", {}, [el("div", { className: "muted", textContent: `Dang ban: ${money(item.current_price)}` }), msg]),
+    el("td", {}, [el("div", { className: "muted", textContent: `Giá đang bán: ${money(item.current_price)}` }), msg]),
   ]);
 }
 
 async function renderProducts() {
   const content = document.getElementById("content");
   content.textContent = "";
-  content.append(el("p", { className: "muted", textContent: "Dang tai danh sach san pham..." }));
+  content.append(el("p", { className: "muted", textContent: "Đang tải danh sách sản phẩm..." }));
 
   try {
     const [data, boost] = await Promise.all([
@@ -245,17 +245,17 @@ async function renderProducts() {
     content.textContent = "";
 
     if (!data.items.length) {
-      content.append(el("div", { className: "empty", textContent: "Shop chua co san pham nao dang ban." }));
+      content.append(el("div", { className: "empty", textContent: "Shop chưa có sản phẩm nào đang bán." }));
       return;
     }
 
-    const head = el("tr", {}, ["Day", "Anh", "San pham", "Gia goc", "Ton kho", "Ghi chu"].map((t) => el("th", { textContent: t, className: t === "Anh" ? "col-img" : "" })));
+    const head = el("tr", {}, ["Đẩy", "Ảnh", "Sản phẩm", "Giá gốc", "Tồn kho", "Ghi chú"].map((t) => el("th", { textContent: t, className: t === "Ảnh" ? "col-img" : "" })));
     const table = el("div", { className: "tablewrap" }, el("table", {}, [
       el("thead", {}, head),
       el("tbody", {}, data.items.map(productRow)),
     ]));
 
-    const prev = el("button", { className: "ghost", textContent: "Trang truoc", disabled: state.offset === 0 });
+    const prev = el("button", { className: "ghost", textContent: "Trang trước", disabled: state.offset === 0 });
     prev.addEventListener("click", () => {
       state.offset = Math.max(0, state.offset - state.pageSize);
       renderProducts();
@@ -270,7 +270,7 @@ async function renderProducts() {
       table,
       el("div", { className: "pager" }, [
         prev,
-        el("span", { className: "muted", textContent: `Tong ${state.total} san pham` }),
+        el("span", { className: "muted", textContent: `Tổng ${state.total} sản phẩm` }),
         next,
       ]),
     );
@@ -281,24 +281,24 @@ async function renderProducts() {
 }
 
 const timeAgo = (ms) => {
-  if (!ms) return "chua bao gio";
+  if (!ms) return "chưa bao giờ";
   const minutes = Math.round((Date.now() - ms) / 60000);
-  if (minutes < 1) return "vua xong";
-  if (minutes < 60) return `${minutes} phut truoc`;
+  if (minutes < 1) return "vừa xong";
+  if (minutes < 60) return `${minutes} phút trước`;
   const hours = Math.floor(minutes / 60);
-  return hours < 24 ? `${hours} gio truoc` : `${Math.floor(hours / 24)} ngay truoc`;
+  return hours < 24 ? `${hours} giờ trước` : `${Math.floor(hours / 24)} ngày trước`;
 };
 
 async function renderBoost() {
   const content = document.getElementById("content");
   content.textContent = "";
-  content.append(el("p", { className: "muted", textContent: "Dang tai trang thai day san pham..." }));
+  content.append(el("p", { className: "muted", textContent: "Đang tải trạng thái đẩy sản phẩm..." }));
 
   try {
     const b = await api("/api/boost");
     content.textContent = "";
 
-    const toggle = el("button", { textContent: b.enabled ? "Tat day tu dong" : "Bat day tu dong", className: b.enabled ? "ghost" : "" });
+    const toggle = el("button", { textContent: b.enabled ? "Tắt đẩy tự động" : "Bật đẩy tự động", className: b.enabled ? "ghost" : "" });
     toggle.addEventListener("click", async () => {
       toggle.disabled = true;
       try {
@@ -313,14 +313,14 @@ async function renderBoost() {
       renderBoost();
     });
 
-    const runNow = el("button", { className: "ghost", textContent: "Chay ngay" });
+    const runNow = el("button", { className: "ghost", textContent: "Đẩy ngay" });
     const runMsg = el("span", { className: "muted" });
     runNow.addEventListener("click", async () => {
       runNow.disabled = true;
-      runMsg.textContent = "Dang day...";
+      runMsg.textContent = "Đang đẩy...";
       try {
         const r = await api("/api/boost/run", { method: "POST" });
-        runMsg.textContent = r.message + (r.failed.length ? " Loi: " + r.failed.map((f) => `${f.itemId} (${f.reason})`).join("; ") : "");
+        runMsg.textContent = r.message + (r.failed.length ? " Lỗi: " + r.failed.map((f) => `${f.itemId} (${f.reason})`).join("; ") : "");
         setTimeout(renderBoost, 1500);
       } catch (error) {
         runMsg.textContent = error.message;
@@ -331,27 +331,27 @@ async function renderBoost() {
     content.append(
       el("div", { className: "panel" }, [
         el("div", { className: "row" }, [
-          el("span", { className: b.enabled ? "pill on" : "pill", textContent: b.enabled ? "Dang BAT tu dong" : "Dang TAT tu dong" }),
-          el("span", { textContent: `Dang day ${b.boostedNow.length}/${b.maxSlots} san pham` }),
+          el("span", { className: b.enabled ? "pill on" : "pill", textContent: b.enabled ? "Đang BẬT tự động" : "Đang TẮT tự động" }),
+          el("span", { textContent: `Đang đẩy ${b.boostedNow.length}/${b.maxSlots} sản phẩm` }),
           el("span", { className: "grow" }),
           toggle,
           runNow,
         ]),
         el("p", { className: "muted", textContent:
-          "Shopee cho day toi da 5 san pham, moi luot 4 gio. Khi bat, cu 10 phut he thong kiem tra, con cho trong thi day tiep san pham lau chua day nhat, xoay vong ca danh sach. " +
-          "Chi chay khi may chu dang chay (cua so Terminal npm start van mo)." }),
-        el("p", { className: "muted", textContent: `Lan chay gan nhat: ${timeAgo(b.lastRunAt)}${b.lastResult ? " - " + b.lastResult : ""}` }),
+          "Shopee cho đẩy tối đa 5 sản phẩm, mỗi lượt 4 giờ. Khi bật, cứ 10 phút hệ thống kiểm tra một lần: còn chỗ trống thì đẩy tiếp sản phẩm lâu chưa được đẩy nhất, xoay vòng cả danh sách. " +
+          "Chỉ chạy khi máy chủ đang chạy (cửa sổ Terminal chạy máy chủ vẫn mở)." }),
+        el("p", { className: "muted", textContent: `Lần chạy gần nhất: ${timeAgo(b.lastRunAt)}${b.lastResult ? " - " + b.lastResult : ""}` }),
         runMsg,
       ]),
     );
 
     if (!b.items.length) {
-      content.append(el("div", { className: "empty", textContent: "Chua chon san pham nao. Vao the San pham, tick o \"Day\" o nhung san pham muon day." }));
+      content.append(el("div", { className: "empty", textContent: "Chưa chọn sản phẩm nào. Vào thẻ Sản phẩm, đánh dấu ô \"Đẩy\" ở những sản phẩm muốn đẩy." }));
       return;
     }
 
     const rows = b.items.map((item) => {
-      const remove = el("button", { className: "ghost", textContent: "Bo khoi danh sach" });
+      const remove = el("button", { className: "ghost", textContent: "Bỏ khỏi danh sách" });
       remove.addEventListener("click", async () => {
         remove.disabled = true;
         try {
@@ -366,17 +366,17 @@ async function renderBoost() {
         renderBoost();
       });
       return el("tr", {}, [
-        el("td", { className: "name" }, [el("span", { textContent: item.name }), el("small", { textContent: `Ma ${item.itemId}` })]),
+        el("td", { className: "name" }, [el("span", { textContent: item.name }), el("small", { textContent: `Mã ${item.itemId}` })]),
         el("td", {}, item.remainingMinutes > 0
-          ? el("span", { className: "pill on", textContent: `Dang day, con ${item.remainingMinutes} phut` })
-          : el("span", { className: "pill", textContent: "Cho luot" })),
+          ? el("span", { className: "pill on", textContent: `Đang đẩy, còn ${item.remainingMinutes} phút` })
+          : el("span", { className: "pill", textContent: "Chờ lượt" })),
         el("td", { textContent: timeAgo(item.lastBoostedAt) }),
         el("td", {}, remove),
       ]);
     });
 
     content.append(el("div", { className: "tablewrap" }, el("table", {}, [
-      el("thead", {}, el("tr", {}, ["San pham", "Trang thai", "Lan day gan nhat", ""].map((t) => el("th", { textContent: t })))),
+      el("thead", {}, el("tr", {}, ["Sản phẩm", "Trạng thái", "Lần đẩy gần nhất", ""].map((t) => el("th", { textContent: t })))),
       el("tbody", {}, rows),
     ])));
   } catch (error) {
@@ -386,8 +386,8 @@ async function renderBoost() {
 }
 
 const TABS = [
-  { id: "products", label: "San pham", render: renderProducts },
-  { id: "boost", label: "Day san pham", render: renderBoost },
+  { id: "products", label: "Sản phẩm", render: renderProducts },
+  { id: "boost", label: "Đẩy sản phẩm", render: renderBoost },
 ];
 
 function readSavedTab() {

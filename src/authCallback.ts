@@ -28,7 +28,7 @@ export function parseAuthCallback(input: string): AuthCallbackParams {
   const code = params.get("code");
   if (!code) {
     throw new Error(
-      "Khong tim thay code trong duong dan. Hay chep NGUYEN duong dan tren thanh dia chi cua trinh duyet.",
+      "Không tìm thấy mã code trong đường dẫn. Hãy chép NGUYÊN đường dẫn trên thanh địa chỉ của trình duyệt.",
     );
   }
 
@@ -37,7 +37,7 @@ export function parseAuthCallback(input: string): AuthCallbackParams {
 
   const shopId = Number(shopIdRaw);
   if (!Number.isInteger(shopId) || shopId <= 0) {
-    throw new Error(`shop_id khong hop le: ${shopIdRaw}`);
+    throw new Error(`shop_id không hợp lệ: ${shopIdRaw}`);
   }
   return { code, shopId };
 }

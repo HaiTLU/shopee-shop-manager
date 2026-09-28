@@ -63,7 +63,7 @@ test("tep token hong thi bao loi ro rang thay vi vo tinh nuot", async () => {
   await fs.mkdir(path.dirname(store.filePath), { recursive: true });
   await fs.writeFile(store.filePath, "{ day khong phai json");
 
-  await assert.rejects(() => store.get(), /bi hong/);
+  await assert.rejects(() => store.get(), /bị hỏng/);
 });
 
 test("ghi nhieu lan cung luc khong bao gio de lai tep do dang", async () => {

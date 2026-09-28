@@ -63,8 +63,8 @@ export async function withLock<T>(lockPath: string, fn: () => Promise<T>): Promi
       }
       if (Date.now() > deadline) {
         throw new Error(
-          `Khong lay duoc khoa ${lockPath} sau ${LOCK_TIMEOUT_MS} mili giay. ` +
-            "Co the mot tien trinh khac dang treo. Kiem tra roi xoa tep khoa neu can.",
+          `Không lấy được khóa ${lockPath} sau ${LOCK_TIMEOUT_MS} mili giây. ` +
+            "Có thể một tiến trình khác đang treo. Kiểm tra rồi xóa tệp khóa nếu cần.",
         );
       }
       await sleep(LOCK_RETRY_MS);
@@ -125,8 +125,8 @@ export class FileTokenStorage implements TokenStorage {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
       if (error instanceof SyntaxError) {
         throw new Error(
-          `Tep token ${this.filePath} bi hong, khong doc duoc. ` +
-            "Xoa tep nay roi vao /auth/start de uy quyen lai.",
+          `Tệp token ${this.filePath} bị hỏng, không đọc được. ` +
+            "Xóa tệp này rồi vào /auth/start để ủy quyền lại.",
         );
       }
       throw error;

@@ -75,7 +75,7 @@ async function guardedRefresh(shopId?: number, merchantId?: number): Promise<Acc
     const current = await tokenStorage.get();
     if (!current) {
       throw new Error(
-        "Chua co token nao duoc luu. Mo /auth/start tren trinh duyet de uy quyen shop.",
+        "Chưa có mã truy cập nào được lưu. Mở /auth/start trên trình duyệt để ủy quyền shop.",
       );
     }
     const justRefreshed =
@@ -92,9 +92,9 @@ async function guardedRefresh(shopId?: number, merchantId?: number): Promise<Acc
     const ageMs = current.obtained_at ? Date.now() - current.obtained_at : null;
     if (ageMs !== null && ageMs > REFRESH_TOKEN_LIFETIME_MS) {
       throw new Error(
-        `refresh_token da qua han 30 ngay (lan gia han gan nhat cach day ${Math.floor(
+        `Mã gia hạn đã quá hạn 30 ngày (lần gia hạn gần nhất cách đây ${Math.floor(
           ageMs / 86_400_000,
-        )} ngay). Phai vao /auth/start de uy quyen lai shop.`,
+        )} ngày). Phải vào /auth/start để ủy quyền lại shop.`,
       );
     }
 
@@ -105,8 +105,8 @@ async function guardedRefresh(shopId?: number, merchantId?: number): Promise<Acc
     );
     if (fresh.error) {
       throw new Error(
-        `Shopee tu choi gia han token: ${fresh.error} - ${fresh.message}. ` +
-          "Neu loi la invalid_refresh_token thi phai uy quyen lai shop tai /auth/start.",
+        `Shopee từ chối gia hạn mã truy cập: ${fresh.error} - ${fresh.message}. ` +
+          "Nếu lỗi là invalid_refresh_token thì phải ủy quyền lại shop tại /auth/start.",
       );
     }
 
@@ -167,9 +167,9 @@ export function startTokenKeepalive(): NodeJS.Timeout | null {
         if (!token) return;
         if (isUsable(token)) return;
         await guardedRefresh();
-        console.log("[token] Da gia han token tu dong.");
+        console.log("[token] Đã tự gia hạn mã truy cập.");
       } catch (error) {
-        console.error("[token] Gia han tu dong that bai:", (error as Error).message);
+        console.error("[token] Tự gia hạn thất bại:", (error as Error).message);
       }
     })();
   }, intervalMs);

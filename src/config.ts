@@ -20,7 +20,7 @@ function required(name: string): string {
   const value = process.env[name];
   if (!value || value.trim() === "") {
     throw new Error(
-      `Thieu bien moi truong ${name} trong tep ${envFile}. Sao chep tu tep mau (.env.example hoac .env.live.example) roi dien gia tri.`,
+      `Thiếu biến môi trường ${name} trong tệp ${envFile}. Sao chép từ tệp mẫu (.env.example hoặc .env.live.example) rồi điền giá trị.`,
     );
   }
   return value.trim();
@@ -31,7 +31,7 @@ function optionalNumber(name: string, fallback: number): number {
   if (raw === undefined || raw.trim() === "") return fallback;
   const value = Number(raw);
   if (!Number.isFinite(value)) {
-    throw new Error(`Bien moi truong ${name} phai la so, dang nhan duoc: ${raw}`);
+    throw new Error(`Biến môi trường ${name} phải là số, đang nhận được: ${raw}`);
   }
   return value;
 }
@@ -40,7 +40,7 @@ function parseRegion(raw: string): ShopeeRegion {
   const allowed = Object.values(ShopeeRegion) as string[];
   if (!allowed.includes(raw)) {
     throw new Error(
-      `SHOPEE_REGION khong hop le: ${raw}. Chi chap nhan: ${allowed.join(", ")}`,
+      `SHOPEE_REGION không hợp lệ: ${raw}. Chỉ chấp nhận: ${allowed.join(", ")}`,
     );
   }
   return raw as ShopeeRegion;
@@ -49,7 +49,7 @@ function parseRegion(raw: string): ShopeeRegion {
 const partnerIdRaw = required("SHOPEE_PARTNER_ID");
 const partnerId = Number(partnerIdRaw);
 if (!Number.isInteger(partnerId) || partnerId <= 0) {
-  throw new Error(`SHOPEE_PARTNER_ID phai la so nguyen duong, dang nhan duoc: ${partnerIdRaw}`);
+  throw new Error(`SHOPEE_PARTNER_ID phải là số nguyên dương, đang nhận được: ${partnerIdRaw}`);
 }
 
 export const config = {
@@ -84,8 +84,8 @@ export const appUrl = (() => {
     return new URL(config.redirectUri).origin;
   } catch {
     throw new Error(
-      `SHOPEE_REDIRECT_URI trong tep ${envFile} khong phai dia chi hop le: ${config.redirectUri}. ` +
-        "Vi du dung: http://localtest.me/auth/callback",
+      `SHOPEE_REDIRECT_URI trong tệp ${envFile} không phải địa chỉ hợp lệ: ${config.redirectUri}. ` +
+        "Ví dụ đúng: http://localtest.me/auth/callback",
     );
   }
 })();

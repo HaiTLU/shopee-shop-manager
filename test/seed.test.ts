@@ -181,7 +181,7 @@ test("tren shop that (GLOBAL) thi tu choi, khong goi Shopee", () => {
     output = e.stdout + e.stderr;
   }
   assert.equal(code, 1);
-  assert.match(output, /Tu choi/);
+  assert.match(output, /Từ chối/);
 });
 
 test("gia vuot muc toi da cua don vi van chuyen thi tu ha gia va thu lai", async () => {
@@ -199,7 +199,7 @@ test("gia vuot muc toi da cua don vi van chuyen thi tu ha gia va thu lai", async
   // San pham 1: 100.000 bi tu choi, 50.000 bi tu choi, 25.000 duoc.
   // San pham 2: bat dau luon tu 25.000 (muc da biet la duoc), khong do lai.
   assert.deepEqual(prices, [100000, 50000, 25000, 25000]);
-  assert.ok(logs.some((l) => l.includes("vuot muc toi da")), "phai bao cho nguoi dung biet vi sao ha gia");
+  assert.ok(logs.some((l) => l.includes("vượt mức tối đa")), "phai bao cho nguoi dung biet vi sao ha gia");
 });
 
 test("loi khong lien quan toi gia thi khong thu lai, bao loi ngay", async () => {
@@ -211,5 +211,5 @@ test("loi khong lien quan toi gia thi khong thu lai, bao loi ngay", async () => 
 
   assert.equal(ids.length, 0);
   assert.equal(calls.slice(start).filter((c) => c.path.endsWith("/add_item")).length, 1);
-  assert.ok(logs.some((l) => l.includes("LOI") && l.includes("product.error_param")));
+  assert.ok(logs.some((l) => l.includes("LỖI") && l.includes("product.error_param")));
 });

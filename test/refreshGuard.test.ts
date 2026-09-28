@@ -210,7 +210,7 @@ test("refresh_token qua 30 ngay thi bao phai uy quyen lai, khong goi Shopee vo i
     obtained_at: Date.now() - 31 * 24 * 60 * 60 * 1000,
   });
 
-  await assert.rejects(() => sdk.refreshToken(), /uy quyen lai/);
+  await assert.rejects(() => sdk.refreshToken(), /ủy quyền lại/);
   assert.equal(refreshCalls, 0, "het han 30 ngay thi goi Shopee cung vo ich");
 });
 

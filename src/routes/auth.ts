@@ -60,22 +60,22 @@ authRouter.get("/callback", async (req, res) => {
     res
       .status(400)
       .send(
-        "Ma state khong hop le hoac da qua han. Hay bat dau lai tu /auth/start " +
-          "thay vi mo truc tiep duong dan callback. Neu duong dan uy quyen duoc tao " +
-          "bang lenh auth-url thi day la binh thuong: chep nguyen duong dan tren thanh " +
-          'dia chi va chay npm run cli -- exchange "<duong dan>" trong vai phut.',
+        "Mã state không hợp lệ hoặc đã quá hạn. Hãy bắt đầu lại từ /auth/start " +
+          "thay vì mở trực tiếp đường dẫn callback. Nếu đường dẫn ủy quyền được tạo " +
+          "bằng lệnh auth-url thì đây là bình thường: chép nguyên đường dẫn trên thanh " +
+          'địa chỉ và chạy npm run cli -- exchange "<đường dẫn>" trong vài phút.',
       );
     return;
   }
 
   if (typeof code !== "string" || code === "") {
-    res.status(400).send("Shopee khong tra ve code. Thu uy quyen lai tu /auth/start.");
+    res.status(400).send("Shopee không trả về mã code. Thử ủy quyền lại từ /auth/start.");
     return;
   }
 
   const shopId = typeof shopIdRaw === "string" ? Number(shopIdRaw) : undefined;
   if (shopId !== undefined && !Number.isInteger(shopId)) {
-    res.status(400).send(`shop_id khong hop le: ${String(shopIdRaw)}`);
+    res.status(400).send(`shop_id không hợp lệ: ${String(shopIdRaw)}`);
     return;
   }
 
@@ -85,14 +85,14 @@ authRouter.get("/callback", async (req, res) => {
       res
         .status(502)
         .send(
-          `Doi code lay token that bai: ${token?.error ?? "khong ro"} - ${token?.message ?? ""}. ` +
-            "Kiem tra lai SHOPEE_REDIRECT_URI da khai dung trong Console cua Shopee chua.",
+          `Đổi mã code lấy mã truy cập thất bại: ${token?.error ?? "không rõ"} - ${token?.message ?? ""}. ` +
+            "Kiểm tra lại SHOPEE_REDIRECT_URI đã khai đúng trong Console của Shopee chưa.",
         );
       return;
     }
     res.redirect("/?connected=1");
   } catch (error) {
-    res.status(502).send(`Loi khi doi code lay token: ${(error as Error).message}`);
+    res.status(502).send(`Lỗi khi đổi mã code lấy mã truy cập: ${(error as Error).message}`);
   }
 });
 

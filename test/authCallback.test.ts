@@ -23,11 +23,11 @@ test("khong co shop_id thi van tra ve code", () => {
 });
 
 test("thieu code thi bao loi huong dan chep nguyen duong dan", () => {
-  assert.throws(() => parseAuthCallback("https://x.vn/cb?shop_id=1"), /NGUYEN duong dan/);
-  assert.throws(() => parseAuthCallback("abc123"), /NGUYEN duong dan/);
+  assert.throws(() => parseAuthCallback("https://x.vn/cb?shop_id=1"), /NGUYÊN đường dẫn/);
+  assert.throws(() => parseAuthCallback("abc123"), /NGUYÊN đường dẫn/);
 });
 
 test("shop_id khong phai so nguyen duong thi bao loi", () => {
-  assert.throws(() => parseAuthCallback("https://x.vn/cb?code=q&shop_id=abc"), /shop_id khong hop le/);
-  assert.throws(() => parseAuthCallback("https://x.vn/cb?code=q&shop_id=-3"), /shop_id khong hop le/);
+  assert.throws(() => parseAuthCallback("https://x.vn/cb?code=q&shop_id=abc"), /shop_id không hợp lệ/);
+  assert.throws(() => parseAuthCallback("https://x.vn/cb?code=q&shop_id=-3"), /shop_id không hợp lệ/);
 });

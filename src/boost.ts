@@ -47,13 +47,13 @@ export function pickItemsToBoost(
 
 /** Chuan hoa danh sach nguoi dung gui len: so nguyen duong, bo trung, giu thu tu. */
 export function normalizeItemIds(raw: unknown): number[] {
-  if (!Array.isArray(raw)) throw new Error("itemIds phai la danh sach ma san pham.");
+  if (!Array.isArray(raw)) throw new Error("itemIds phải là danh sách mã sản phẩm.");
   const ids = [...new Set(raw.map(Number))];
   if (ids.some((id) => !Number.isInteger(id) || id <= 0)) {
-    throw new Error("Moi ma san pham phai la so nguyen duong.");
+    throw new Error("Mỗi mã sản phẩm phải là số nguyên dương.");
   }
   if (ids.length > MAX_ROTATION_ITEMS) {
-    throw new Error(`Toi da ${MAX_ROTATION_ITEMS} san pham trong danh sach day.`);
+    throw new Error(`Tối đa ${MAX_ROTATION_ITEMS} sản phẩm trong danh sách đẩy.`);
   }
   return ids;
 }
@@ -79,10 +79,10 @@ export interface BoostRunResult {
 export async function runBoostCycle(options: { force?: boolean } = {}): Promise<BoostRunResult> {
   const state = await readState();
   if (!state.boost.enabled && !options.force) {
-    return { boostedNow: [], newlyBoosted: [], failed: [], message: "Dang tat day tu dong." };
+    return { boostedNow: [], newlyBoosted: [], failed: [], message: "Đang tắt đẩy tự động." };
   }
   if (!state.boost.itemIds.length) {
-    return { boostedNow: [], newlyBoosted: [], failed: [], message: "Chua chon san pham nao de day." };
+    return { boostedNow: [], newlyBoosted: [], failed: [], message: "Chưa chọn sản phẩm nào để đẩy." };
   }
 
   const boostedNow = await fetchBoostedNow();
@@ -101,20 +101,20 @@ export async function runBoostCycle(options: { force?: boolean } = {}): Promise<
   if (!toBoost.length) {
     message =
       freeSlots <= 0
-        ? `Du ${MAX_BOOST_SLOTS} san pham dang duoc day, cho het luot.`
-        : "Cac san pham trong danh sach deu dang duoc day.";
+        ? `Đã đủ ${MAX_BOOST_SLOTS} sản phẩm đang được đẩy, chờ hết lượt.`
+        : "Các sản phẩm trong danh sách đều đang được đẩy.";
   } else {
     try {
       const result = (await sdk.product.boostItem({ item_id_list: toBoost })).response;
       failed = (result?.failure_list ?? [])
         .filter((f) => f.item_id)
-        .map((f) => ({ itemId: f.item_id!, reason: f.failed_reason ?? "khong ro" }));
+        .map((f) => ({ itemId: f.item_id!, reason: f.failed_reason ?? "không rõ" }));
       const failedIds = new Set(failed.map((f) => f.itemId));
       newlyBoosted = toBoost.filter((id) => !failedIds.has(id));
-      message = `Da day ${newlyBoosted.length} san pham` + (failed.length ? `, ${failed.length} that bai` : "") + ".";
+      message = `Đã đẩy ${newlyBoosted.length} sản phẩm` + (failed.length ? `, ${failed.length} thất bại` : "") + ".";
     } catch (error) {
       failed = toBoost.map((itemId) => ({ itemId, reason: describeError(error) }));
-      message = `Day that bai: ${describeError(error)}`;
+      message = `Đẩy thất bại: ${describeError(error)}`;
     }
   }
 
@@ -131,7 +131,7 @@ export async function runBoostCycle(options: { force?: boolean } = {}): Promise<
 export async function saveBoostSettings(patch: { itemIds?: unknown; enabled?: unknown }): Promise<BoostState> {
   const itemIds = patch.itemIds === undefined ? undefined : normalizeItemIds(patch.itemIds);
   if (patch.enabled !== undefined && typeof patch.enabled !== "boolean") {
-    throw new Error("enabled phai la true hoac false.");
+    throw new Error("enabled phải là true hoặc false.");
   }
   const state = await updateState((s) => {
     if (itemIds) {
@@ -157,9 +157,9 @@ export function startBoostScheduler(): NodeJS.Timeout | null {
   const tick = async () => {
     try {
       const result = await runBoostCycle();
-      if (result.newlyBoosted.length || result.failed.length) console.log(`[day san pham] ${result.message}`);
+      if (result.newlyBoosted.length || result.failed.length) console.log(`[đẩy sản phẩm] ${result.message}`);
     } catch (error) {
-      console.error(`[day san pham] Loi: ${describeError(error)}`);
+      console.error(`[đẩy sản phẩm] Lỗi: ${describeError(error)}`);
     }
   };
 

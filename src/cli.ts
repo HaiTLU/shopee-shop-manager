@@ -39,21 +39,21 @@ async function main(): Promise<void> {
   switch (command) {
     case "status": {
       const status = await tokenStatus();
-      console.log(`Tep cau hinh:    ${envFile}`);
-      console.log(`Vung:            ${config.region}`);
-      console.log(`Da ket noi:      ${status.connected ? "co" : "chua"}`);
+      console.log(`Tệp cấu hình:     ${envFile}`);
+      console.log(`Vùng:             ${config.region}`);
+      console.log(`Đã kết nối:       ${status.connected ? "có" : "chưa"}`);
       if (status.connected) {
-        console.log(`Shop ID:         ${status.shopId ?? "khong ro"}`);
+        console.log(`Shop ID:          ${status.shopId ?? "không rõ"}`);
         const minutes = status.accessTokenExpiresInMinutes ?? 0;
         console.log(
-          `Token con:       ${minutes > 0 ? `${minutes} phut` : "da het han, tu gia han o lan goi tiep theo"}`,
+          `Mã truy cập còn:  ${minutes > 0 ? `${minutes} phút` : "đã hết hạn, tự gia hạn ở lần gọi tiếp theo"}`,
         );
-        console.log(`Ma gia han con:  ${status.refreshTokenExpiresInDays} ngay`);
+        console.log(`Mã gia hạn còn:   ${status.refreshTokenExpiresInDays} ngày`);
       }
       if (status.needsReauthorization) {
         console.log(
-          `Can uy quyen: chay '${startCommand()}', mo ${appUrl} tren trinh duyet ` +
-            "roi bam 'Ket noi shop Shopee'.",
+          `Cần ủy quyền: chạy '${startCommand()}', mở ${appUrl} trên trình duyệt ` +
+            "rồi bấm 'Kết nối shop Shopee'.",
         );
       }
       break;
@@ -64,18 +64,18 @@ async function main(): Promise<void> {
       // Duong dan nay khong di qua /auth/start nen khong co ma state. Trang
       // callback cua may chu se tu choi (dung nhu thiet ke chong gia mao) va
       // KHONG dung toi code, nen van doi code lay token bang lenh exchange duoc.
-      console.log("\nCach nay chi dung khi khong mo duoc trang web. Binh thuong hay bam nut tren trang web.");
-      console.log("1. Mo duong dan tren, dang nhap tai khoan nguoi ban va bam dong y.");
-      console.log("2. Trinh duyet se bao loi 'Ma state khong hop le'. Day la binh thuong.");
-      console.log("3. Chep NGUYEN duong dan tren thanh dia chi, chay trong vai phut:");
-      console.log('   npm run cli -- exchange "<duong dan vua chep>"');
+      console.log("\nCách này chỉ dùng khi không mở được trang web. Bình thường hãy bấm nút trên trang web.");
+      console.log("1. Mở đường dẫn trên, đăng nhập tài khoản người bán và bấm đồng ý.");
+      console.log("2. Trình duyệt sẽ báo lỗi 'Mã state không hợp lệ'. Đây là bình thường.");
+      console.log("3. Chép NGUYÊN đường dẫn trên thanh địa chỉ, chạy trong vài phút:");
+      console.log('   npm run cli -- exchange "<đường dẫn vừa chép>"');
       break;
     }
 
     case "exchange": {
       const input = args.join(" ");
       if (!input) {
-        console.error('Cach dung: npm run cli -- exchange "<duong dan tren thanh dia chi sau khi uy quyen>"');
+        console.error('Cách dùng: npm run cli -- exchange "<đường dẫn trên thanh địa chỉ sau khi ủy quyền>"');
         process.exitCode = 1;
         break;
       }
@@ -83,19 +83,19 @@ async function main(): Promise<void> {
       const token = await sdk.authenticateWithCode(code, shopId);
       if (!token || token.error) {
         throw new Error(
-          `Doi code lay token that bai: ${token?.error ?? "khong ro"} - ${token?.message ?? ""}. ` +
-            "Code chi dung duoc mot lan va het han sau vai phut, hay uy quyen lai roi dan ngay.",
+          `Đổi mã code lấy mã truy cập thất bại: ${token?.error ?? "không rõ"} - ${token?.message ?? ""}. ` +
+            "Mã code chỉ dùng được một lần và hết hạn sau vài phút, hãy ủy quyền lại rồi dán ngay.",
         );
       }
-      console.log(`Da ket noi shop ${token.shop_id ?? shopId ?? ""}. Token luu tai ${config.tokenFile}`);
+      console.log(`Đã kết nối shop ${token.shop_id ?? shopId ?? ""}. Token lưu tại ${config.tokenFile}`);
       break;
     }
 
     case "tao-san-pham-thu": {
       const count = Math.min(Math.max(Number(args[0]) || 3, 1), 5);
-      console.log(`Dang tao ${count} san pham thu tren shop thu nghiem...`);
+      console.log(`Đang tạo ${count} sản phẩm thử trên shop thử nghiệm...`);
       const ids = await seedTestProducts(count);
-      console.log(`\nXong: tao duoc ${ids.length}/${count} san pham. Tai lai ${appUrl} de xem.`);
+      console.log(`\nXong: tạo được ${ids.length}/${count} sản phẩm. Tải lại ${appUrl} để xem.`);
       if (ids.length < count) process.exitCode = 1;
       break;
     }
@@ -103,25 +103,25 @@ async function main(): Promise<void> {
     case "trang-thai-day": {
       const { boost } = await readState();
       const now = await fetchBoostedNow();
-      console.log(`Tu dong:        ${boost.enabled ? "BAT" : "TAT"}`);
-      console.log(`Danh sach day:  ${boost.itemIds.length} san pham`);
-      console.log(`Dang day:       ${now.length}/${MAX_BOOST_SLOTS}`);
-      for (const b of now) console.log(`  ${b.itemId}  con ${b.remainingMinutes} phut`);
-      if (boost.lastResult) console.log(`Lan chay gan nhat: ${boost.lastResult}`);
+      console.log(`Tự động:         ${boost.enabled ? "BẬT" : "TẮT"}`);
+      console.log(`Danh sách đẩy:   ${boost.itemIds.length} sản phẩm`);
+      console.log(`Đang đẩy:        ${now.length}/${MAX_BOOST_SLOTS}`);
+      for (const b of now) console.log(`  ${b.itemId}  còn ${b.remainingMinutes} phút`);
+      if (boost.lastResult) console.log(`Lần chạy gần nhất: ${boost.lastResult}`);
       break;
     }
 
     case "day-ngay": {
       const result = await runBoostCycle({ force: true });
       console.log(result.message);
-      for (const f of result.failed) console.log(`  Loi ${f.itemId}: ${f.reason}`);
+      for (const f of result.failed) console.log(`  Lỗi ${f.itemId}: ${f.reason}`);
       if (result.failed.length) process.exitCode = 1;
       break;
     }
 
     case "refresh": {
       const token = await sdk.refreshToken();
-      console.log(token ? "Da gia han token." : "Khong gia han duoc.");
+      console.log(token ? "Đã gia hạn mã truy cập." : "Không gia hạn được.");
       break;
     }
 
@@ -143,7 +143,7 @@ async function main(): Promise<void> {
         .filter((id): id is number => typeof id === "number");
 
       if (ids.length === 0) {
-        console.log("Shop chua co san pham nao o trang thai dang ban.");
+        console.log("Shop chưa có sản phẩm nào đang bán.");
         break;
       }
 
@@ -155,7 +155,7 @@ async function main(): Promise<void> {
           [
             String(item.item_id).padEnd(14),
             String(price?.current_price ?? "-").padStart(10),
-            `ton ${String(stock?.total_available_stock ?? "-").padStart(5)}`,
+            `tồn ${String(stock?.total_available_stock ?? "-").padStart(5)}`,
             item.item_name ?? "",
           ].join("  "),
         );
@@ -164,8 +164,8 @@ async function main(): Promise<void> {
     }
 
     default:
-      console.error(`Lenh khong ro: ${command}`);
-      console.error("Cac lenh co: status, auth-url, exchange, refresh, shop, products, tao-san-pham-thu, trang-thai-day, day-ngay");
+      console.error(`Lệnh không rõ: ${command}`);
+      console.error("Các lệnh có: status, auth-url, exchange, refresh, shop, products, tao-san-pham-thu, trang-thai-day, day-ngay");
       process.exitCode = 1;
   }
 }
@@ -174,6 +174,6 @@ async function main(): Promise<void> {
 startTokenKeepalive()?.unref();
 
 main().catch((error: Error) => {
-  console.error(`Loi: ${error.message}`);
+  console.error(`Lỗi: ${error.message}`);
   process.exitCode = 1;
 });

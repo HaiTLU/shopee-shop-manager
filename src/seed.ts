@@ -141,25 +141,25 @@ async function ensureLogistics(log: Log) {
   const list = (await sdk.logistics.getChannelList()).response?.logistics_channel_list ?? [];
   let usable = logisticInfoFrom(list);
   if (usable.length) {
-    log(`Van chuyen: dang bat ${usable.length} don vi.`);
+    log(`Vận chuyển: đang bật ${usable.length} đơn vị.`);
     return usable;
   }
 
-  log("Van chuyen: chua bat don vi nao, dang thu bat...");
+  log("Vận chuyển: chưa bật đơn vị nào, đang thử bật...");
   for (const channel of list) {
     if (!channel.logistics_channel_id) continue;
     try {
       await sdk.logistics.updateChannel({ logistics_channel_id: channel.logistics_channel_id, enabled: true });
-      log(`  Da bat: ${channel.logistics_channel_name ?? channel.logistics_channel_id}`);
+      log(`  Đã bật: ${channel.logistics_channel_name ?? channel.logistics_channel_id}`);
     } catch (error) {
-      log(`  Khong bat duoc ${channel.logistics_channel_name ?? channel.logistics_channel_id}: ${describeError(error)}`);
+      log(`  Không bật được ${channel.logistics_channel_name ?? channel.logistics_channel_id}: ${describeError(error)}`);
     }
   }
   const again = (await sdk.logistics.getChannelList()).response?.logistics_channel_list ?? [];
   usable = logisticInfoFrom(again);
   if (!usable.length) {
     throw new Error(
-      "Khong bat duoc don vi van chuyen nao. Vao Kenh Nguoi Ban thu nghiem > Cai dat van chuyen, bat mot don vi roi chay lai.",
+      "Không bật được đơn vị vận chuyển nào. Vào Kênh Người Bán thử nghiệm > Cài đặt vận chuyển, bật một đơn vị rồi chạy lại.",
     );
   }
   return usable;
@@ -173,7 +173,7 @@ async function pickCategory(log: Log) {
     categories = (await sdk.product.getCategory()).response?.category_list ?? [];
   }
   const ranked = rankLeafCategories(categories).slice(0, 20);
-  if (!ranked.length) throw new Error("Shopee khong tra ve nganh hang nao.");
+  if (!ranked.length) throw new Error("Shopee không trả về ngành hàng nào.");
 
   const trees =
     (await sdk.product.getAttributeTree({ category_id_list: ranked.map((c) => c.category_id!) })).response?.list ?? [];
@@ -187,8 +187,8 @@ async function pickCategory(log: Log) {
     if (attributes.length === 0) break;
   }
   log(
-    `Nganh hang: ${best!.category.display_category_name ?? best!.category.original_category_name} ` +
-      `(ma ${best!.category.category_id}, ${best!.attributes.length} thuoc tinh bat buoc)`,
+    `Ngành hàng: ${best!.category.display_category_name ?? best!.category.original_category_name} ` +
+      `(mã ${best!.category.category_id}, ${best!.attributes.length} thuộc tính bắt buộc)`,
   );
   return best!;
 }
@@ -214,7 +214,7 @@ async function addItemLoweringPrice(
     } catch (error) {
       const next = Math.max(MIN_PRICE, Math.floor(price / 2 / 1000) * 1000);
       if (!PRICE_LIMIT_ERROR.test(describeError(error)) || next >= price) throw error;
-      log(`  ${label}: gia ${price.toLocaleString("vi-VN")}d vuot muc toi da cua don vi van chuyen thu nghiem, thu ${next.toLocaleString("vi-VN")}d`);
+      log(`  ${label}: giá ${price.toLocaleString("vi-VN")}đ vượt mức tối đa của đơn vị vận chuyển thử nghiệm, thử ${next.toLocaleString("vi-VN")}đ`);
       price = next;
     }
   }
@@ -231,7 +231,7 @@ const COLORS: [number, number, number][] = [
 export async function seedTestProducts(count: number, log: Log = console.log): Promise<number[]> {
   if (!isSandbox) {
     throw new Error(
-      "Tu choi: lenh nay chi chay tren moi truong thu nghiem (SHOPEE_REGION=TEST_GLOBAL), khong tao hang gia tren shop that.",
+      "Từ chối: lệnh này chỉ chạy trên môi trường thử nghiệm (SHOPEE_REGION=TEST_GLOBAL), không tạo hàng giả trên shop thật.",
     );
   }
 
@@ -243,12 +243,12 @@ export async function seedTestProducts(count: number, log: Log = console.log): P
   let acceptedCeiling = Number.POSITIVE_INFINITY;
 
   for (let i = 1; i <= count; i++) {
-    const label = `San pham thu ${i}`;
+    const label = `Sản phẩm thử ${i}`;
     try {
       const png = makeSquarePng(800, COLORS[(i - 1) % COLORS.length]!);
       const upload = await sdk.mediaSpace.uploadImage({ image: png });
       const imageId = upload.response?.image_info?.image_id ?? upload.response?.image_info_list?.[0]?.image_info?.image_id;
-      if (!imageId) throw new Error("Shopee khong tra ve image_id khi tai anh");
+      if (!imageId) throw new Error("Shopee không trả về image_id khi tải ảnh");
 
       const { result, price, lowered } = await addItemLoweringPrice(label, Math.min(100000 * i, acceptedCeiling), log, (originalPrice) => ({
         item_name: `Sản phẩm thử nghiệm số ${i} - tạo qua API`,
@@ -271,10 +271,10 @@ export async function seedTestProducts(count: number, log: Log = console.log): P
       }));
       if (lowered) acceptedCeiling = Math.min(acceptedCeiling, price);
       const itemId = result.response?.item_id;
-      log(`${label}: da tao, ma san pham ${itemId}, gia ${price.toLocaleString("vi-VN")}d`);
+      log(`${label}: đã tạo, mã sản phẩm ${itemId}, giá ${price.toLocaleString("vi-VN")}đ`);
       if (itemId) created.push(itemId);
     } catch (error) {
-      log(`${label}: LOI ${describeError(error)}`);
+      log(`${label}: LỖI ${describeError(error)}`);
     }
   }
   return created;

@@ -31,8 +31,8 @@ app.use("/api", async (_req, res, next) => {
   const token = await tokenStorage.get();
   if (!token?.access_token) {
     res.status(401).json({
-      error: "Shop chua duoc uy quyen.",
-      action: "Mo /auth/start tren trinh duyet de ket noi shop.",
+      error: "Shop chưa được ủy quyền.",
+      action: "Mở /auth/start trên trình duyệt để kết nối shop.",
     });
     return;
   }
@@ -48,14 +48,14 @@ app.get("/healthz", async (_req, res) => {
 app.use(express.static(publicDir));
 
 app.listen(config.port, () => {
-  console.log(`Dang chay tai ${appUrl} (cong ${config.port})`);
-  console.log(`Tep cau hinh: ${envFile}`);
-  console.log(`Vung: ${config.region}${isSandbox ? " (moi truong thu nghiem)" : " (moi truong that)"}`);
-  console.log(`Dia chi nhan uy quyen: ${config.redirectUri}`);
-  console.log(`Token luu tai: ${config.tokenFile}`);
+  console.log(`Đang chạy tại ${appUrl} (cổng ${config.port})`);
+  console.log(`Tệp cấu hình: ${envFile}`);
+  console.log(`Vùng: ${config.region}${isSandbox ? " (môi trường thử nghiệm)" : " (môi trường thật)"}`);
+  console.log(`Địa chỉ nhận ủy quyền: ${config.redirectUri}`);
+  console.log(`Token lưu tại: ${config.tokenFile}`);
   if (!isSandbox) {
     console.log(
-      "Canh bao: dang noi vao shop THAT. Moi thay doi gia va ton kho deu co hieu luc ngay.",
+      "Cảnh báo: đang nối vào shop THẬT. Mọi thay đổi giá và tồn kho đều có hiệu lực ngay.",
     );
   }
   startTokenKeepalive();
