@@ -1,6 +1,6 @@
 # Quản lý shop Shopee
 
-Trang web tự quản lý shop Shopee qua Open Platform API v2: xem, tìm, sắp xếp sản phẩm; sửa giá và tồn kho từng sản phẩm, từng phân loại hoặc hàng loạt bằng Excel; theo dõi tài chính và lãi lỗ; đẩy sản phẩm tự động.
+Trang web tự quản lý shop Shopee qua Open Platform API v2: xem, tìm, sắp xếp sản phẩm; sửa giá và tồn kho từng sản phẩm, từng phân loại hoặc hàng loạt bằng Excel; theo dõi tài chính và lãi lỗ; tự trả lời đánh giá; đẩy sản phẩm tự động.
 
 Toàn bộ khóa bí mật và token nằm trên máy chủ. Trình duyệt không bao giờ nhìn thấy `partner_key` hay `access_token`.
 
@@ -66,6 +66,15 @@ Số liệu lấy từ Shopee (danh sách đơn, `get_escrow_detail_batch`, `get
 
 **Giá vốn** là giá nhập một đơn vị, Shopee không biết nên shop tự nhập: ở cột Giá vốn trang Sản phẩm, trong bảng Theo sản phẩm của trang Tài chính, hoặc cột Giá vốn của tệp Excel. Chỉ lưu trên máy (`data/costs-<vùng>-<partner_id>.json`), không gửi Shopee. Lãi lỗ dùng giá vốn hiện tại cho mọi đơn trong kỳ.
 
+## Tự trả lời đánh giá
+
+Thẻ **Đánh giá** đọc tối đa 1.000 đánh giá gần nhất (giới hạn của Shopee), không hiện và không lưu tên người mua.
+
+- Bật công tắc **Tự trả lời 4-5 sao**: cứ 30 phút (đổi bằng `REVIEW_CHECK_MINUTES`), đánh giá 4-5 sao trong 30 ngày gần nhất chưa có trả lời được trả lời theo mẫu. Lần bật đầu tiên trên shop thật phải bấm hai lần, lần đầu nói rõ sẽ trả lời ngay bao nhiêu đánh giá.
+- Đánh giá 1-3 sao và đánh giá cũ hơn nằm ở mục **Chờ duyệt**: câu trả lời đã soạn sẵn theo mẫu, sửa rồi bấm **Gửi trả lời**, hoặc đánh dấu nhiều câu rồi gửi một lần (shop thật bấm hai lần).
+- **Mẫu trả lời** theo từng mức sao, mỗi mức nhiều mẫu; mỗi đánh giá được gán cố định một mẫu để các câu không trùng nhau. `{shop}` chèn tên shop, `{san_pham}` chèn tên sản phẩm rút gọn; tối đa 500 ký tự.
+- Mỗi câu đã gửi qua trang được ghi lại (`data/reviews-<vùng>-<partner_id>.json`) để không bao giờ gửi trùng, kể cả khi Shopee cập nhật chậm.
+
 ## Đẩy sản phẩm tự động
 
 Shopee cho đẩy tối đa 5 sản phẩm cùng lúc, mỗi lượt 4 giờ. Trên trang web:
@@ -95,7 +104,7 @@ npm run cli -- day-ngay            # Chạy một vòng đẩy sản phẩm ngay
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 59 bài kiểm thử
+npm test            # 65 bài kiểm thử
 ```
 
 ## Cấu trúc
@@ -114,6 +123,8 @@ src/
   finance.ts         Lấy số liệu tiền, lập bảng kê, lãi lỗ theo kỳ
   costs.ts           Giá vốn, chỉ lưu trên máy
   routes/finance.ts  Đường dẫn tài chính và giá vốn
+  reviews.ts         Soạn trả lời theo mẫu, tự trả lời 4-5 sao, hẹn giờ
+  routes/reviews.ts  Đường dẫn đánh giá
   boost.ts           Đẩy sản phẩm tự động
   authCallback.ts    Tách code và shop_id từ đường dẫn sau ủy quyền
   cli.ts             Công cụ dòng lệnh
@@ -150,7 +161,7 @@ Lớp bảo vệ cũng xử lý trường hợp Shopee từ chối một token m
 
 Đây là nền móng chạy được, chưa phải bản đầy đủ. Những phần có thể làm tiếp:
 
-- Tự trả lời đánh giá theo mẫu (đang làm)
+- Xử lý và in đơn hàng loạt (làm tiếp theo)
 - Quản lý đơn hàng: in vận đơn, cập nhật trạng thái
 - Mã giảm giá, khuyến mại, flash sale
 - Nhận thông báo đẩy từ Shopee thay vì hỏi liên tục

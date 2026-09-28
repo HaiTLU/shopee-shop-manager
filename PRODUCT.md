@@ -28,8 +28,8 @@ Shop tự vận hành, không phải dịch vụ thuê ngoài: khóa API, mã tr
 
 ## Capabilities and Constraints
 
-- Đã có: kết nối và ủy quyền shop; xem, tìm, sắp xếp sản phẩm kèm giá, tồn từng phân loại, phần tồn đang giữ cho khuyến mại; sửa giá, tồn từng sản phẩm, từng phân loại; sửa hàng loạt bằng Excel (xem trước, chọn dòng, áp dụng, báo kết quả từng dòng); tài chính (tiền chờ về, đã về, ví, bảng kê phí, lãi lỗ theo giá vốn shop tự nhập); đẩy sản phẩm tự động (xoay vòng danh sách, bật/tắt, đẩy ngay).
-- Sắp làm (PM đã chọn, theo thứ tự): tự trả lời đánh giá; xử lý và in đơn hàng loạt.
+- Đã có: kết nối và ủy quyền shop; xem, tìm, sắp xếp sản phẩm kèm giá, tồn từng phân loại, phần tồn đang giữ cho khuyến mại; sửa giá, tồn từng sản phẩm, từng phân loại; sửa hàng loạt bằng Excel (xem trước, chọn dòng, áp dụng, báo kết quả từng dòng); tài chính (tiền chờ về, đã về, ví, bảng kê phí, lãi lỗ theo giá vốn shop tự nhập); tự trả lời đánh giá (4-5 sao tự gửi theo mẫu, 1-3 sao chờ duyệt); đẩy sản phẩm tự động (xoay vòng danh sách, bật/tắt, đẩy ngay).
+- Sắp làm (PM đã chọn): xử lý và in đơn hàng loạt.
 - Giới hạn của Shopee: đẩy tối đa 5 sản phẩm cùng lúc, mỗi lượt 4 giờ; sửa giá, tồn từng sản phẩm một (tối đa 50 phân loại mỗi lần); ứng dụng không có quyền xem dữ liệu nhạy cảm của người mua (tên, số điện thoại, địa chỉ bị che).
 - Kỹ thuật: máy chủ Express (Node.js, TypeScript); giao diện là một tệp HTML thuần, không có bước biên dịch. Mọi chữ hiển thị là tiếng Việt có dấu.
 

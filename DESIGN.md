@@ -268,6 +268,12 @@ Tiền trình bày như trang sổ quỹ: nhãn bên trái, dòng chấm dẫn, 
 ### Daily Chart (biểu đồ theo ngày)
 Một chuỗi số (thực nhận mỗi ngày) nên không cần chú giải; cột mực xanh rộng tối đa 24px, đầu cột bo 4px, chân vuông trên đường 0, lưới ngang mảnh màu dòng kẻ. Rê chuột hoặc dùng phím Tab tới một ngày thì hiện ô ghi số ngày đó; luôn có bảng "Xem số từng ngày" thay cho biểu đồ.
 
+### Filter Chips (nút lọc)
+Nhóm nút vuông góc 4px, viền 1,5px dòng kẻ đậm, chữ 600 13px kèm số đếm; nút đang chọn nền mực xanh chữ trắng (`aria-pressed`). Dùng để lọc Chờ duyệt, Đã trả lời, Tất cả.
+
+### Review Entry (dòng đánh giá)
+Mỗi đánh giá là một dòng sổ: năm ngôi sao vẽ bằng SVG (sao đã chấm tô mực xanh, sao còn lại chỉ nét dòng kẻ đậm, có nhãn đọc "N sao"), tên sản phẩm đậm, ngày và mã đơn nhỏ. Nội dung khách viết để nguyên. Câu trả lời đã gửi nằm trong khối nền mực rất nhạt, chữ mực xanh, ghi rõ "tự động" hay "gửi từ trang này". Câu chưa gửi là ô soạn thảo viền 1,5px (chỉ đọc sau khi gửi thì viền đứt nét), đếm ký tự trên 500, ô chọn để gửi hàng loạt và nút Gửi trả lời bên phải.
+
 ### Status Marks
 Trạng thái luôn có chữ kèm dấu hình: ô vuông đặc mực xanh cho "Đang đẩy, còn ...", ô vuông rỗng cho "Chờ lượt"; dấu tích và dấu chéo vẽ bằng nét, không dùng ký tự hay biểu tượng cảm xúc.
 

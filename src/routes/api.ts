@@ -19,6 +19,7 @@ import { readState } from "../stateStore.js";
 import { getCatalog, patchCatalog } from "../catalog.js";
 import { excelRouter } from "./excel.js";
 import { costsRouter, financeRouter } from "./finance.js";
+import { reviewsRouter } from "./reviews.js";
 
 /**
  * Va kieu bi dat nham cho trong SDK.
@@ -97,6 +98,7 @@ apiRouter.get(
 apiRouter.use("/excel", excelRouter);
 apiRouter.use("/finance", financeRouter);
 apiRouter.use("/costs", costsRouter);
+apiRouter.use("/reviews", reviewsRouter);
 
 /**
  * Danh sach san pham kem gia va ton kho.

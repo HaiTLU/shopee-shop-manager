@@ -12,6 +12,8 @@ import { startTokenKeepalive, tokenStorage, tokenStatus } from "./shopee.js";
 import { authRouter } from "./routes/auth.js";
 import { apiRouter } from "./routes/api.js";
 import { startBoostScheduler } from "./boost.js";
+import { startReviewScheduler } from "./reviews.js";
+import { shopeeReviewDeps } from "./routes/reviews.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, "..", "public");
@@ -60,4 +62,5 @@ app.listen(config.port, () => {
   }
   startTokenKeepalive();
   startBoostScheduler();
+  startReviewScheduler(shopeeReviewDeps);
 });
