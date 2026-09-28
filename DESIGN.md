@@ -262,6 +262,12 @@ Sản phẩm có phân loại hiện khoảng giá và tổng tồn ở dòng ch
 ### Bulk Preview (xem trước sửa hàng loạt)
 Ba bước đánh số bằng mực xanh; ô thả tệp viền đứt nét, sáng mực khi kéo tệp vào. Bảng xem trước dùng lại kiểu chữa sổ: số cũ gạch đỏ, mũi tên nhạt, số mới mực xanh đậm; dòng lỗi liệt kê riêng bằng bút đỏ kèm số dòng trong tệp; cảnh báo giá đổi lớn ghi "Kiểm tra lại" bằng bút đỏ ngay dưới tên. Nút áp dụng đếm số dòng đang chọn; ở shop thật phải bấm hai lần, lần đầu nút chuyển đỏ và nói rõ số dòng sẽ đổi. Khi gửi, thanh tiến độ mực xanh chạy và từng dòng nhận dấu tích hoặc dấu chéo kèm lý do.
 
+### Statement Lines (dòng bảng kê)
+Tiền trình bày như trang sổ quỹ: nhãn bên trái, dòng chấm dẫn, số bên phải thẳng cột (số dạng bảng), cột tỷ lệ % rộng cố định 6 ký tự luôn có mặt để các số không lệch. Dòng trừ thụt vào 16px, chữ in nhạt, số mang dấu "-". Dòng tổng (Thực nhận, Lãi gộp) có kẻ đậm 1,5px phía trên, số đậm mực xanh; lỗ thì bút đỏ. Không dùng thẻ số liệu lớn.
+
+### Daily Chart (biểu đồ theo ngày)
+Một chuỗi số (thực nhận mỗi ngày) nên không cần chú giải; cột mực xanh rộng tối đa 24px, đầu cột bo 4px, chân vuông trên đường 0, lưới ngang mảnh màu dòng kẻ. Rê chuột hoặc dùng phím Tab tới một ngày thì hiện ô ghi số ngày đó; luôn có bảng "Xem số từng ngày" thay cho biểu đồ.
+
 ### Status Marks
 Trạng thái luôn có chữ kèm dấu hình: ô vuông đặc mực xanh cho "Đang đẩy, còn ...", ô vuông rỗng cho "Chờ lượt"; dấu tích và dấu chéo vẽ bằng nét, không dùng ký tự hay biểu tượng cảm xúc.
 

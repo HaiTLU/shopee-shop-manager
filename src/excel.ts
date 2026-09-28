@@ -9,6 +9,7 @@
  */
 import ExcelJS from "exceljs";
 import type { CatalogItem } from "./catalog.js";
+import { costKey } from "./costs.js";
 
 export const SHEET_GUIDE = "00-HuongDan";
 export const SHEET_DATA = "01-GiaTon";
@@ -24,6 +25,7 @@ export const COLUMNS = [
   { key: "stock", header: "Tồn kho hiện tại", width: 14 },
   { key: "newPrice", header: "Giá gốc mới", width: 15 },
   { key: "newStock", header: "Tồn kho mới", width: 14 },
+  { key: "cost", header: "Giá vốn", width: 14 },
 ] as const;
 
 type ColumnKey = (typeof COLUMNS)[number]["key"];
@@ -36,6 +38,8 @@ export interface ExportMeta {
   shopName: string;
   sandbox: boolean;
   exportedAt: Date;
+  /** Gia von hien tai, dien san vao cot Gia von. */
+  costs?: Record<string, number>;
 }
 
 const fold = (s: string) =>
@@ -60,6 +64,7 @@ export async function buildWorkbook(items: CatalogItem[], meta: ExportMeta): Pro
     }
     const lines = item.hasModel ? item.models : [{ modelId: 0, name: "", sku: item.sku, price: item.price, stock: item.stock }];
     for (const m of lines) {
+      const cost = meta.costs?.[costKey(item.itemId, m.modelId)];
       rows.push({
         itemId: item.itemId,
         modelId: m.modelId,
@@ -70,6 +75,7 @@ export async function buildWorkbook(items: CatalogItem[], meta: ExportMeta): Pro
         stock: m.stock ?? null,
         newPrice: null,
         newStock: null,
+        cost: cost ?? null,
       });
     }
   }
@@ -85,7 +91,7 @@ export async function buildWorkbook(items: CatalogItem[], meta: ExportMeta): Pro
     [""],
     ["Cách dùng", { bold: true }],
     [`1. Mở trang "${SHEET_DATA}". Mỗi dòng là một sản phẩm, hoặc một phân loại nếu sản phẩm có phân loại.`],
-    ['2. Chỉ điền vào hai cột nền xanh nhạt "Giá gốc mới" và "Tồn kho mới". Để trống là giữ nguyên.'],
+    ['2. Chỉ điền vào các cột nền xanh nhạt "Giá gốc mới", "Tồn kho mới" và "Giá vốn". Để trống là giữ nguyên.'],
     ["3. Không sửa cột Mã sản phẩm, Mã phân loại: hệ thống dựa vào hai cột này để biết dòng nào là dòng nào."],
     ["4. Lưu tệp (vẫn dạng .xlsx), vào trang quản lý, thẻ Sửa hàng loạt, chọn tệp để xem trước."],
     ["5. Xem kỹ danh sách thay đổi, bỏ chọn dòng không muốn đổi, rồi bấm Áp dụng."],
@@ -94,6 +100,7 @@ export async function buildWorkbook(items: CatalogItem[], meta: ExportMeta): Pro
     ["- Giá là số nguyên, đơn vị đồng, không cần dấu chấm hay chữ đ (gõ 95000 hoặc 95.000 đều được)."],
     ["- Tồn kho không được thấp hơn phần Shopee đang giữ cho khuyến mại, nếu không Shopee sẽ từ chối dòng đó."],
     ["- Giá, tồn có thể đã đổi sau lúc xuất tệp. Khi xem trước, hệ thống so với số liệu Shopee ngay lúc đó."],
+    ["- Giá vốn là giá nhập một đơn vị, dùng để tính lãi lỗ ở trang Tài chính. Chỉ lưu trên máy của shop, không gửi lên Shopee. Cột này đã điền sẵn giá vốn đang lưu, sửa số nào thì số đó được cập nhật."],
     ["- Giá mới gấp rưỡi trở lên hoặc chỉ bằng một nửa trở xuống sẽ được đánh dấu để kiểm tra lại, phòng gõ thừa hoặc thiếu số 0."],
   ];
   if (skipped.length) {
@@ -125,12 +132,12 @@ export async function buildWorkbook(items: CatalogItem[], meta: ExportMeta): Pro
       const key = COLUMNS[col - 1]?.key;
       cell.border = { top: THIN, left: THIN, bottom: THIN, right: THIN };
       cell.alignment = { vertical: "middle", wrapText: key === "name" || key === "model" };
-      if (key === "price" || key === "stock" || key === "newPrice" || key === "newStock") {
+      if (key === "price" || key === "stock" || key === "newPrice" || key === "newStock" || key === "cost") {
         cell.numFmt = "#,##0";
         cell.alignment = { ...cell.alignment, horizontal: "right" };
       }
       if (key === "itemId" || key === "modelId") cell.numFmt = "0";
-      if (key === "newPrice" || key === "newStock") {
+      if (key === "newPrice" || key === "newStock" || key === "cost") {
         cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: INPUT_FILL } };
         cell.dataValidation = {
           type: "whole",
@@ -139,7 +146,12 @@ export async function buildWorkbook(items: CatalogItem[], meta: ExportMeta): Pro
           allowBlank: true,
           showErrorMessage: true,
           errorTitle: "Chưa đúng",
-          error: key === "newPrice" ? "Giá gốc mới phải là số nguyên lớn hơn 0." : "Tồn kho mới phải là số nguyên từ 0 trở lên.",
+          error:
+            key === "newPrice"
+              ? "Giá gốc mới phải là số nguyên lớn hơn 0."
+              : key === "cost"
+                ? "Giá vốn phải là số nguyên từ 0 trở lên."
+                : "Tồn kho mới phải là số nguyên từ 0 trở lên.",
         };
       }
     });
@@ -157,9 +169,11 @@ export interface ParsedRow {
   modelId: number;
   newPrice?: number;
   newStock?: number;
+  newCost?: number;
   /** Chu nguoi dung go ma khong doc ra so, de bao loi dung nguyen van. */
   badPrice?: string;
   badStock?: string;
+  badCost?: string;
   badId?: string;
 }
 
@@ -206,7 +220,7 @@ export async function parseWorkbook(buffer: Buffer): Promise<ParsedRow[]> {
         if (key && !cols.has(key)) cols.set(key, col);
       });
       if (!cols.has("itemId")) continue;
-      if (!cols.has("newPrice") && !cols.has("newStock")) {
+      if (!cols.has("newPrice") && !cols.has("newStock") && !cols.has("cost")) {
         throw new Error('Không thấy cột "Giá gốc mới" hoặc "Tồn kho mới". Hãy dùng tệp tải về từ trang quản lý.');
       }
       const out: ParsedRow[] = [];
@@ -217,15 +231,19 @@ export async function parseWorkbook(buffer: Buffer): Promise<ParsedRow[]> {
         const model = readWhole(get("modelId"));
         const price = readWhole(get("newPrice"));
         const stock = readWhole(get("newStock"));
-        if (id.value === undefined && !id.bad && price.value === undefined && !price.bad && stock.value === undefined && !stock.bad) continue;
+        const cost = readWhole(get("cost"));
+        const empty = (x: { value?: number; bad?: string }) => x.value === undefined && !x.bad;
+        if (empty(id) && empty(price) && empty(stock) && empty(cost)) continue;
         out.push({
           row: r,
           ...(id.value !== undefined ? { itemId: id.value } : {}),
           modelId: model.value ?? 0,
           ...(price.value !== undefined ? { newPrice: price.value } : {}),
           ...(stock.value !== undefined ? { newStock: stock.value } : {}),
+          ...(cost.value !== undefined ? { newCost: cost.value } : {}),
           ...(price.bad ? { badPrice: price.bad } : {}),
           ...(stock.bad ? { badStock: stock.bad } : {}),
+          ...(cost.bad ? { badCost: cost.bad } : {}),
           ...(id.bad || model.bad ? { badId: id.bad ?? model.bad } : {}),
         });
       }
@@ -248,6 +266,8 @@ export interface Change {
   newPrice?: number;
   oldStock?: number;
   newStock?: number;
+  oldCost?: number;
+  newCost?: number;
   warnings: string[];
 }
 
@@ -267,7 +287,7 @@ export interface Diff {
 const BIG_PRICE_CHANGE = 0.5;
 
 /** So tep voi so lieu Shopee hien tai. Ham thuan, khong goi mang. */
-export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
+export function diffRows(rows: ParsedRow[], items: CatalogItem[], costs: Record<string, number> = {}): Diff {
   const byId = new Map(items.map((i) => [i.itemId, i]));
   const seen = new Map<string, number>();
   const changes: Change[] = [];
@@ -275,7 +295,8 @@ export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
   let unchanged = 0;
 
   for (const r of rows) {
-    const hasInput = r.newPrice !== undefined || r.newStock !== undefined || r.badPrice || r.badStock;
+    const hasInput =
+      r.newPrice !== undefined || r.newStock !== undefined || r.newCost !== undefined || r.badPrice || r.badStock || r.badCost;
     if (!hasInput) {
       unchanged++;
       continue;
@@ -308,6 +329,7 @@ export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
     const bad: string[] = [];
     if (r.badPrice) bad.push(`Giá gốc mới "${r.badPrice}" không phải số nguyên.`);
     if (r.badStock) bad.push(`Tồn kho mới "${r.badStock}" không phải số nguyên.`);
+    if (r.badCost) bad.push(`Giá vốn "${r.badCost}" không phải số nguyên.`);
     if (r.newPrice !== undefined && r.newPrice < 1) bad.push("Giá gốc mới phải lớn hơn 0.");
     const reserved = target.reserved ?? 0;
     if (r.newStock !== undefined && r.newStock < reserved) {
@@ -320,7 +342,9 @@ export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
 
     const priceChanged = r.newPrice !== undefined && r.newPrice !== target.price;
     const stockChanged = r.newStock !== undefined && r.newStock !== target.stock;
-    if (!priceChanged && !stockChanged) {
+    const oldCost = costs[costKey(item.itemId, r.modelId)];
+    const costChanged = r.newCost !== undefined && r.newCost !== oldCost;
+    if (!priceChanged && !stockChanged && !costChanged) {
       unchanged++;
       continue;
     }
@@ -334,6 +358,11 @@ export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
         warnings.push(`Giá mới chỉ bằng ${fmt(ratio * 100)}% giá cũ, kiểm tra có gõ thiếu số 0 không.`);
       }
     }
+    const cost = costChanged ? r.newCost! : oldCost;
+    const price = priceChanged ? r.newPrice! : target.price;
+    if ((costChanged || priceChanged) && typeof cost === "number" && typeof price === "number" && cost > price) {
+      warnings.push(`Giá vốn ${cost.toLocaleString("vi-VN")} cao hơn giá gốc ${price.toLocaleString("vi-VN")}: bán là lỗ.`);
+    }
     const modelName = r.modelId ? (target as { name: string }).name : undefined;
     changes.push({
       key,
@@ -346,6 +375,8 @@ export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
       ...(priceChanged ? { newPrice: r.newPrice } : {}),
       ...(typeof target.stock === "number" ? { oldStock: target.stock } : {}),
       ...(stockChanged ? { newStock: r.newStock } : {}),
+      ...(oldCost !== undefined ? { oldCost } : {}),
+      ...(costChanged ? { newCost: r.newCost } : {}),
       warnings,
     });
   }
@@ -356,7 +387,7 @@ export function diffRows(rows: ParsedRow[], items: CatalogItem[]): Diff {
 
 export interface ApplyResult {
   key: string;
-  field: "price" | "stock";
+  field: "price" | "stock" | "cost";
   ok: boolean;
   message: string;
 }
@@ -365,6 +396,8 @@ type Failure = { model_id?: number; failed_reason?: string };
 export interface ApplyDeps {
   updatePrice(itemId: number, list: { model_id: number; original_price: number }[]): Promise<{ failure_list?: Failure[] }>;
   updateStock(itemId: number, list: { model_id: number; seller_stock: { stock: number }[] }[]): Promise<{ failure_list?: Failure[] }>;
+  /** Gia von chi luu tren may, khong goi Shopee. */
+  saveCosts?(list: { itemId: number; modelId: number; cost: number }[]): Promise<void>;
   sleep(ms: number): Promise<void>;
   onResult(result: ApplyResult): void;
 }
@@ -380,7 +413,7 @@ export function isRetryable(message: string): boolean {
   return /busy|too.?many|rate.?limit|timeout|timed out|ECONNRESET|ETIMEDOUT|fetch failed|socket hang up|50[234]|server_error|system_error/i.test(message);
 }
 
-async function withRetry<T>(fn: () => Promise<T>, sleep: (ms: number) => Promise<void>): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, sleep: (ms: number) => Promise<void>): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
       return await fn();
@@ -394,6 +427,17 @@ async function withRetry<T>(fn: () => Promise<T>, sleep: (ms: number) => Promise
 
 /** Gui cac thay doi len Shopee: gom theo san pham, moi lenh toi da 50 phan loai. */
 export async function applyChanges(changes: Change[], deps: ApplyDeps): Promise<void> {
+  // Gia von luu truoc, mot lan, khong phu thuoc Shopee.
+  const costList = changes.filter((c) => c.newCost !== undefined);
+  if (costList.length && deps.saveCosts) {
+    try {
+      await deps.saveCosts(costList.map((c) => ({ itemId: c.itemId, modelId: c.modelId, cost: c.newCost! })));
+      for (const c of costList) deps.onResult({ key: c.key, field: "cost", ok: true, message: "Đã lưu giá vốn." });
+    } catch (error) {
+      for (const c of costList) deps.onResult({ key: c.key, field: "cost", ok: false, message: (error as Error).message });
+    }
+  }
+
   const byItem = new Map<number, Change[]>();
   for (const c of changes) byItem.set(c.itemId, [...(byItem.get(c.itemId) ?? []), c]);
 

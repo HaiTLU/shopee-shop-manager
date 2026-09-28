@@ -14,6 +14,7 @@ import crypto from "node:crypto";
 import express, { Router } from "express";
 import { isSandbox } from "../config.js";
 import { getCatalog, patchCatalog } from "../catalog.js";
+import { readCosts, saveCosts } from "../costs.js";
 import { applyChanges, buildWorkbook, diffRows, parseWorkbook, type ApplyResult, type Change } from "../excel.js";
 import { sdk } from "../shopee.js";
 
@@ -76,8 +77,8 @@ async function shopName(): Promise<string> {
 excelRouter.get("/template", async (_req, res) => {
   try {
     // Luon lay so moi nhat: tep Excel la can cu de nguoi dung sua.
-    const [catalog, name] = await Promise.all([getCatalog({ force: true }), shopName()]);
-    const buffer = await buildWorkbook(catalog.items, { shopName: name, sandbox: isSandbox, exportedAt: new Date() });
+    const [catalog, name, costs] = await Promise.all([getCatalog({ force: true }), shopName(), readCosts()]);
+    const buffer = await buildWorkbook(catalog.items, { shopName: name, sandbox: isSandbox, exportedAt: new Date(), costs });
     const file = fileName(name);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     res.setHeader("Content-Disposition", `attachment; filename="${file}"; filename*=UTF-8''${encodeURIComponent(file)}`);
@@ -103,8 +104,8 @@ excelRouter.post("/preview", express.raw({ type: () => true, limit: MAX_UPLOAD }
   }
   try {
     // So voi so lieu Shopee ngay luc nay, khong dung so trong tep.
-    const catalog = await getCatalog({ force: true });
-    const diff = diffRows(rows, catalog.items);
+    const [catalog, costs] = await Promise.all([getCatalog({ force: true }), readCosts()]);
+    const diff = diffRows(rows, catalog.items, costs);
     const id = crypto.randomUUID();
     previews.set(id, { changes: new Map(diff.changes.map((c) => [c.key, c])), createdAt: Date.now() });
     res.json({ previewId: id, sandbox: isSandbox, ...diff });
@@ -139,7 +140,10 @@ excelRouter.post("/apply", async (req, res) => {
 
   const job: Job = {
     id: crypto.randomUUID(),
-    total: chosen.reduce((n, c) => n + (c.newPrice !== undefined ? 1 : 0) + (c.newStock !== undefined ? 1 : 0), 0),
+    total: chosen.reduce(
+      (n, c) => n + (c.newPrice !== undefined ? 1 : 0) + (c.newStock !== undefined ? 1 : 0) + (c.newCost !== undefined ? 1 : 0),
+      0,
+    ),
     results: [],
     finished: false,
     startedAt: Date.now(),
@@ -160,11 +164,14 @@ excelRouter.post("/apply", async (req, res) => {
       if (r.error) throw new Error(`${r.error}: ${r.message || "không có mô tả"}`);
       return r.response ?? {};
     },
+    saveCosts: async (list) => {
+      await saveCosts(list);
+    },
     sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     onResult: (result) => {
       job.results.push(result);
       const c = byKey.get(result.key);
-      if (result.ok && c) {
+      if (result.ok && c && result.field !== "cost") {
         patchCatalog(c.itemId, c.modelId, result.field === "price" ? { price: c.newPrice! } : { stock: c.newStock! });
       }
     },

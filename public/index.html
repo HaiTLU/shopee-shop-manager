@@ -231,11 +231,11 @@
   .thumb { display: block; width: 48px; height: 48px; object-fit: cover; border-radius: 3px; border: 1px solid var(--rule); background: var(--paper); }
   .name { font-weight: 600; line-height: 1.4; max-width: 44ch; }
   .meta { margin-top: 2px; font-size: 13px; color: var(--print-soft); }
-  .c-price { width: 220px; }
-  .c-stock { width: 190px; }
-  .c-sell { width: 130px; text-align: right; white-space: nowrap; }
-  .c-boost { width: 104px; }
-  .sell-label { display: none; }
+  .c-price { width: 210px; }
+  .c-stock { width: 160px; }
+  .c-cost { width: 180px; }
+  .c-boost { width: 96px; }
+  .fix .meta .num { white-space: nowrap; }
 
   /* O sua so: so cu gach do, so moi viet muc xanh */
   .fix { display: grid; gap: 6px; justify-items: end; }
@@ -394,7 +394,7 @@
   .problems .icon { color: var(--red); }
   .problems .icon svg { width: 16px; height: 16px; margin-top: 3px; }
   .changes .c-pick { width: 56px; }
-  .changes .c-price, .changes .c-stock { width: 210px; text-align: right; white-space: nowrap; }
+  .changes .c-price, .changes .c-stock, .changes .c-cost { width: 190px; text-align: right; white-space: nowrap; }
   .changes .c-result { width: 260px; }
   .change { display: inline-flex; align-items: baseline; gap: 6px; }
   .change .fix-old { display: inline; }
@@ -408,6 +408,60 @@
   .progress[hidden] { display: none; }
   .progress .slot-bar { margin-top: 0; height: 6px; }
   .progress .slot-bar i { width: 0; transition: width .3s ease-out; }
+
+  /* ---------- Tai chinh ---------- */
+  .fin { margin-top: 32px; }
+  .fin h3 { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+  .fin.two { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px 48px; align-items: start; }
+  .fin .empty { padding: 12px 0; }
+  .lines { display: grid; max-width: 620px; }
+  .ln { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; }
+  .ln-label { flex: 0 1 auto; min-width: 0; }
+  .ln-leader { flex: 1 1 16px; min-width: 16px; border-bottom: 1px dotted var(--rule-strong); transform: translateY(-4px); }
+  .ln-value { flex: none; font-weight: 600; text-align: right; }
+  .ln-note { flex: none; width: 6ch; font-size: 12px; color: var(--print-soft); text-align: right; }
+  .ln.sub .ln-label { padding-left: 16px; color: var(--print-soft); }
+  .ln.sub .ln-value { font-weight: 500; }
+  .ln.total { margin-top: 4px; padding-top: 8px; border-top: 1.5px solid var(--print); font-size: 17px; }
+  .ln.total .ln-label { font-weight: 700; }
+  .ln.total .ln-value { font-weight: 700; color: var(--ink); }
+  .ln .ln-value.err { color: var(--red); }
+  .fin .meta { max-width: 72ch; margin-top: 6px; }
+  .date-input { min-height: 40px; padding: 4px 2px; border: 0; background: transparent; color: var(--print); font: 500 16px/1.3 var(--font); font-variant-numeric: tabular-nums; }
+  .date-input:focus { outline: none; }
+  .custom-range { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+  .custom-range[hidden] { display: none; }
+  .sync-box .loading { padding: 8px 0; }
+  .chart-wrap { position: relative; max-width: 780px; }
+  .chart { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart .grid { stroke: var(--rule); stroke-width: 1; }
+  .chart .axis { stroke: var(--rule-strong); stroke-width: 1; }
+  .chart .tick { fill: var(--print-soft); font: 500 11px var(--font); font-variant-numeric: tabular-nums; }
+  .chart .bar { fill: var(--ink); }
+  .chart .hit { fill: transparent; }
+  .chart .hit:hover, .chart .hit:focus { fill: var(--ink-wash); outline: none; }
+  .chart-tip {
+    position: absolute; top: 0; transform: translateX(-50%);
+    display: grid; gap: 2px; padding: 8px 10px;
+    border: 1px solid var(--rule-strong); border-radius: 4px;
+    background: var(--label); color: var(--print);
+    font-size: 13px; white-space: nowrap; pointer-events: none;
+  }
+  .chart-tip[hidden] { display: none; }
+  .day-table { margin-top: 12px; }
+  .day-table summary { min-height: 32px; color: var(--ink); font-weight: 600; font-size: 14px; cursor: pointer; }
+  .ledger.mini td, .ledger.mini th { padding: 8px 12px; }
+  .ledger td.r, .ledger th.r { text-align: right; }
+  .row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 12px; }
+  .row-actions [hidden] { display: none; }
+  .fin-products .c-qty { width: 72px; }
+  .fin-products .c-goods, .fin-products .c-net, .fin-products .c-profit { width: 120px; }
+  .fin-products .c-cost { width: 190px; }
+  .fin-products .c-margin { width: 80px; }
+  .fin-orders .c-sn .toggle { margin: 0; }
+  .order-detail td { padding: 8px 16px 16px 40px; background: var(--ink-wash); }
+  .order-detail .lines { max-width: 560px; }
+  .c-amount.ok { color: var(--ink); }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -454,7 +508,7 @@
     .products tr {
       display: grid;
       grid-template-columns: 48px minmax(0, 1fr) auto;
-      grid-template-areas: "img name name" "price price price" "stock stock stock" "sell sell boost";
+      grid-template-areas: "img name name" "price price price" "stock stock stock" "cost cost cost" "boost boost boost";
       gap: 10px 12px;
       padding: 16px 0;
       border-bottom: 1px solid var(--rule);
@@ -463,9 +517,8 @@
     .products .c-name { grid-area: name; }
     .products .c-price { grid-area: price; }
     .products .c-stock { grid-area: stock; }
-    .products .c-sell { grid-area: sell; align-self: center; text-align: left; font-size: 13px; color: var(--print-soft); }
+    .products .c-cost { grid-area: cost; }
     .products .c-boost { grid-area: boost; }
-    .sell-label { display: inline; }
     .thumb { width: 48px; height: 48px; }
 
     .fix { justify-items: stretch; }
@@ -508,12 +561,12 @@
     .sum-label { display: inline; font-weight: 400; color: var(--print-soft); }
     .products .model-row { padding: 12px 0; border-bottom: 1px dotted var(--rule-strong); }
     .model-row .c-name { padding-left: 0; }
-    .products .model-row .c-sell:empty, .products .c-boost:empty { display: none; }
+    .products .c-boost:empty { display: none; }
 
     .changes tr {
       display: grid;
       grid-template-columns: 40px minmax(0, 1fr);
-      grid-template-areas: "pick name" "pick price" "pick stock" "pick result";
+      grid-template-areas: "pick name" "pick price" "pick stock" "pick cost" "pick result";
       gap: 6px 8px;
       padding: 14px 0;
       border-bottom: 1px solid var(--rule);
@@ -522,11 +575,26 @@
     .changes .c-name { grid-area: name; }
     .changes .c-price { grid-area: price; text-align: left; }
     .changes .c-stock { grid-area: stock; text-align: left; }
+    .changes .c-cost { grid-area: cost; text-align: left; }
+    .changes .c-cost::before { content: "Giá vốn: "; color: var(--print-soft); font-size: 13px; }
     .changes .c-result { grid-area: result; }
     .changes .c-price::before { content: "Giá gốc: "; color: var(--print-soft); font-size: 13px; }
     .changes .c-stock::before { content: "Tồn kho: "; color: var(--print-soft); font-size: 13px; }
-    .changes .c-pick, .changes .c-price, .changes .c-stock, .changes .c-result { width: auto; }
+    .changes .c-pick, .changes .c-price, .changes .c-stock, .changes .c-cost, .changes .c-result { width: auto; }
     .dropzone { padding: 16px; }
+    .fin.two { grid-template-columns: minmax(0, 1fr); }
+    .ln { flex-wrap: wrap; }
+    .fin .ledger tr {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--rule);
+    }
+    .fin .ledger td { text-align: left; width: auto; }
+    .fin .ledger td[data-label]::before { content: attr(data-label) ": "; color: var(--print-soft); font-size: 13px; }
+    .fin .ledger .c-name, .fin .ledger .c-cost, .fin .ledger .c-sn { grid-column: 1 / -1; }
+    .fin .ledger tr.order-detail { display: block; padding: 0; }
+    .order-detail td { padding: 8px 12px 12px; }
+    .ledger.mini td:first-child { grid-column: 1 / -1; font-weight: 600; }
+
 
     .rot .c-name { grid-area: name; }
     .rot .c-state { grid-area: state; }
@@ -550,7 +618,7 @@
 <main class="sheet" id="content"></main>
 
 <script>
-const state = { status: null, boostIds: [], boostNote: null, catalog: null, query: "", sort: "recent", page: 1, pageSize: 30, open: new Set() };
+const state = { status: null, boostIds: [], boostNote: null, catalog: null, costs: {}, query: "", sort: "recent", page: 1, pageSize: 30, open: new Set(), period: null };
 let uid = 0;
 let boostQueue = Promise.resolve();
 
@@ -577,6 +645,7 @@ const ICONS = {
   upload: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4.5"/><path d="M7.5 9 12 4.5 16.5 9"/><path d="M4.5 15.5v3a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-3"/></svg>',
   download: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5v11"/><path d="M7.5 11 12 15.5 16.5 11"/><path d="M4.5 15.5v3a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-3"/></svg>',
   arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12h15M14 6.5l5.5 5.5-5.5 5.5"/></svg>',
+  coins: '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="9" cy="7" rx="5.5" ry="2.5"/><path d="M3.5 7v4c0 1.4 2.5 2.5 5.5 2.5"/><path d="M3.5 11v4c0 1.4 2.5 2.5 5.5 2.5"/><ellipse cx="15" cy="13" rx="5.5" ry="2.5"/><path d="M9.5 13v4c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-4"/></svg>',
   reload: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5V9H15"/></svg>',
 };
 function icon(name) {
@@ -726,7 +795,7 @@ function renderConnect() {
  * Mot o sua gia hoac ton. Sua xong, so cu hien gach do, so moi viet muc xanh;
  * bam Luu (hoac Enter) moi gui len Shopee, Esc de tra lai so cu.
  */
-function fixField({ label, unit, value, min, action, save, onSaved, extra }) {
+function fixField({ label, unit, value, min, action, save, onSaved, extra, okText = () => `Shopee đã nhận lúc ${clock()}.`, failPrefix = "Shopee chưa nhận" }) {
   let saved = typeof value === "number" ? value : null;
   const id = `f${++uid}`;
   const wrap = el("div", { className: "fix" });
@@ -797,10 +866,10 @@ function fixField({ label, unit, value, min, action, save, onSaved, extra }) {
       saved = v;
       input.value = money(v);
       wrap.dataset.state = "saved";
-      show("ok", `Shopee đã nhận lúc ${clock()}.`);
+      show("ok", okText());
     } catch (error) {
       wrap.dataset.state = "error";
-      show("err", `Shopee chưa nhận: ${error.message}`);
+      show("err", `${failPrefix}: ${error.message}`);
     } finally {
       saveBtn.disabled = false;
       cancelBtn.disabled = false;
@@ -828,7 +897,7 @@ function fixField({ label, unit, value, min, action, save, onSaved, extra }) {
     ]),
     el("div", { className: "fix-actions" }, [cancelBtn, saveBtn]),
     msg,
-    extra ? el("p", { className: "meta", textContent: extra }) : null,
+    extra ? el("p", { className: "meta" }, extra) : null,
   ].filter(Boolean));
   // Tren may tinh nhan o dau cot bang; ten o nhap van phai doc duoc.
   input.setAttribute("aria-label", label);
@@ -935,6 +1004,7 @@ function priceField(item, model, sellEl) {
   const target = model ?? item;
   return fixField({
     label: "Giá gốc", unit: "₫", value: target.price, min: 1, action: "Lưu giá",
+    extra: sellEl ? ["Đang bán ", sellEl] : null,
     save: (v) => api(`/api/products/${item.itemId}/price`, send("POST", { original_price: v, model_id: model ? model.modelId : 0 })),
     onSaved: (v) => {
       if (target.currentPrice === target.price) {
@@ -958,12 +1028,32 @@ function stockField(item, model) {
   });
 }
 
+/** Gia von chi luu tren may nay (khong gui Shopee), dung cho trang Tai chinh. */
+function costField(item, model) {
+  const key = `${item.itemId}:${model ? model.modelId : 0}`;
+  return fixField({
+    label: "Giá vốn", unit: "₫", value: state.costs[key], min: 0, action: "Lưu giá vốn",
+    save: (v) => api("/api/costs", send("PUT", { itemId: item.itemId, modelId: model ? model.modelId : 0, cost: v })),
+    onSaved: (v) => { state.costs[key] = v; refreshSummary(item); },
+    okText: () => "Đã lưu trên máy này.",
+    failPrefix: "Chưa lưu được",
+  });
+}
+
+/** So phan loai da co gia von, hien tren dong san pham co phan loai. */
+function costSummary(item) {
+  const have = item.models.filter((m) => state.costs[`${item.itemId}:${m.modelId}`] !== undefined).length;
+  return have === item.models.length ? "Đủ giá vốn" : `Thiếu ${item.models.length - have}/${item.models.length}`;
+}
+
 /** Cap nhat khoang gia, tong ton tren dong san pham sau khi sua mot phan loai. */
 function refreshSummary(item) {
   const body = document.querySelector(`tbody[data-item="${item.itemId}"]`);
   if (!body || !item.hasModel) return;
   body.querySelector(".sum-price").textContent = range(item.priceMin, item.priceMax);
   body.querySelector(".sum-stock").textContent = typeof item.stockTotal === "number" ? money(item.stockTotal) : "-";
+  const cost = body.querySelector(".sum-cost");
+  if (cost) cost.textContent = costSummary(item);
 }
 
 function modelRow(item, m) {
@@ -976,7 +1066,7 @@ function modelRow(item, m) {
     ]),
     el("td", { className: "c-price" }, priceField(item, m, sell)),
     el("td", { className: "c-stock" }, stockField(item, m)),
-    el("td", { className: "c-sell" }, [el("span", { className: "sell-label", textContent: "Đang bán " }), sell]),
+    el("td", { className: "c-cost" }, costField(item, m)),
     el("td", { className: "c-boost" }),
   ]);
 }
@@ -991,7 +1081,7 @@ function productBody(item, openNow) {
     item.problem ? el("p", { className: "meta err", textContent: item.problem }) : null,
   ]);
 
-  let priceCell, stockCell, sellText;
+  let priceCell, stockCell, costCell, sellText;
   const sell = el("span", { className: "num" });
   if (item.hasModel) {
     priceCell = el("td", { className: "c-price" }, el("p", { className: "sum" }, [
@@ -1004,9 +1094,15 @@ function productBody(item, openNow) {
     ]));
     const cur = item.models.map((m) => m.currentPrice).filter((x) => typeof x === "number");
     sellText = cur.length ? range(Math.min(...cur), Math.max(...cur)) : "-";
+    priceCell.append(el("p", { className: "meta" }, ["Đang bán ", sell]));
+    costCell = el("td", { className: "c-cost" }, el("p", { className: "sum" }, [
+      el("span", { className: "sum-label", textContent: "Giá vốn " }),
+      el("span", { className: "sum-cost", textContent: costSummary(item) }),
+    ]));
   } else {
     priceCell = el("td", { className: "c-price" }, priceField(item, null, sell));
     stockCell = el("td", { className: "c-stock" }, stockField(item));
+    costCell = el("td", { className: "c-cost" }, costField(item));
     sellText = `${money(item.currentPrice)} ₫`;
   }
 
@@ -1018,7 +1114,7 @@ function productBody(item, openNow) {
     nameCell,
     priceCell,
     stockCell,
-    el("td", { className: "c-sell" }, [el("span", { className: "sell-label", textContent: "Đang bán " }), sell]),
+    costCell,
     el("td", { className: "c-boost" }, boostTick(item)),
   ]));
 
@@ -1080,7 +1176,7 @@ function renderList() {
       el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm" }),
       el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá gốc" }),
       el("th", { className: "r", attrs: { scope: "col" }, textContent: "Tồn kho" }),
-      el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá đang bán" }),
+      el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá vốn" }),
       el("th", { attrs: { scope: "col" }, textContent: "Đẩy" }),
     ])),
     ...slice.map((item) => productBody(item, openIds.has(item.itemId))),
@@ -1103,11 +1199,13 @@ async function renderProducts(force = false) {
     ? "Đang tải toàn bộ sản phẩm và phân loại từ Shopee, shop nhiều sản phẩm có thể mất vài chục giây..."
     : "Đang mở danh sách..." }));
   try {
-    const [catalog, boost] = await Promise.all([
+    const [catalog, boost, costs] = await Promise.all([
       !force && state.catalog ? state.catalog : api(`/api/catalog${force ? "?refresh=1" : ""}`),
       api("/api/boost/settings"),
+      api("/api/costs"),
     ]);
     state.catalog = catalog;
+    state.costs = costs;
     state.boostIds = boost.itemIds;
 
     const loaded = new Date(catalog.loadedAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -1346,7 +1444,7 @@ function renderBulk() {
         el("p", {}, [el("strong", { textContent: "Tải tệp giá, tồn hiện tại. " }), "Mỗi sản phẩm hoặc mỗi phân loại là một dòng, có sẵn giá và tồn đang bán."]),
         el("a", { className: "btn", href: "/api/excel/template", download: "" }, [icon("download"), "Tải tệp Excel"]),
       ]),
-      el("li", {}, el("p", {}, [el("strong", { textContent: "Điền cột nền xanh nhạt " }), '"Giá gốc mới", "Tồn kho mới". Ô để trống là giữ nguyên. Không sửa cột mã.'])),
+      el("li", {}, el("p", {}, [el("strong", { textContent: "Điền cột nền xanh nhạt " }), '"Giá gốc mới", "Tồn kho mới", "Giá vốn". Ô để trống là giữ nguyên. Không sửa cột mã. Giá vốn chỉ lưu trên máy này để tính lãi lỗ, không gửi Shopee.'])),
       el("li", {}, [el("p", {}, [el("strong", { textContent: "Tải tệp lên để xem trước. " }), "Chưa có gì được gửi lên Shopee cho tới khi anh chị bấm Áp dụng."]), drop]),
     ]),
     preview,
@@ -1417,6 +1515,7 @@ function showPreview(fileName, data, box) {
       ]),
       el("td", { className: "c-price" }, cell(c.oldPrice, c.newPrice, " ₫")),
       el("td", { className: "c-stock" }, cell(c.oldStock, c.newStock, "")),
+      el("td", { className: "c-cost" }, cell(c.oldCost, c.newCost, " ₫")),
       result,
     ]);
   });
@@ -1434,7 +1533,7 @@ function showPreview(fileName, data, box) {
     applyBtn.disabled = n === 0;
     applyBtn.textContent = armed
       ? `Bấm lần nữa để đổi ${n} dòng trên shop thật`
-      : `Áp dụng ${n} thay đổi lên Shopee`;
+      : `Áp dụng ${n} thay đổi`;
     applyBtn.classList.toggle("armed", armed);
   };
   checks.forEach((b) => b.addEventListener("change", () => {
@@ -1480,6 +1579,7 @@ function showPreview(fileName, data, box) {
         el("th", { attrs: { scope: "col" }, textContent: "Sản phẩm, phân loại" }),
         el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá gốc" }),
         el("th", { className: "r", attrs: { scope: "col" }, textContent: "Tồn kho" }),
+        el("th", { className: "r", attrs: { scope: "col" }, textContent: "Giá vốn" }),
         el("th", { attrs: { scope: "col" }, textContent: "Kết quả" }),
       ])),
       el("tbody", {}, rows),
@@ -1506,7 +1606,7 @@ async function follow(jobId, total, resultCells, progress) {
       const cell = resultCells.get(r.key);
       if (cell) {
         cell.append(el("p", { className: `fix-note ${r.ok ? "ok" : "err"}` },
-          note(r.ok ? "ok" : "err", `${r.field === "price" ? "Giá" : "Tồn"}: ${r.ok ? "Shopee đã nhận" : r.message}`)));
+          note(r.ok ? "ok" : "err", `${{ price: "Giá", stock: "Tồn", cost: "Giá vốn" }[r.field]}: ${r.ok ? (r.field === "cost" ? "đã lưu" : "Shopee đã nhận") : r.message}`)));
       }
     }
     shown = job.results.length;
@@ -1521,11 +1621,477 @@ async function follow(jobId, total, resultCells, progress) {
   }
 }
 
+// ---------- Tai chinh ----------
+
+/** Ngay YYYY-MM-DD theo gio Ha Noi. */
+const hnDay = (ms = Date.now()) => new Date(ms + 7 * 3600 * 1000).toISOString().slice(0, 10);
+const addDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+const viDay = (day) => { const [y, m, d] = day.split("-"); return `${d}/${m}/${y}`; };
+const shortDay = (day) => { const [, m, d] = day.split("-"); return `${d}/${m}`; };
+const signed = (v) => (v < 0 ? `-${money(-v)}` : money(v));
+const two = (x) => String(x).padStart(2, "0");
+/** "08:37 ngay 28/09" theo gio may nguoi dung. */
+const when = (ms) => { const d = new Date(ms); return `${two(d.getHours())}:${two(d.getMinutes())} ngày ${two(d.getDate())}/${two(d.getMonth() + 1)}`; };
+const pct = (a, b) => (b ? `${(Math.round((a / b) * 1000) / 10).toLocaleString("vi-VN")}%` : "-");
+
+const PERIODS = [
+  { id: "7", label: "7 ngày qua", range: (t) => [addDays(t, -6), t] },
+  { id: "30", label: "30 ngày qua", range: (t) => [addDays(t, -29), t] },
+  { id: "month", label: "Tháng này", range: (t) => [`${t.slice(0, 7)}-01`, t] },
+  { id: "last-month", label: "Tháng trước", range: (t) => {
+    const first = `${t.slice(0, 7)}-01`;
+    const end = addDays(first, -1);
+    return [`${end.slice(0, 7)}-01`, end];
+  } },
+  { id: "custom", label: "Tự chọn", range: null },
+];
+
+function currentPeriod() {
+  if (!state.period) {
+    const saved = readPref("finance-period", "30");
+    const p = PERIODS.find((x) => x.id === saved && x.range) ?? PERIODS[1];
+    const [from, to] = p.range(hnDay());
+    state.period = { id: p.id, from, to };
+  }
+  return state.period;
+}
+
+/** Dong so: nhan ben trai, dong cham dan, so ben phai. */
+function line(label, value, opts = {}) {
+  return el("div", { className: `ln${opts.total ? " total" : ""}${opts.sub ? " sub" : ""}` }, [
+    el("span", { className: "ln-label" }, label),
+    el("span", { className: "ln-leader", attrs: { "aria-hidden": "true" } }),
+    el("span", { className: `ln-value num${opts.neg ? " err" : ""}` }, value),
+    // Cot ti le luon co mat (co the trong) de cac so thang cot.
+    el("span", { className: "ln-note num" }, opts.note ?? ""),
+  ]);
+}
+
+async function renderFinance(autoSync = true) {
+  const content = $("content");
+  const period = currentPeriod();
+  content.replaceChildren(el("p", { className: "loading", textContent: "Đang mở sổ tài chính..." }));
+
+  const [report, overview] = await Promise.all([
+    api(`/api/finance/report?from=${period.from}&to=${period.to}`).catch((e) => ({ error: e.message })),
+    api("/api/finance/overview").catch((e) => ({ error: e.message })),
+  ]);
+  if (report.error) {
+    content.replaceChildren(problem(report.error, () => renderFinance(false)));
+    return;
+  }
+
+  // Thanh chon ky
+  const select = el("select", { id: "period", className: "sort-select" },
+    PERIODS.map((p) => el("option", { value: p.id, textContent: p.label, selected: p.id === period.id })));
+  const fromIn = el("input", { type: "date", id: "from", className: "date-input", value: period.from, max: hnDay() });
+  const toIn = el("input", { type: "date", id: "to", className: "date-input", value: period.to, max: hnDay() });
+  const custom = el("span", { className: "custom-range", hidden: period.id !== "custom" }, [
+    el("label", { className: "tool" }, [el("span", { className: "tool-label", textContent: "Từ ngày" }), el("span", { className: "tool-field" }, fromIn)]),
+    el("label", { className: "tool" }, [el("span", { className: "tool-label", textContent: "Đến ngày" }), el("span", { className: "tool-field" }, toIn)]),
+  ]);
+  select.addEventListener("change", () => {
+    const p = PERIODS.find((x) => x.id === select.value);
+    if (p.range) {
+      const [from, to] = p.range(hnDay());
+      state.period = { id: p.id, from, to };
+      writePref("finance-period", p.id);
+      renderFinance();
+    } else {
+      custom.hidden = false;
+      state.period = { ...state.period, id: "custom" };
+    }
+  });
+  const applyCustom = () => {
+    if (fromIn.value && toIn.value && fromIn.value <= toIn.value) {
+      state.period = { id: "custom", from: fromIn.value, to: toIn.value };
+      renderFinance();
+    }
+  };
+  fromIn.addEventListener("change", applyCustom);
+  toIn.addEventListener("change", applyCustom);
+
+  const syncBtn = el("button", { type: "button", className: "btn line" }, [icon("reload"), "Lấy số liệu mới từ Shopee"]);
+  const syncBox = el("div", { className: "sync-box", attrs: { role: "status" } });
+  syncBtn.addEventListener("click", () => runSync(period, syncBtn, syncBox));
+
+  const synced = report.syncedAt ? `số liệu lấy lúc ${when(report.syncedAt)}` : "chưa lấy số liệu";
+
+  const parts = [
+    el("div", { className: "sheet-head" }, [
+      el("h2", { textContent: "Tài chính" }),
+      el("p", { className: "soft num", textContent: `${viDay(period.from)} đến ${viDay(period.to)} · ${synced}` }),
+    ]),
+    el("div", { className: "toolbar" }, [
+      el("label", { className: "tool" }, [el("span", { className: "tool-label", textContent: "Kỳ xem" }), el("span", { className: "tool-field" }, [select, icon("chevron")])]),
+      custom,
+      el("span", { className: "grow" }),
+      syncBtn,
+    ]),
+    syncBox,
+  ];
+
+  const key = `${period.from}:${period.to}`;
+  const willSync = autoSync && report.missingDays.length > 0 && !state.autoSynced?.has(key);
+  if (report.missingDays.length && !willSync) {
+    parts.push(el("p", { className: "env-note live", textContent: `Còn ${report.missingDays.length} ngày trong kỳ chưa có số liệu. Bấm "Lấy số liệu mới từ Shopee".` }));
+  }
+
+  parts.push(moneySection(report, overview), statementSection(report), dailySection(report), productSection(report), orderSection(report), walletSection(report));
+  content.replaceChildren(...parts);
+
+  // Lan dau mo mot ky chua co so lieu: tu lay, khong bat nguoi dung bam.
+  if (willSync) {
+    (state.autoSynced ??= new Set()).add(key);
+    runSync(period, syncBtn, syncBox);
+  }
+}
+
+async function runSync(period, button, box) {
+  button.disabled = true;
+  box.replaceChildren(el("p", { className: "loading num", textContent: "Đang lấy số liệu từ Shopee..." }));
+  try {
+    const { jobId } = await api("/api/finance/sync", send("POST", { from: period.from, to: period.to }));
+    for (;;) {
+      const job = await api(`/api/finance/jobs/${jobId}`);
+      box.firstChild.textContent = job.message;
+      if (job.finished) {
+        const failed = job.steps.filter((s) => !s.ok);
+        if (failed.length) {
+          state.syncProblems = failed;
+        } else {
+          state.syncProblems = null;
+        }
+        renderFinance(false);
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
+  } catch (error) {
+    button.disabled = false;
+    box.replaceChildren(problem(error.message, () => runSync(period, button, box)));
+  }
+}
+
+function moneySection(report, overview) {
+  const w = report.wallet;
+  const rows = [
+    line("Đang chờ Shopee đối soát (tất cả đơn)", overview.error ? "không lấy được" : `${money(overview.pending ?? 0)} ₫`, { neg: Boolean(overview.error) }),
+    line("Đã về ví trong kỳ", `${money(report.releasedInPeriod)} ₫`),
+    line("Số dư ví Shopee", typeof w.balance === "number" ? `${money(w.balance)} ₫` : "-"),
+  ];
+  const notes = [];
+  if (w.balanceAt) notes.push(el("p", { className: "meta", textContent: `Số dư theo giao dịch ví gần nhất, lúc ${when(w.balanceAt * 1000)}.` }));
+  if (overview.error) notes.push(el("p", { className: "meta err", textContent: overview.error }));
+  for (const s of state.syncProblems ?? []) notes.push(el("p", { className: "meta err" }, [el("strong", { textContent: `${s.name}: ` }), s.message]));
+  return el("section", { className: "fin" }, [el("h3", { textContent: "Tiền" }), el("div", { className: "lines" }, rows), ...notes]);
+}
+
+function statementSection(report) {
+  const s = report.statement;
+  const c = report.counts;
+  const p = report.profit;
+  if (!c.orders) {
+    return el("section", { className: "fin" }, [
+      el("h3", { textContent: "Bảng kê" }),
+      el("p", { className: "empty", textContent: c.cancelled || c.unpaid
+        ? `Không có đơn tính tiền trong kỳ (${c.cancelled} đơn hủy, ${c.unpaid} đơn chờ thanh toán).`
+        : "Không có đơn nào trong kỳ." }),
+    ]);
+  }
+  const minus = (v) => (v ? `-${money(v)}` : "0");
+  const rows = [
+    line(`Tiền hàng (${money(c.orders)} đơn)`, money(s.goods)),
+    line("Mã giảm giá, xu của shop", minus(s.sellerVoucher), { sub: true }),
+    line("Phí cố định", minus(s.commission), { sub: true, note: pct(s.commission, s.goods) }),
+    line("Phí dịch vụ", minus(s.service), { sub: true, note: pct(s.service, s.goods) }),
+    line("Phí thanh toán", minus(s.transaction), { sub: true, note: pct(s.transaction, s.goods) }),
+    line("Phí khác (xử lý đơn, tiếp thị liên kết...)", minus(s.otherFees), { sub: true }),
+    line("Thuế Shopee khấu trừ thay", minus(s.tax), { sub: true }),
+    line("Vận chuyển, trả hàng, điều chỉnh khác", signed(s.adjust), { sub: true }),
+    line("Thực nhận", `${money(s.net)} ₫`, { total: true, note: pct(s.net, s.goods) }),
+  ];
+  const notes = [el("p", { className: "meta", textContent: "Cột % tính trên tiền hàng." })];
+  if (c.estimated) notes.push(el("p", { className: "meta", textContent: `${c.estimated} đơn chưa hoàn thành: số của các đơn này là tạm tính, Shopee chốt khi đơn hoàn thành.` }));
+  if (c.cancelled) notes.push(el("p", { className: "meta", textContent: `${c.cancelled} đơn hủy không tính vào bảng kê${report.cancelledNet ? `; Shopee đã trừ ${money(-report.cancelledNet)} ₫ phí đơn hủy, giao thất bại` : ""}.` }));
+  if (c.noIncome) notes.push(el("p", { className: "meta err", textContent: `${c.noIncome} đơn chưa lấy được tiền từ Shopee, bấm Lấy số liệu mới.` }));
+
+  const profit = [el("h3", { textContent: "Lãi lỗ" })];
+  if (!p.orders) {
+    profit.push(el("p", { className: "meta err", textContent: "Chưa đơn nào đủ giá vốn nên chưa tính được lãi. Nhập giá vốn ở bảng Theo sản phẩm bên dưới, ở trang Sản phẩm, hoặc qua tệp Excel." }));
+  } else {
+    profit.push(el("div", { className: "lines" }, [
+      line(`Thực nhận của ${money(p.orders)} đơn đủ giá vốn`, money(p.net)),
+      line("Giá vốn", `-${money(p.cogs)}`, { sub: true }),
+      line(p.profit < 0 ? "Lỗ" : "Lãi gộp", `${signed(p.profit)} ₫`, { total: true, neg: p.profit < 0, note: pct(p.profit, p.net) }),
+    ]));
+    profit.push(el("p", { className: "meta", textContent: "Cột % là tỷ suất lãi trên thực nhận." }));
+    if (p.orders < c.orders) {
+      profit.push(el("p", { className: "meta err", textContent: `${c.orders - p.orders} đơn có sản phẩm chưa nhập giá vốn, chưa tính vào lãi lỗ.` }));
+    }
+  }
+  return el("section", { className: "fin two" }, [
+    el("div", {}, [el("h3", { textContent: "Bảng kê" }), el("div", { className: "lines" }, rows), ...notes]),
+    el("div", {}, profit),
+  ]);
+}
+
+/** Bieu do cot: thuc nhan tung ngay. Mot chuoi so, mot mau, co o tro va bang so. */
+function dailySection(report) {
+  const days = report.daily;
+  const max = Math.max(0, ...days.map((d) => d.net));
+  const min = Math.min(0, ...days.map((d) => d.net));
+  const section = el("section", { className: "fin" }, [el("h3", { textContent: "Thực nhận theo ngày" })]);
+  if (!days.some((d) => d.orders)) {
+    section.append(el("p", { className: "empty", textContent: "Chưa có số liệu để vẽ." }));
+    return section;
+  }
+  const W = 720, H = 220, L = 64, B = 24, T = 12;
+  const plotW = W - L - 8, plotH = H - B - T;
+  const step = niceStep((max - min) / 4 || 1);
+  const top = Math.ceil(max / step) * step || step;
+  const bottom = Math.floor(min / step) * step;
+  const y = (v) => T + ((top - v) / (top - bottom)) * plotH;
+  const slot = plotW / days.length;
+  const barW = Math.max(2, Math.min(24, slot - 2));
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("class", "chart");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `Biểu đồ thực nhận theo ngày từ ${viDay(report.from)} đến ${viDay(report.to)}; số từng ngày ở bảng bên dưới.`);
+  const add = (tag, attrs, text) => {
+    const node = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    if (text != null) node.textContent = text;
+    svg.append(node);
+    return node;
+  };
+  for (let v = bottom; v <= top + 1e-6; v += step) {
+    add("line", { x1: L, x2: W - 8, y1: y(v), y2: y(v), class: v === 0 ? "axis" : "grid" });
+    add("text", { x: L - 8, y: y(v) + 4, class: "tick", "text-anchor": "end" }, compact(v));
+  }
+  const labelEvery = Math.ceil(days.length / 8);
+  const tip = el("div", { className: "chart-tip", hidden: true });
+  days.forEach((d, i) => {
+    const x = L + i * slot + (slot - barW) / 2;
+    if (d.net !== 0) {
+      const y0 = y(0), y1 = y(d.net);
+      const h = Math.max(1, Math.abs(y1 - y0));
+      const r = Math.min(4, h, barW / 2);
+      // Dau cot bo tron 4px, chan cot vuong tren duong 0.
+      const up = d.net > 0;
+      const yTop = up ? y1 : y0;
+      const path = up
+        ? `M${x},${y0} V${yTop + r} Q${x},${yTop} ${x + r},${yTop} H${x + barW - r} Q${x + barW},${yTop} ${x + barW},${yTop + r} V${y0} Z`
+        : `M${x},${y0} V${y1 - r} Q${x},${y1} ${x + r},${y1} H${x + barW - r} Q${x + barW},${y1} ${x + barW},${y1 - r} V${y0} Z`;
+      add("path", { d: path, class: "bar" });
+    }
+    if (i % labelEvery === 0) add("text", { x: L + i * slot + slot / 2, y: H - 6, class: "tick", "text-anchor": "middle" }, shortDay(d.day));
+    const hit = add("rect", { x: L + i * slot, y: T, width: slot, height: plotH, class: "hit", tabindex: "0" });
+    const show = () => {
+      tip.hidden = false;
+      tip.replaceChildren(
+        el("strong", { textContent: viDay(d.day) }),
+        el("span", { className: "num", textContent: `${d.orders} đơn · thực nhận ${money(d.net)} ₫` }),
+        el("span", { className: "num", textContent: d.profit === undefined ? "Lãi: thiếu giá vốn" : `Lãi gộp ${signed(d.profit)} ₫` }),
+      );
+      const box = svg.getBoundingClientRect();
+      const left = ((L + i * slot + slot / 2) / W) * box.width;
+      tip.style.left = `${Math.min(Math.max(left, 90), box.width - 90)}px`;
+    };
+    hit.addEventListener("mouseenter", show);
+    hit.addEventListener("focus", show);
+    hit.addEventListener("mouseleave", () => { tip.hidden = true; });
+    hit.addEventListener("blur", () => { tip.hidden = true; });
+  });
+
+  const table = el("details", { className: "day-table" }, [
+    el("summary", { textContent: "Xem số từng ngày" }),
+    el("table", { className: "ledger mini" }, [
+      el("thead", {}, el("tr", {}, ["Ngày", "Đơn", "Tiền hàng", "Thực nhận", "Lãi gộp"].map((t, i) => el("th", { className: i ? "r" : "", attrs: { scope: "col" }, textContent: t })))),
+      el("tbody", {}, days.filter((d) => d.orders).reverse().map((d) => el("tr", {}, [
+        el("td", { className: "num", textContent: viDay(d.day) }),
+        el("td", { className: "r num", textContent: money(d.orders), attrs: { "data-label": "Đơn" } }),
+        el("td", { className: "r num", textContent: money(d.goods), attrs: { "data-label": "Tiền hàng" } }),
+        el("td", { className: "r num", textContent: money(d.net), attrs: { "data-label": "Thực nhận" } }),
+        el("td", { className: `r num${(d.profit ?? 0) < 0 ? " err" : ""}`, textContent: d.profit === undefined ? "thiếu giá vốn" : signed(d.profit), attrs: { "data-label": "Lãi gộp" } }),
+      ]))),
+    ]),
+  ]);
+  section.append(el("div", { className: "chart-wrap" }, [svg, tip]), table);
+  return section;
+}
+
+function niceStep(raw) {
+  const pow = 10 ** Math.floor(Math.log10(raw));
+  const n = raw / pow;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * pow;
+}
+const compact = (v) => {
+  const a = Math.abs(v);
+  const s = a >= 1e9 ? `${+(a / 1e9).toFixed(1)} tỷ` : a >= 1e6 ? `${+(a / 1e6).toFixed(1)} tr` : a >= 1e3 ? `${+(a / 1e3).toFixed(0)} k` : String(a);
+  return (v < 0 ? "-" : "") + s.replace(".", ",");
+};
+
+function productSection(report) {
+  const section = el("section", { className: "fin" }, [
+    el("h3", { textContent: "Theo sản phẩm" }),
+    el("p", { className: "meta", textContent: "Thực nhận của mỗi đơn chia cho từng sản phẩm theo tỷ lệ tiền hàng. Giá vốn sửa ngay tại đây, chỉ lưu trên máy này." }),
+  ]);
+  if (!report.products.length) {
+    section.append(el("p", { className: "empty", textContent: "Chưa có sản phẩm bán ra trong kỳ." }));
+    return section;
+  }
+  let limit = 20;
+  const body = el("tbody");
+  const more = el("button", { type: "button", className: "btn line sm" });
+  const draw = () => {
+    body.replaceChildren(...report.products.slice(0, limit).map((pr) => {
+      const profitCell = el("td", { className: `c-profit r num${(pr.profit ?? 0) < 0 ? " err" : ""}`, textContent: pr.profit === undefined ? "thiếu giá vốn" : signed(pr.profit), attrs: { "data-label": "Lãi" } });
+      const marginCell = el("td", { className: "c-margin r num", textContent: pr.profit === undefined ? "-" : pct(pr.profit, pr.net), attrs: { "data-label": "Tỷ suất" } });
+      const cost = fixField({
+        label: "Giá vốn", unit: "₫", value: pr.cost, min: 0, action: "Lưu",
+        save: (v) => api("/api/costs", send("PUT", { itemId: pr.itemId, modelId: pr.modelId, cost: v })),
+        onSaved: (v) => {
+          state.costs[`${pr.itemId}:${pr.modelId}`] = v;
+          pr.cost = v; pr.cogs = v * pr.qty; pr.profit = pr.net - pr.cogs;
+          profitCell.textContent = signed(pr.profit);
+          profitCell.classList.toggle("err", pr.profit < 0);
+          marginCell.textContent = pct(pr.profit, pr.net);
+          state.financeStale = true;
+        },
+        okText: () => "Đã lưu. Bấm Tải lại bảng kê để tính lại các đơn.",
+        failPrefix: "Chưa lưu được",
+      });
+      return el("tr", {}, [
+        el("td", { className: "c-name" }, [el("p", { className: "name", textContent: pr.name }), pr.modelName ? el("p", { className: "model-name", textContent: pr.modelName }) : null]),
+        el("td", { className: "c-qty r num", textContent: money(pr.qty), attrs: { "data-label": "Đã bán" } }),
+        el("td", { className: "c-goods r num", textContent: money(pr.goods), attrs: { "data-label": "Tiền hàng" } }),
+        el("td", { className: "c-net r num", textContent: money(pr.net), attrs: { "data-label": "Thực nhận" } }),
+        el("td", { className: "c-cost" }, cost),
+        profitCell,
+        marginCell,
+      ]);
+    }));
+    more.hidden = limit >= report.products.length;
+    more.textContent = `Xem thêm (còn ${report.products.length - limit})`;
+  };
+  more.addEventListener("click", () => { limit += 30; draw(); });
+  draw();
+  const reload = el("button", { type: "button", className: "link" }, [icon("reload"), "Tải lại bảng kê"]);
+  reload.addEventListener("click", () => renderFinance(false));
+  section.append(
+    el("table", { className: "ledger fin-products" }, [
+      el("thead", {}, el("tr", {}, ["Sản phẩm", "Đã bán", "Tiền hàng", "Thực nhận", "Giá vốn / cái", "Lãi", "Tỷ suất"].map((t, i) => el("th", { className: i ? "r" : "", attrs: { scope: "col" }, textContent: t })))),
+      body,
+    ]),
+    el("div", { className: "row-actions" }, [more, reload]),
+  );
+  return section;
+}
+
+function orderSection(report) {
+  const section = el("section", { className: "fin" }, [el("h3", { textContent: `Đơn hàng (${money(report.orders.length)})` })]);
+  if (!report.orders.length) return section;
+  let limit = 20;
+  const body = el("tbody");
+  const more = el("button", { type: "button", className: "btn line sm" });
+  const detail = (o) => {
+    const i = o.income;
+    const minus = (v) => (v ? `-${money(v)}` : "0");
+    return el("tr", { className: "order-detail", hidden: true }, el("td", { attrs: { colspan: "7" } }, el("div", { className: "lines" }, [
+      ...o.lines.map((l) => line(`${l.name}${l.modelName ? " · " + l.modelName : ""} × ${l.qty}`, money(l.amount), { sub: true })),
+      line("Tiền hàng", money(i.goods)),
+      line("Mã giảm giá, xu của shop", minus(i.sellerVoucher), { sub: true }),
+      line("Phí cố định, dịch vụ, thanh toán", minus(i.commission + i.service + i.transaction), { sub: true }),
+      line("Phí khác", minus(i.otherFees), { sub: true }),
+      line("Thuế khấu trừ", minus(i.tax), { sub: true }),
+      line("Vận chuyển, trả hàng, điều chỉnh", signed(i.adjust), { sub: true }),
+      line("Thực nhận", `${money(i.net)} ₫`, { total: true }),
+    ])));
+  };
+  const draw = () => {
+    const rows = [];
+    for (const o of report.orders.slice(0, limit)) {
+      const fees = o.income.sellerVoucher + o.income.commission + o.income.service + o.income.transaction + o.income.otherFees + o.income.tax;
+      const d = detail(o);
+      const toggle = el("button", { type: "button", className: "link ink toggle", attrs: { "aria-expanded": "false" } }, [icon("chevron"), el("span", { className: "num", textContent: o.sn })]);
+      toggle.addEventListener("click", () => {
+        d.hidden = !d.hidden;
+        toggle.setAttribute("aria-expanded", String(!d.hidden));
+      });
+      rows.push(el("tr", {}, [
+        el("td", { className: "c-sn" }, toggle),
+        el("td", { className: "c-day num", textContent: shortDay(o.day) }),
+        el("td", { className: "c-status" }, el("span", { className: o.final ? "state on" : "state" }, [el("span", { className: o.final ? "mark on" : "mark", attrs: { "aria-hidden": "true" } }), o.statusName])),
+        el("td", { className: "c-goods r num", textContent: money(o.income.goods), attrs: { "data-label": "Tiền hàng" } }),
+        el("td", { className: "c-fees r num", textContent: fees ? `-${money(fees)}` : "0", attrs: { "data-label": "Phí, thuế" } }),
+        el("td", { className: "c-net r num", textContent: money(o.income.net), attrs: { "data-label": "Thực nhận" } }),
+        el("td", { className: `c-profit r num${(o.profit ?? 0) < 0 ? " err" : ""}`, textContent: o.profit === undefined ? "thiếu giá vốn" : signed(o.profit), attrs: { "data-label": "Lãi" } }),
+      ]), d);
+    }
+    body.replaceChildren(...rows);
+    more.hidden = limit >= report.orders.length;
+    more.textContent = `Xem thêm (còn ${report.orders.length - limit})`;
+  };
+  more.addEventListener("click", () => { limit += 30; draw(); });
+  draw();
+  section.append(
+    el("table", { className: "ledger fin-orders" }, [
+      el("thead", {}, el("tr", {}, ["Mã đơn", "Ngày", "Trạng thái", "Tiền hàng", "Phí, thuế", "Thực nhận", "Lãi"].map((t, i) => el("th", { className: i > 2 ? "r" : "", attrs: { scope: "col" }, textContent: t })))),
+      body,
+    ]),
+    el("div", { className: "row-actions" }, more),
+  );
+  return section;
+}
+
+function walletSection(report) {
+  const w = report.wallet;
+  const section = el("section", { className: "fin" }, [
+    el("h3", { textContent: "Ví Shopee" }),
+    el("div", { className: "lines" }, [
+      line("Tiền vào ví trong kỳ", `${money(w.inflow)} ₫`),
+      line("Tiền ra khỏi ví trong kỳ", `-${money(w.outflow)} ₫`, { sub: true }),
+      line("Trong đó rút về ngân hàng", `${money(w.withdrawn)} ₫`, { sub: true }),
+    ]),
+  ]);
+  if (!w.transactions.length) {
+    section.append(el("p", { className: "empty", textContent: "Không có giao dịch ví trong kỳ." }));
+    return section;
+  }
+  let limit = 20;
+  const body = el("tbody");
+  const more = el("button", { type: "button", className: "btn line sm" });
+  const draw = () => {
+    body.replaceChildren(...w.transactions.slice(0, limit).map((t) => el("tr", {}, [
+      el("td", { className: "c-day num", textContent: when(t.time * 1000) }),
+      el("td", { className: "c-name" }, [el("p", { textContent: t.title || t.type }), t.orderSn ? el("p", { className: "meta num", textContent: `Đơn ${t.orderSn}` }) : null]),
+      el("td", { className: `c-amount r num${t.amount > 0 ? " ok" : ""}`, textContent: `${t.amount > 0 ? "+" : ""}${signed(t.amount)}`, attrs: { "data-label": "Số tiền" } }),
+      el("td", { className: "c-balance r num", textContent: typeof t.balance === "number" ? money(t.balance) : "-", attrs: { "data-label": "Số dư sau" } }),
+    ])));
+    more.hidden = limit >= w.transactions.length;
+    more.textContent = `Xem thêm (còn ${w.transactions.length - limit})`;
+  };
+  more.addEventListener("click", () => { limit += 30; draw(); });
+  draw();
+  section.append(
+    el("table", { className: "ledger fin-wallet" }, [
+      el("thead", {}, el("tr", {}, ["Lúc", "Nội dung", "Số tiền", "Số dư sau"].map((t, i) => el("th", { className: i > 1 ? "r" : "", attrs: { scope: "col" }, textContent: t })))),
+      body,
+    ]),
+    el("div", { className: "row-actions" }, more),
+  );
+  return section;
+}
+
 // ---------- Chuyen trang ----------
 
 const TABS = [
   { id: "products", label: "Sản phẩm", icon: "tag", render: () => renderProducts() },
   { id: "bulk", label: "Sửa hàng loạt", icon: "sheet", render: renderBulk },
+  { id: "finance", label: "Tài chính", icon: "coins", render: () => renderFinance() },
   { id: "boost", label: "Đẩy sản phẩm", icon: "boost", render: renderBoost },
 ];
 

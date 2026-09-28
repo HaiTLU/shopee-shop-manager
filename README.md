@@ -1,6 +1,6 @@
 # Quản lý shop Shopee
 
-Trang web tự quản lý shop Shopee qua Open Platform API v2: xem, tìm, sắp xếp sản phẩm; sửa giá và tồn kho từng sản phẩm, từng phân loại hoặc hàng loạt bằng Excel; đẩy sản phẩm tự động.
+Trang web tự quản lý shop Shopee qua Open Platform API v2: xem, tìm, sắp xếp sản phẩm; sửa giá và tồn kho từng sản phẩm, từng phân loại hoặc hàng loạt bằng Excel; theo dõi tài chính và lãi lỗ; đẩy sản phẩm tự động.
 
 Toàn bộ khóa bí mật và token nằm trên máy chủ. Trình duyệt không bao giờ nhìn thấy `partner_key` hay `access_token`.
 
@@ -47,11 +47,24 @@ Sản phẩm có phân loại (mùi, cỡ, combo...) thì Shopee lưu giá và t
 Thẻ **Sửa hàng loạt**:
 
 1. **Tải tệp Excel**: mỗi sản phẩm hoặc phân loại một dòng, có sẵn giá và tồn hiện tại. Tên tệp theo dạng `YYMMDD_TenShop_SuaGiaTon.xlsx`.
-2. Điền hai cột nền xanh nhạt **Giá gốc mới**, **Tồn kho mới**. Ô trống là giữ nguyên. Không sửa cột mã.
+2. Điền các cột nền xanh nhạt **Giá gốc mới**, **Tồn kho mới**, **Giá vốn** (giá vốn đã điền sẵn số đang lưu). Ô trống là giữ nguyên. Không sửa cột mã.
 3. Tải tệp lên: hệ thống so với số liệu Shopee ngay lúc đó, liệt kê từng thay đổi (số cũ gạch đỏ, số mới mực xanh), dòng lỗi kèm số dòng trong tệp, và đánh dấu dòng giá đổi bất thường (gấp rưỡi trở lên hoặc còn một nửa trở xuống) để kiểm tra lại.
 4. Bỏ chọn dòng không muốn đổi rồi bấm **Áp dụng**. Ở shop thật phải bấm hai lần. Hệ thống gửi dần lên Shopee (gom theo sản phẩm, tối đa 50 phân loại mỗi lệnh, nghỉ giữa các lệnh, tự thử lại khi Shopee báo bận) và báo kết quả từng dòng.
 
 Bản xem trước giữ trên máy chủ 30 phút và chỉ áp dụng được một lần, nên số được gửi đúng là số người dùng đã xem.
+
+## Tài chính và lãi lỗ
+
+Thẻ **Tài chính** (chọn kỳ: 7 ngày, 30 ngày, tháng này, tháng trước hoặc tự chọn):
+
+- **Tiền:** tiền đang chờ Shopee đối soát, tiền đã về ví trong kỳ, số dư ví.
+- **Bảng kê:** tiền hàng, trừ mã giảm giá của shop, phí cố định, phí dịch vụ, phí thanh toán, phí khác, thuế Shopee khấu trừ thay, vận chuyển và điều chỉnh, ra **thực nhận** đúng bằng số Shopee trả (dòng vận chuyển, điều chỉnh là phần bù để khớp tuyệt đối). Đơn chưa hoàn thành ghi rõ là tạm tính; đơn hủy tính riêng.
+- **Lãi lỗ:** thực nhận trừ giá vốn, chỉ tính trên đơn có đủ giá vốn và nói rõ bao nhiêu đơn còn thiếu.
+- **Theo ngày** (biểu đồ, có bảng số), **theo sản phẩm** (thực nhận chia theo tỷ lệ tiền hàng, sửa giá vốn ngay tại bảng), **đơn hàng** (mở ra xem từng khoản tiền), **ví** (tiền vào, rút về ngân hàng).
+
+Số liệu lấy từ Shopee (danh sách đơn, `get_escrow_detail_batch`, `get_income_detail`, `get_wallet_transaction_list`, `get_income_overview`), chia khoảng theo giới hạn 14, 15 ngày của Shopee, lưu vào `data/finance-<vùng>-<partner_id>.json`. Chỉ lưu con số cần cho báo cáo, **không lưu tên, địa chỉ hay thông tin người mua**. Lần đầu mở một kỳ chưa có số liệu, trang tự lấy; sau đó bấm **Lấy số liệu mới từ Shopee** khi cần. Phần nào Shopee không cho lấy (ứng dụng chưa được cấp quyền) thì báo riêng phần đó, các phần khác vẫn chạy.
+
+**Giá vốn** là giá nhập một đơn vị, Shopee không biết nên shop tự nhập: ở cột Giá vốn trang Sản phẩm, trong bảng Theo sản phẩm của trang Tài chính, hoặc cột Giá vốn của tệp Excel. Chỉ lưu trên máy (`data/costs-<vùng>-<partner_id>.json`), không gửi Shopee. Lãi lỗ dùng giá vốn hiện tại cho mọi đơn trong kỳ.
 
 ## Đẩy sản phẩm tự động
 
@@ -82,7 +95,7 @@ npm run cli -- day-ngay            # Chạy một vòng đẩy sản phẩm ngay
 
 ```bash
 npm run typecheck   # Kiểm tra kiểu dữ liệu
-npm test            # 52 bài kiểm thử
+npm test            # 59 bài kiểm thử
 ```
 
 ## Cấu trúc
@@ -98,6 +111,9 @@ src/
   routes/excel.ts    Tải tệp, xem trước, áp dụng sửa hàng loạt
   catalog.ts         Toàn bộ sản phẩm kèm từng phân loại, giữ trong bộ nhớ
   excel.ts           Tạo, đọc tệp Excel, so sánh thay đổi, gửi dần lên Shopee
+  finance.ts         Lấy số liệu tiền, lập bảng kê, lãi lỗ theo kỳ
+  costs.ts           Giá vốn, chỉ lưu trên máy
+  routes/finance.ts  Đường dẫn tài chính và giá vốn
   boost.ts           Đẩy sản phẩm tự động
   authCallback.ts    Tách code và shop_id từ đường dẫn sau ủy quyền
   cli.ts             Công cụ dòng lệnh

@@ -18,6 +18,7 @@ import { fetchBoostedNow, runBoostCycle, saveBoostSettings, MAX_BOOST_SLOTS } fr
 import { readState } from "../stateStore.js";
 import { getCatalog, patchCatalog } from "../catalog.js";
 import { excelRouter } from "./excel.js";
+import { costsRouter, financeRouter } from "./finance.js";
 
 /**
  * Va kieu bi dat nham cho trong SDK.
@@ -94,6 +95,8 @@ apiRouter.get(
 );
 
 apiRouter.use("/excel", excelRouter);
+apiRouter.use("/finance", financeRouter);
+apiRouter.use("/costs", costsRouter);
 
 /**
  * Danh sach san pham kem gia va ton kho.
