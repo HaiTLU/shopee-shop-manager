@@ -24,6 +24,13 @@ type ItemWithStock = GetItemBaseInfoItem & { stock_info_v2?: GetItemBaseInfoStoc
 
 const [command = "status", ...args] = process.argv.slice(2);
 
+/** Lenh chay may chu ung voi tep cau hinh dang dung, de loi nhac khong chi nham moi truong. */
+function startCommand(): string {
+  if (envFile === ".env") return "npm start";
+  if (envFile === ".env.live") return "npm run start:live";
+  return `ENV_FILE=${envFile} npm start`;
+}
+
 async function main(): Promise<void> {
   switch (command) {
     case "status": {
@@ -33,12 +40,15 @@ async function main(): Promise<void> {
       console.log(`Da ket noi:      ${status.connected ? "co" : "chua"}`);
       if (status.connected) {
         console.log(`Shop ID:         ${status.shopId ?? "khong ro"}`);
-        console.log(`Token con:       ${status.accessTokenExpiresInMinutes} phut`);
+        const minutes = status.accessTokenExpiresInMinutes ?? 0;
+        console.log(
+          `Token con:       ${minutes > 0 ? `${minutes} phut` : "da het han, tu gia han o lan goi tiep theo"}`,
+        );
         console.log(`Ma gia han con:  ${status.refreshTokenExpiresInDays} ngay`);
       }
       if (status.needsReauthorization) {
         console.log(
-          `Can uy quyen: chay 'npm start', mo http://localhost:${config.port} tren trinh duyet ` +
+          `Can uy quyen: chay '${startCommand()}', mo http://localtest.me:${config.port} tren trinh duyet ` +
             "roi bam 'Ket noi shop Shopee'.",
         );
       }

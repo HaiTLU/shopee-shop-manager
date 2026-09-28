@@ -42,6 +42,7 @@ test("ENV_FILE tro toi tep cau hinh shop that thi dung dung vung GLOBAL va tep t
   assert.match(output, new RegExp(`Tep cau hinh:\\s+${live.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`));
   assert.match(output, /Vung:\s+GLOBAL/);
   assert.match(output, /Da ket noi:\s+chua/, "tep token shop that rieng, chua co gi");
+  assert.doesNotMatch(output, /chay 'npm start'/, "che do shop that khong duoc nhac lenh cua moi truong thu nghiem");
 });
 
 test("thieu khoa trong tep cau hinh thi bao ro ten tep", async () => {

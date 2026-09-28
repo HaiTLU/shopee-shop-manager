@@ -124,7 +124,8 @@ async function renderStatus() {
       el("span", {
         className: "grow",
         textContent:
-          `Da ket noi shop ${s.shopId}. Token con ${s.accessTokenExpiresInMinutes} phut, ` +
+          `Da ket noi shop ${s.shopId}. ` +
+          (s.accessTokenExpiresInMinutes > 0 ? `Token con ${s.accessTokenExpiresInMinutes} phut, ` : "Token da het han, se tu gia han khi dung, ") +
           `ma gia han con ${s.refreshTokenExpiresInDays} ngay.`,
       }),
       el("a", { className: "btn ghost", href: "/auth/start", textContent: "Uy quyen lai" }),
