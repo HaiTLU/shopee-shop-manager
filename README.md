@@ -64,6 +64,13 @@ Thẻ **Tài chính** (chọn kỳ: 7 ngày, 30 ngày, tháng này, tháng trư�
 
 Số liệu lấy từ Shopee (danh sách đơn, `get_escrow_detail_batch`, `get_income_detail`, `get_wallet_transaction_list`, `get_income_overview`), chia khoảng theo giới hạn 14, 15 ngày của Shopee, lưu vào `data/finance-<vùng>-<partner_id>.json`. Chỉ lưu con số cần cho báo cáo, **không lưu tên, địa chỉ hay thông tin người mua**. Lần đầu mở một kỳ chưa có số liệu, trang tự lấy; sau đó bấm **Lấy số liệu mới từ Shopee** khi cần. Phần nào Shopee không cho lấy (ứng dụng chưa được cấp quyền) thì báo riêng phần đó, các phần khác vẫn chạy.
 
+Bản trước 29/9/2026 lấy trang đầu của ví hai lần (mỗi 15 ngày có trên 100 giao dịch thừa 100 dòng), làm phồng tiền vào, tiền ra, nạp quảng cáo. Nay mỗi lần lưu đều bỏ dòng trùng. Muốn làm sạch tệp cũ ngay mà không cần lấy lại từ Shopee, tắt máy chủ rồi chạy (chỉ đọc, ghi tệp trên máy; tự sao lưu sang `.backup-<ngày giờ>.json` trước khi ghi):
+
+```bash
+npx tsx scripts/lam-sach-vi.ts data/finance-<vùng>-<partner_id>.json --chay-thu
+npx tsx scripts/lam-sach-vi.ts data/finance-<vùng>-<partner_id>.json --so-dong-bo=<số dòng lần chạy thử báo>
+```
+
 **Giá vốn** là giá nhập một đơn vị, Shopee không biết nên shop tự nhập: ở cột Giá vốn trang Sản phẩm, trong bảng Theo sản phẩm của trang Tài chính, hoặc cột Giá vốn của tệp Excel. Chỉ lưu trên máy (`data/costs-<vùng>-<partner_id>.json`), không gửi Shopee. Lãi lỗ dùng giá vốn hiện tại cho mọi đơn trong kỳ.
 
 ## Tự trả lời đánh giá
