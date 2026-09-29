@@ -83,11 +83,19 @@ export interface FinanceData {
   orders: Record<string, OrderRecord>;
   wallet: WalletTx[];
   released: Released[];
-  /** Ngay (YYYY-MM-DD, gio Ha Noi) da lay so lieu -> luc lay. */
+  /** Ngay (YYYY-MM-DD, gio Ha Noi) da lay don va tien tung don -> luc lay. */
   syncedDays: Record<string, number>;
+  /**
+   * Ngay da lay xong tien da ve -> luc lay. Ghi rieng tung phan vi tien da ve va
+   * vi can quyen Payment, co the loi trong khi phan don van lay duoc. Tep luu tu
+   * ban truoc chua co truong nay: coi nhu chua lay.
+   */
+  releasedDays?: Record<string, number>;
+  /** Ngay da lay xong giao dich vi -> luc lay, nhu releasedDays. */
+  walletDays?: Record<string, number>;
 }
 
-export const financeStore = jsonStore<FinanceData>("finance", () => ({ orders: {}, wallet: [], released: [], syncedDays: {} }));
+export const financeStore = jsonStore<FinanceData>("finance", () => ({ orders: {}, wallet: [], released: [], syncedDays: {}, releasedDays: {}, walletDays: {} }));
 
 // ---------------------------------------------------------------- ngay gio Ha Noi
 
@@ -241,8 +249,16 @@ export interface ReportOrder {
 export interface Report {
   from: string;
   to: string;
-  /** Ngay trong ky chua lay so lieu tu Shopee. */
+  /**
+   * Ngay trong ky chua lay don hang tu Shopee. Trang tu lay lai khi co ngay
+   * thieu, nen khong tinh phan tien da ve, vi: shop chua duoc cap quyen Payment
+   * thi hai phan do luon loi, tinh vao day thi lan mo nao cung tu lay lai.
+   */
   missingDays: string[];
+  /** Ngay trong ky chua lay duoc tien da ve: releasedInPeriod chua du. */
+  releasedMissingDays: string[];
+  /** Ngay trong ky chua lay duoc giao dich vi: so lieu vi chua du. */
+  walletMissingDays: string[];
   counts: { orders: number; final: number; estimated: number; cancelled: number; unpaid: number; noIncome: number };
   statement: Statement;
   /** Tien don huy, giao that bai (thuong la 0, co khi bi tru phi). */
@@ -363,6 +379,8 @@ export function buildReport(data: FinanceData, costs: Record<string, number>, fr
     from,
     to,
     missingDays: days.filter((d) => !data.syncedDays[d]),
+    releasedMissingDays: days.filter((d) => !data.releasedDays?.[d]),
+    walletMissingDays: days.filter((d) => !data.walletDays?.[d]),
     counts,
     statement,
     cancelledNet,
@@ -406,7 +424,8 @@ const PAUSE_MS = 150;
 /**
  * Lay so lieu tu Shopee cho ky [from, to] va luu lai. Moi phan (don, tien ve,
  * vi) chay rieng: phan nao Shopee tu choi (vd chua cap quyen) thi bao loi phan
- * do, cac phan khac van lay.
+ * do, cac phan khac van lay. Ngay da lay cung ghi rieng tung phan (syncedDays,
+ * releasedDays, walletDays).
  */
 export async function syncFinance(from: string, to: string, deps: SyncDeps, store = financeStore): Promise<SyncStep[]> {
   const steps: SyncStep[] = [];
@@ -506,12 +525,27 @@ export async function syncFinance(from: string, to: string, deps: SyncDeps, stor
     steps.push({ name: "Ví Shopee", ok: false, message: (error as Error).message });
   }
 
-  if (ordersOk) for (const d of daysBetween(from, to)) data.syncedDays[d] = Date.now();
+  // Moi phan chi danh dau ngay khi chinh phan do lay xong: tien da ve, vi loi
+  // (vd chua duoc cap quyen Payment) thi bao cao biet cac ngay do con thieu thay
+  // vi hien 0. Phan loi giu ngay da lay truoc do vi so lieu cu cua no con nguyen.
+  const done = (name: string) => steps.some((s) => s.name === name && s.ok);
+  const releasedOk = done("Tiền đã về");
+  const walletOk = done("Ví Shopee");
+  const releasedDays = (data.releasedDays ??= {});
+  const walletDays = (data.walletDays ??= {});
+  const now = Date.now();
+  for (const d of daysBetween(from, to)) {
+    if (ordersOk) data.syncedDays[d] = now;
+    if (releasedOk) releasedDays[d] = now;
+    if (walletOk) walletDays[d] = now;
+  }
   await store.update((d) => {
     d.orders = data.orders;
     d.released = data.released;
     d.wallet = data.wallet;
     d.syncedDays = data.syncedDays;
+    d.releasedDays = releasedDays;
+    d.walletDays = walletDays;
   });
   return steps;
 }
