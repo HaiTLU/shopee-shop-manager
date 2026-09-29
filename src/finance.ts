@@ -15,6 +15,7 @@
  */
 import { jsonStore } from "./jsonStore.js";
 import { costKey } from "./costs.js";
+import { uniqueRecords } from "./dedupe.js";
 
 // ---------------------------------------------------------------- kieu du lieu
 
@@ -389,6 +390,7 @@ export interface SyncDeps {
   orderDetails(sns: string[]): Promise<{ sn: string; status: string; createTime: number }[]>;
   escrowBatch(sns: string[]): Promise<{ sn: string; income: EscrowIncome }[]>;
   released(dateFrom: string, dateTo: string, cursor: string): Promise<{ items: Released[]; next: string }>;
+  /** `page` la page_no cua Shopee, danh so tu 1 (Shopee coi 0 cung la trang 1). */
   wallet(timeFrom: number, timeTo: number, page: number): Promise<{ items: WalletTx[]; more: boolean }>;
   sleep(ms: number): Promise<void>;
   progress(message: string): void;
@@ -482,17 +484,19 @@ export async function syncFinance(from: string, to: string, deps: SyncDeps, stor
         cursor = page.next;
       }
     }
-    data.released = [...data.released.filter((r) => r.time < start || r.time > end), ...got];
-    steps.push({ name: "Tiền đã về", ok: true, message: `${got.length} khoản.` });
+    const fetched = uniqueRecords(got);
+    data.released = uniqueRecords([...data.released.filter((r) => r.time < start || r.time > end), ...fetched]);
+    steps.push({ name: "Tiền đã về", ok: true, message: `${fetched.length} khoản.` });
   } catch (error) {
     steps.push({ name: "Tiền đã về", ok: false, message: (error as Error).message });
   }
 
-  // 3. Giao dich vi, moi lan hoi toi da 15 ngay.
+  // 3. Giao dich vi, moi lan hoi toi da 15 ngay. page_no bat dau tu 1: hoi trang 0
+  // thi Shopee van tra trang 1, nen bat dau tu 0 se luu trang dau hai lan.
   try {
     const got: WalletTx[] = [];
     for (const w of windows(from, to, 15)) {
-      for (let page = 0; ; page++) {
+      for (let page = 1; ; page++) {
         deps.progress(`Đang lấy giao dịch ví ${w.from} đến ${w.to}...`);
         const r = await deps.wallet(dayStart(w.from), Math.min(dayStart(w.to) + 86400 - 1, end), page);
         got.push(...r.items);
@@ -500,8 +504,10 @@ export async function syncFinance(from: string, to: string, deps: SyncDeps, stor
         if (!r.more) break;
       }
     }
-    data.wallet = [...data.wallet.filter((t) => t.time < start || t.time > end), ...got];
-    steps.push({ name: "Ví Shopee", ok: true, message: `${got.length} giao dịch.` });
+    // Bo trung ca kho, khong chi phan vua lay: tep luu tu ban cu co the con ban trung.
+    const fetched = uniqueRecords(got);
+    data.wallet = uniqueRecords([...data.wallet.filter((t) => t.time < start || t.time > end), ...fetched]);
+    steps.push({ name: "Ví Shopee", ok: true, message: `${fetched.length} giao dịch.` });
   } catch (error) {
     steps.push({ name: "Ví Shopee", ok: false, message: (error as Error).message });
   }
