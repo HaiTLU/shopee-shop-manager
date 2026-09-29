@@ -44,6 +44,17 @@ export const sdk = new ShopeeSDK(
   tokenStorage,
 );
 
+/**
+ * Danh sach cho tham so GET kieu `order_sn_list` cua Shopee.
+ *
+ * SDK bien mang thanh nhieu tham so lap (`a=1&a=2`), con Shopee chi doc mot
+ * gia tri trong so do: hoi 50 don chi nhan ve 1 don. Shopee can mot chuoi noi
+ * bang dau phay, nen gop lai thanh mang mot phan tu cho dung kieu cua SDK.
+ */
+export function commaList(values: readonly (string | number)[]): string[] {
+  return values.length ? [values.join(",")] : [];
+}
+
 /** Loi hua gia han dang chay, de gop cac lenh goi song song. */
 let inflightRefresh: Promise<AccessToken | null> | null = null;
 
