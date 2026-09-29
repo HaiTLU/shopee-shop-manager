@@ -178,6 +178,43 @@ export function orderLines(oi: EscrowIncome): OrderLine[] {
   });
 }
 
+// ---------------------------------------------------------------- tien da ve
+
+type Row = Record<string, unknown>;
+const isRow = (v: unknown): v is Row => typeof v === "object" && v !== null && !Array.isArray(v);
+const seconds = (v: unknown): number => (v instanceof Date ? Math.floor(v.getTime() / 1000) : Number(v) || 0);
+
+/**
+ * Doc mot trang get_income_detail thanh cac khoan da ve.
+ *
+ * Khac cac API khac, tai lieu Shopee (ca bang tham so lan vi du phan hoi) dat
+ * income_detail_list o cap ngoai cung chu khong trong `response`, va la mot
+ * doi tuong { list, next_page }. Kieu cua SDK ghi la mang nhom
+ * { income_detail_list_item, next_page } trong `response`; doc theo kieu do thi
+ * trang nao cung ra 0 khoan ma khong bao loi. Nhan ca hai dang, dang khac thi
+ * bao loi chu khong coi la khong co tien ve.
+ */
+export function readIncomeDetail(body: unknown): { items: Released[]; next: string } {
+  const top = isRow(body) ? body : {};
+  const detail = top.income_detail_list ?? (isRow(top.response) ? top.response.income_detail_list : undefined);
+  const groups = Array.isArray(detail) ? detail : [detail];
+  const lists = groups.map((g) => (isRow(g) ? (g.list ?? g.income_detail_list_item ?? []) : undefined));
+  if (!lists.every(Array.isArray)) {
+    const fields = Object.keys(top).join(", ") || "trống";
+    throw new Error(`Không đọc được tiền đã về: Shopee trả về income_detail_list không đúng dạng hoặc không có (các trường: ${fields}).`);
+  }
+  const rows = lists.flat().filter(isRow);
+  const page = groups.find(isRow)?.next_page;
+  const cursor = isRow(page) && typeof page.cursor === "string" ? page.cursor : "";
+  return {
+    items: rows
+      .filter((i) => i.order_sn)
+      .map((i) => ({ sn: String(i.order_sn), amount: Number(i.released_amount ?? i.estimated_escrow_amount ?? 0), time: seconds(i.actual_payout_time ?? i.creation_date) })),
+    // Trang rong thi thoi, du Shopee van gui cursor.
+    next: rows.length ? cursor : "",
+  };
+}
+
 // ---------------------------------------------------------------- bao cao
 
 /** Trang thai Shopee da chot tien; con lai la tam tinh. */
@@ -478,7 +515,8 @@ export async function syncFinance(from: string, to: string, deps: SyncDeps, stor
         const page = await deps.released(w.from, w.to, cursor);
         got.push(...page.items);
         await pause();
-        if (!page.next) break;
+        // Cursor tra lai y nhu vua hoi thi hoi tiep cung chi lap lai mai trang do.
+        if (!page.next || page.next === cursor) break;
         cursor = page.next;
       }
     }
