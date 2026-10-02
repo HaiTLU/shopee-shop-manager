@@ -1784,9 +1784,11 @@ async function renderFinance(autoSync = true) {
   ];
 
   const key = `${period.from}:${period.to}`;
+  // Chi tu lay lai khi con ngay chua lay don. Ngay thieu tien da ve, vi khong tinh:
+  // shop chua duoc cap quyen Payment thi hai phan nay lan nao cung loi, se tu lay mai.
   const willSync = autoSync && report.missingDays.length > 0 && !state.autoSynced?.has(key);
   if (report.missingDays.length && !willSync) {
-    parts.push(el("p", { className: "env-note live", textContent: `Còn ${report.missingDays.length} ngày trong kỳ chưa có số liệu. Bấm "Lấy số liệu mới từ Shopee".` }));
+    parts.push(el("p", { className: "env-note live", textContent: `Còn ${report.missingDays.length} ngày trong kỳ chưa có số liệu đơn hàng. Bấm "Lấy số liệu mới từ Shopee".` }));
   }
 
   parts.push(moneySection(report, overview), statementSection(report), dailySection(report), productSection(report), orderSection(report), walletSection(report));
@@ -1825,17 +1827,48 @@ async function runSync(period, button, box) {
   }
 }
 
+const PAYMENT_HINT = 'Bấm "Lấy số liệu mới từ Shopee" để lấy lại; phần này cần ứng dụng được Shopee cấp quyền Payment.';
+
+/**
+ * Tien da ve, vi chua lay du cac ngay trong ky (loi, vd thieu quyen Payment, hoac
+ * tep luu tu ban cu): tong cong duoc chi la mot phan nen khong hien nhu so that.
+ * Tra ve chu hien thay cho so va cau noi da lay duoc bao nhieu ngay; du thi null.
+ * May chu ban cu (chua khoi dong lai sau khi cap nhat) khong gui danh sach nay.
+ */
+function shortfall(report, missingDays) {
+  if (!missingDays?.length) return null;
+  const total = report.daily.length;
+  if (missingDays.length >= total) return { value: "chưa có số liệu", got: "chưa lấy được ngày nào trong kỳ", partial: false };
+  return { value: "chưa đủ số liệu", got: `mới lấy được ${total - missingDays.length}/${total} ngày trong kỳ`, partial: true };
+}
+
+/**
+ * Ghi chu duoi phan chua du ngay. Lan lay vua roi buoc `step` loi thi noi luon ly
+ * do Shopee bao thay cho loi nhac chung, va danh sach loi o muc Tien khong lap lai.
+ */
+function shortfallNote(step, label, short, extra = "") {
+  const reason = state.syncProblems?.find((s) => s.name === step)?.message;
+  const tail = reason ? `Lần lấy vừa rồi Shopee báo: ${reason}` : PAYMENT_HINT;
+  return el("p", { className: "meta err" }, [el("strong", { textContent: `${label}: ` }), `${short.got}${extra}. ${tail}`]);
+}
+
 function moneySection(report, overview) {
   const w = report.wallet;
+  const released = shortfall(report, report.releasedMissingDays);
   const rows = [
     line("Đang chờ Shopee đối soát (tất cả đơn)", overview.error ? "không lấy được" : `${money(overview.pending ?? 0)} ₫`, { neg: Boolean(overview.error) }),
-    line("Đã về ví trong kỳ", `${money(report.releasedInPeriod)} ₫`),
+    line("Đã về ví trong kỳ", released ? released.value : `${money(report.releasedInPeriod)} ₫`, { neg: Boolean(released) }),
     line("Số dư ví Shopee", typeof w.balance === "number" ? `${money(w.balance)} ₫` : "-"),
   ];
   const notes = [];
+  if (released) notes.push(shortfallNote("Tiền đã về", "Tiền đã về", released, released.partial ? `, các ngày đó cộng lại ${money(report.releasedInPeriod)} ₫` : ""));
   if (w.balanceAt) notes.push(el("p", { className: "meta", textContent: `Số dư theo giao dịch ví gần nhất, lúc ${when(w.balanceAt * 1000)}.` }));
   if (overview.error) notes.push(el("p", { className: "meta err", textContent: overview.error }));
-  for (const s of state.syncProblems ?? []) notes.push(el("p", { className: "meta err" }, [el("strong", { textContent: `${s.name}: ` }), s.message]));
+  // Loi cua phan dang thieu ngay da noi trong ghi chu cua phan do (o tren, o muc Vi).
+  const told = new Set([released ? "Tiền đã về" : null, shortfall(report, report.walletMissingDays) ? "Ví Shopee" : null]);
+  for (const s of (state.syncProblems ?? []).filter((p) => !told.has(p.name))) {
+    notes.push(el("p", { className: "meta err" }, [el("strong", { textContent: `${s.name}: ` }), s.message]));
+  }
   return el("section", { className: "fin" }, [el("h3", { textContent: "Tiền" }), el("div", { className: "lines" }, rows), ...notes]);
 }
 
@@ -2101,16 +2134,20 @@ function orderSection(report) {
 
 function walletSection(report) {
   const w = report.wallet;
+  const short = shortfall(report, report.walletMissingDays);
+  const amount = (text) => (short ? short.value : text);
   const section = el("section", { className: "fin" }, [
     el("h3", { textContent: "Ví Shopee" }),
     el("div", { className: "lines" }, [
-      line("Tiền vào ví trong kỳ", `${money(w.inflow)} ₫`),
-      line("Tiền ra khỏi ví trong kỳ", `-${money(w.outflow)} ₫`, { sub: true }),
-      line("Trong đó rút về ngân hàng", `${money(w.withdrawn)} ₫`, { sub: true }),
+      line("Tiền vào ví trong kỳ", amount(`${money(w.inflow)} ₫`), { neg: Boolean(short) }),
+      line("Tiền ra khỏi ví trong kỳ", amount(`-${money(w.outflow)} ₫`), { sub: true, neg: Boolean(short) }),
+      line("Trong đó rút về ngân hàng", amount(`${money(w.withdrawn)} ₫`), { sub: true, neg: Boolean(short) }),
     ]),
   ]);
+  if (short) section.append(shortfallNote("Ví Shopee", "Giao dịch ví", short, short.partial && w.transactions.length ? ", bảng dưới chỉ có giao dịch của các ngày đó" : ""));
   if (!w.transactions.length) {
-    section.append(el("p", { className: "empty", textContent: "Không có giao dịch ví trong kỳ." }));
+    // Chua lay duoc thi khong noi "khong co giao dich": ghi chu tren da noi ro.
+    if (!short) section.append(el("p", { className: "empty", textContent: "Không có giao dịch ví trong kỳ." }));
     return section;
   }
   let limit = 20;
