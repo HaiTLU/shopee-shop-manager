@@ -13,7 +13,7 @@ import { TimeRangeField } from "@congminh1254/shopee-sdk/schemas";
 import { sdk } from "../shopee.js";
 import { readCosts, saveCosts } from "../costs.js";
 import { withRetry } from "../excel.js";
-import { buildReport, daysBetween, financeStore, isDay, syncFinance, type SyncStep, type WalletTx } from "../finance.js";
+import { buildReport, daysBetween, financeStore, isDay, readIncomeDetail, syncFinance, type SyncStep, type WalletTx } from "../finance.js";
 
 export const financeRouter: Router = Router();
 export const costsRouter: Router = Router();
@@ -123,17 +123,8 @@ financeRouter.post("/sync", async (req, res) => {
         .filter((d) => d?.order_sn && d.order_income)
         .map((d) => ({ sn: d!.order_sn!, income: d!.order_income as unknown as Record<string, unknown> }));
     },
-    released: async (dateFrom, dateTo, cursor) => {
-      const r = await retry(() => sdk.payment.getIncomeDetail({ date_from: dateFrom, date_to: dateTo, income_status: 1, cursor, page_size: 50 }));
-      const groups = r.response?.income_detail_list ?? [];
-      const items = groups.flatMap((g) => g.income_detail_list_item ?? []);
-      return {
-        items: items
-          .filter((i) => i.order_sn)
-          .map((i) => ({ sn: i.order_sn!, amount: Number(i.released_amount ?? i.estimated_escrow_amount ?? 0), time: seconds(i.actual_payout_time ?? i.creation_date) })),
-        next: groups[0]?.next_page?.cursor ?? "",
-      };
-    },
+    released: async (dateFrom, dateTo, cursor) =>
+      readIncomeDetail(await retry(() => sdk.payment.getIncomeDetail({ date_from: dateFrom, date_to: dateTo, income_status: 1, cursor, page_size: 50 }))),
     wallet: async (timeFrom, timeTo, page) => {
       const r = await retry(() =>
         sdk.payment.getWalletTransactionList({ page_no: page, page_size: 100, create_time_from: timeFrom, create_time_to: timeTo }),
