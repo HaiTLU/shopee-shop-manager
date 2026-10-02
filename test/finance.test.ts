@@ -199,6 +199,86 @@ test("lay so lieu: chia khoang theo gioi han Shopee, chi hoi tien don can, phan 
   assert.equal(run, 2);
 });
 
+test("ma don: 6 ky tu dau la ngay tao YYMMDD, uoc 12:00 gio Singapore de roi dung ngay o Ha Noi", () => {
+  // Don that: tao 2026-09-13 21:35 gio Ha Noi, ma bat dau 260913.
+  assert.equal(fin.dayKey(fin.snTime("26091308N797HB")!), "2026-09-13");
+  assert.equal(fin.snTime("26091308N797HB"), Date.parse("2026-09-13T04:00:00Z") / 1000);
+  assert.equal(fin.snTime("261399ABCDEF"), undefined, "thang 13 khong co that");
+  assert.equal(fin.snTime("S1"), undefined);
+  assert.equal(fin.orderTime({ sn: "26091308N797HB", createTime: t("2026-09-13T14:35:03Z") }), t("2026-09-13T14:35:03Z"), "co ngay that thi dung ngay that");
+  assert.equal(fin.orderTime({ sn: "26091308N797HB", createTime: 0 }), fin.snTime("26091308N797HB"));
+});
+
+test("bao cao: don chua co ngay tao van duoc tinh theo ngay tren ma don", () => {
+  const data = sampleData();
+  data.orders["260911ABCDEF01"] = { sn: "260911ABCDEF01", status: "COMPLETED", income: { ...sampleData().orders.A!.income! } };
+  data.orders["260911ABCDEF02"] = { sn: "260911ABCDEF02", status: "COMPLETED", createTime: 0, income: { ...sampleData().orders.A!.income! } };
+  data.orders["260830ABCDEF03"] = { sn: "260830ABCDEF03", status: "COMPLETED", income: { ...sampleData().orders.A!.income! } }; // ngoai ky
+  const r = fin.buildReport(data, {}, "2026-09-10", "2026-09-12");
+  assert.equal(r.counts.orders, 4, "A, B va hai don chi co ma");
+  assert.deepEqual(r.daily.map((d) => [d.day, d.orders]), [["2026-09-10", 1], ["2026-09-11", 3], ["2026-09-12", 0]]);
+});
+
+test("Shopee: danh sach tham so GET gop thanh mot chuoi noi dau phay", async () => {
+  const { commaList } = await import("../src/shopee.js");
+  assert.deepEqual(commaList(["A", "B", "C"]), ["A,B,C"]);
+  assert.deepEqual(commaList([1, 2]), ["1,2"]);
+  assert.deepEqual(commaList([]), []);
+});
+
+test("lay so lieu: Shopee tra thieu ngay tao thi khong luu 0, lan sau hoi lai; don co ngay 0 hoac thieu duoc hoi lai", async () => {
+  // Kho rieng trong bo nho, khong dung chung tep voi cac kiem thu khac.
+  let saved: import("../src/finance.js").FinanceData = {
+    orders: {
+      OLD0: { sn: "OLD0", status: "COMPLETED", createTime: 0 },
+      OLDX: { sn: "OLDX", status: "COMPLETED" },
+      GOOD: { sn: "GOOD", status: "COMPLETED", createTime: t("2026-09-02T03:00:00Z") },
+    },
+    wallet: [],
+    released: [],
+    syncedDays: {},
+  };
+  const store = {
+    file: "(bo nho)",
+    read: async () => structuredClone(saved),
+    update: async (mutate: (d: typeof saved) => void) => {
+      const d = structuredClone(saved);
+      mutate(d);
+      saved = d;
+      return d;
+    },
+  };
+  const asked: string[][] = [];
+  // Giong loi that: hoi ca lo nhung Shopee chi tra don dau tien.
+  let firstOnly = true;
+  const deps: import("../src/finance.js").SyncDeps = {
+    listOrders: async () => ({ orders: ["OLD0", "OLDX", "GOOD", "NEW1"].map((sn) => ({ sn, status: "COMPLETED" })), more: false, next: "" }),
+    orderDetails: async (sns) => {
+      asked.push(sns);
+      return (firstOnly ? sns.slice(0, 1) : sns).map((sn) => ({ sn, status: "COMPLETED", createTime: t("2026-09-03T03:00:00Z") }));
+    },
+    escrowBatch: async () => [],
+    released: async () => ({ items: [], next: "" }),
+    wallet: async () => ({ items: [], more: false }),
+    sleep: async () => {},
+    progress: () => {},
+  };
+
+  const steps = await fin.syncFinance("2026-09-01", "2026-09-05", deps, store);
+  assert.deepEqual(asked, [["OLD0", "OLDX", "NEW1"]], "don co ngay 0 hoac thieu duoc hoi lai, don co ngay that thi khong");
+  assert.equal(saved.orders.OLD0!.createTime, t("2026-09-03T03:00:00Z"));
+  assert.equal(saved.orders.OLDX!.createTime, undefined, "khong tra ve thi de trong, khong ghi 0");
+  assert.equal(saved.orders.NEW1!.createTime, undefined);
+  assert.equal(saved.orders.GOOD!.createTime, t("2026-09-02T03:00:00Z"));
+  assert.match(steps[0]!.message, /2 đơn Shopee chưa trả ngày tạo/);
+
+  asked.length = 0;
+  firstOnly = false;
+  await fin.syncFinance("2026-09-01", "2026-09-05", deps, store);
+  assert.deepEqual(asked, [["OLDX", "NEW1"]], "lan sau hoi lai dung cac don con thieu");
+  assert.equal(saved.orders.NEW1!.createTime, t("2026-09-03T03:00:00Z"));
+});
+
 test("gia von: luu, xoa, tu choi so am", async () => {
   await saveCosts([{ itemId: 5, modelId: 0, cost: 12000 }, { itemId: 6, modelId: 61, cost: 8000 }]);
   await saveCosts([{ itemId: 6, modelId: 61, cost: null }]);

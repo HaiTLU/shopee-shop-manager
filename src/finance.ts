@@ -110,6 +110,25 @@ export function isDay(text: unknown): text is string {
   return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === text;
 }
 
+/**
+ * Ngay tao uoc tinh tu ma don: 6 ky tu dau la YYMMDD theo gio Singapore.
+ * Tra ve 12:00 trua gio Singapore (11:00 gio Ha Noi, van cung ngay) de don
+ * roi dung ngay ghi tren ma; lay 00:00 thi sang gio Ha Noi thanh hom truoc.
+ * Chi dung khi chua co ngay tao that; lech toi da mot ngay voi don gan nua dem.
+ */
+export function snTime(sn: string): number | undefined {
+  const m = /^(\d{2})(\d{2})(\d{2})/.exec(sn);
+  if (!m) return undefined;
+  const day = `20${m[1]}-${m[2]}-${m[3]}`;
+  if (!isDay(day)) return undefined;
+  return Date.parse(`${day}T12:00:00+08:00`) / 1000;
+}
+
+/** Ngay tao cua don: ngay that tu Shopee, thieu thi uoc tu ma don. */
+export function orderTime(o: Pick<OrderRecord, "sn" | "createTime">): number | undefined {
+  return o.createTime || snTime(o.sn);
+}
+
 /** Danh sach ngay tu from den to (tinh ca hai dau). */
 export function daysBetween(from: string, to: string): string[] {
   const out: string[] = [];
@@ -282,7 +301,8 @@ export function buildReport(data: FinanceData, costs: Record<string, number>, fr
   const orders: ReportOrder[] = [];
 
   for (const o of Object.values(data.orders)) {
-    if (!o.createTime || o.createTime < start || o.createTime >= end) continue;
+    const time = orderTime(o);
+    if (!time || time < start || time >= end) continue;
     if (UNPAID.has(o.status)) {
       counts.unpaid++;
       continue;
@@ -305,7 +325,7 @@ export function buildReport(data: FinanceData, costs: Record<string, number>, fr
     const lines = o.lines ?? [];
     const missingCost = !lines.length || lines.some((l) => costs[costKey(l.itemId, l.modelId)] === undefined);
     const cogs = missingCost ? undefined : lines.reduce((sum, l) => sum + l.qty * costs[costKey(l.itemId, l.modelId)]!, 0);
-    const day = dayKey(o.createTime);
+    const day = dayKey(time);
     const d = daily.get(day)!;
     d.orders++;
     d.goods += o.income.goods;
@@ -431,13 +451,19 @@ export async function syncFinance(from: string, to: string, deps: SyncDeps, stor
       }
     }
 
-    // Don moi: can ngay tao.
+    // Don chua co ngay tao that (don moi, hoac lan truoc Shopee khong tra ve / tra 0).
     const fresh = [...found.keys()].filter((sn) => !data.orders[sn]?.createTime);
+    let noTime = 0;
     for (let i = 0; i < fresh.length; i += BATCH) {
       deps.progress(`Đang lấy ngày tạo đơn ${Math.min(i + BATCH, fresh.length)}/${fresh.length}...`);
-      for (const d of await deps.orderDetails(fresh.slice(i, i + BATCH))) {
-        data.orders[d.sn] = { ...data.orders[d.sn], sn: d.sn, status: d.status, createTime: d.createTime };
+      const batch = fresh.slice(i, i + BATCH);
+      const got = new Set<string>();
+      for (const d of await deps.orderDetails(batch)) {
+        // Khong luu 0: de trong thi lan sau hoi lai, bao cao tam uoc ngay tu ma don.
+        if (d.createTime > 0) got.add(d.sn);
+        data.orders[d.sn] = { ...data.orders[d.sn], sn: d.sn, status: d.status, ...(d.createTime > 0 ? { createTime: d.createTime } : {}) };
       }
+      noTime += batch.filter((sn) => !got.has(sn)).length;
       await pause();
     }
     for (const [sn, status] of found) data.orders[sn] = { ...data.orders[sn], sn, status };
@@ -463,7 +489,8 @@ export async function syncFinance(from: string, to: string, deps: SyncDeps, stor
       await pause();
     }
     ordersOk = true;
-    steps.push({ name: "Đơn hàng và tiền từng đơn", ok: true, message: `${found.size} đơn, cập nhật tiền ${needIncome.length} đơn.` });
+    const note = noTime ? ` ${noTime} đơn Shopee chưa trả ngày tạo, tạm tính theo mã đơn.` : "";
+    steps.push({ name: "Đơn hàng và tiền từng đơn", ok: true, message: `${found.size} đơn, cập nhật tiền ${needIncome.length} đơn.${note}` });
   } catch (error) {
     steps.push({ name: "Đơn hàng và tiền từng đơn", ok: false, message: (error as Error).message });
   }

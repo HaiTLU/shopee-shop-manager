@@ -10,7 +10,7 @@
 import crypto from "node:crypto";
 import { Router } from "express";
 import { TimeRangeField } from "@congminh1254/shopee-sdk/schemas";
-import { sdk } from "../shopee.js";
+import { commaList, sdk } from "../shopee.js";
 import { readCosts, saveCosts } from "../costs.js";
 import { withRetry } from "../excel.js";
 import { buildReport, daysBetween, financeStore, isDay, syncFinance, type SyncStep, type WalletTx } from "../finance.js";
@@ -111,7 +111,7 @@ financeRouter.post("/sync", async (req, res) => {
       };
     },
     orderDetails: async (sns) => {
-      const r = await retry(() => sdk.order.getOrderDetail({ order_sn_list: sns }));
+      const r = await retry(() => sdk.order.getOrderDetail({ order_sn_list: commaList(sns) }));
       return (r.response?.order_list ?? [])
         .filter((o) => o.order_sn)
         .map((o) => ({ sn: o.order_sn!, status: String(o.order_status ?? ""), createTime: seconds(o.create_time) }));
